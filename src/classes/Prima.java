@@ -1,7 +1,6 @@
 package classes;
 
 import javax.swing.*;
-import javax.swing.plaf.LayerUI;
 import java.awt.*;
 import java.util.HashMap;
 
@@ -34,12 +33,10 @@ public class Prima {
         f.setMinimumSize(new Dimension(801, 601));
         f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        VisualScene panel = new VisualScene();
-        LayerUI<VisualScene> layerUI = new GraphView(prepareInout());
-        ((GraphView) layerUI).setSolvation("ABD");
-        JLayer<VisualScene> jLayer = new JLayer<>(panel, layerUI);
+        VisualScene panel = new VisualScene(prepareInout());
+        panel.setSolvation("ABD");
 
-        f.add(jLayer);
+        f.add(panel);
         f.setVisible(true);
         f.pack();
     }
