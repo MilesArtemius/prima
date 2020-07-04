@@ -5,13 +5,12 @@ import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
-import java.util.Collection;
 
 public class Graph {
 
 
     private HashMap<String, Node> nodes = new HashMap<String, Node>();
-    private LinkedList<Ark> arks = new LinkedList<Ark>();
+    private LinkedList<Ark> arks = new LinkedList<Ark>(); // я бы предложил создавать массив в момент вызова getArks(), чтобы избежать хранения лишнего, хотя так быстрее
 
     public Node getNode(String name){
 
@@ -85,42 +84,33 @@ public class Graph {
     }
 
     public ArrayList<Node> getNodes() {
-        //новая часть для тестов
-        addNode(new Point2D.Double(10, 20), "1");
-        addNode(new Point2D.Double(40, 60), "2");
-        addNode(new Point2D.Double(100, 200), "3");
-        addNode(new Point2D.Double(278, 347), "4");
+        if (nodes.isEmpty()) return null;
+        else return new ArrayList<Node>(nodes.values());
 
-        if (nodes.isEmpty())
-            return null;
-
-        ArrayList<Node> nodesArr = new ArrayList<Node>(nodes.values());
         /* старая часть для тестов
-        //ArrayList<Node> nodesArr = new ArrayList<>();
-        //nodesArr.add(new Node(new Point2D.Double(1, 2), "1"));
-        //nodesArr.add(new Node(new Point2D.Double(10, 20), "2"));
-        //nodesArr.add(new Node(new Point2D.Double(100, 200), "3"));
-        //nodesArr.add(new Node(new Point2D.Double(278, 347), "4"));
+        ArrayList<Node> nodesArr = new ArrayList<Node>(nodes.values());
+        ArrayList<Node> nodesArr = new ArrayList<>();
+        nodesArr.add(new Node(new Point2D.Double(1, 2), "1"));
+        nodesArr.add(new Node(new Point2D.Double(10, 20), "2"));
+        nodesArr.add(new Node(new Point2D.Double(100, 200), "3"));
+        nodesArr.add(new Node(new Point2D.Double(278, 347), "4"));
+        return nodesArr;
 
          */
-        return nodesArr;
     }
 
     public List<Ark> getArks() {
+        return arks;
+
         /* старая часть для тестов
         LinkedList<Ark> arks = new LinkedList<>();
         arks.add(new Ark(getNodes().get(0), getNodes().get(1), 10.0));
         arks.add(new Ark(getNodes().get(2), getNodes().get(3), 27.5));
 
          */
-
-        //новая часть для тестов
-        addArk("1", "2", 8);
-        addArk("3", "4", 8);
-        return arks;
     }
 
-    private void setPosition(int total, int number) {//для чего?
+    private void setPosition(int total, int number) {//для чего? этот метод позволяет расставить начальные позиции для узлов, если они не заданы. если у нас создание узлов только по щелчку, можешь удалять.
         double ang = 360.0 / total * number;
         double trueAng = Math.toRadians(90) - Math.toRadians(ang);
         int x = 401 + (int) (Math.cos(trueAng) * 200);
