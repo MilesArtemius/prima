@@ -15,7 +15,10 @@ public class Graph {
     }
 
     public List<Ark> getArks() {
-        return new LinkedList<>();
+        LinkedList<Ark> arks = new LinkedList<>();
+        arks.add(new Ark(getNodes().get(0), getNodes().get(1), 10.0));
+        arks.add(new Ark(getNodes().get(2), getNodes().get(3), 27.5));
+        return arks;
     }
 
     private void setPosition(int total, int number) {

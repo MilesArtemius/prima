@@ -13,7 +13,8 @@ public class NodeShape extends Ellipse2D.Double {
     Node node;
 
     public NodeShape(Node node, int sizeModifier) {
-        super(node.getPosition().getX(), node.getPosition().getY(), gap * sizeModifier, gap * sizeModifier);
+        super(node.getPosition().getX() - (gap * sizeModifier) / 2.0, node.getPosition().getY() - (gap * sizeModifier) / 2.0,
+                gap * sizeModifier, gap * sizeModifier);
         this.node = node;
         adapter = new MouseAdapter() {
             @Override

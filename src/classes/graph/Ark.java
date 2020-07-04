@@ -2,7 +2,7 @@ package classes.graph;
 
 public class Ark {
     private Node start, end;
-    private boolean isTargeted;
+    double weight;
 
     public void setStart(Node start, Node end) {
         this.start = start;
@@ -17,11 +17,13 @@ public class Ark {
         return end;
     }
 
-    public boolean isTargeted() {
-        return isTargeted;
+    public double getWeight() {
+        return weight;
     }
 
-    public void setTargeted(boolean targeted) {
-        isTargeted = targeted;
+    public Ark(Node start, Node end, double weight) {
+        this.start = start;
+        this.end = end;
+        this.weight = weight;
     }
 }

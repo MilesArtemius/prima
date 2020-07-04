@@ -52,6 +52,6 @@ public class GraphShape extends JPanel {
     }
 
     private int getSizeModifier() {
-        return 10;
+        return 2;
     }
 }
