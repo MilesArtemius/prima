@@ -3,10 +3,9 @@ package classes.graph;
 public class Ark {
 
     private final Node start, end;
-    private final int weight;
-    //private boolean isTargeted;
+    private final double weight;
 
-    public Ark(Node start, Node end, int weight){
+    public Ark(Node start, Node end, double weight){
         this.start = start;
         this.end = end;
         this.weight = weight;
@@ -21,7 +20,7 @@ public class Ark {
         return end;
     }
 
-    public int getWeight(){
+    public double getWeight(){
 
         return weight;
     }
@@ -32,12 +31,4 @@ public class Ark {
     // }
 
 
-//что это
-    //public boolean isTargeted() {
-    //    return isTargeted;
-    //}
-
-    //public void setTargeted(boolean targeted) {
-    //    isTargeted = targeted;
-    // }
 }
