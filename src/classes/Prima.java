@@ -1,5 +1,8 @@
 package classes;
 
+import classes.graph.Graph;
+import classes.shapes.GraphShape;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
@@ -29,14 +32,17 @@ public class Prima {
     }
 
     public static void main(String[] args) {
-        JFrame f = new JFrame("Graph");
+        JFrame f = new JFrame("GraphShape");
         f.setMinimumSize(new Dimension(801, 601));
         f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        VisualScene panel = new VisualScene(prepareInout());
-        panel.setSolvation("ABD");
+        /*VisualScene panel = new VisualScene(prepareInout());
+        panel.setSolvation("ABD");*/
 
-        f.add(panel);
+        Graph graph = new Graph();
+        GraphShape shape = new GraphShape(graph);
+
+        f.add(shape);
         f.setVisible(true);
         f.pack();
     }

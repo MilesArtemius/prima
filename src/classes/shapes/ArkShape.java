@@ -1,25 +1,25 @@
 package classes.shapes;
 
+import classes.graph.Ark;
+
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
 
-public class Node extends Ellipse2D.Double {
-    private static final int gap = 10;
+public class ArkShape extends Polygon {
+    private static final int gap = 3;
 
     MouseAdapter adapter;
-    String name;
+    Ark ark;
 
-    public Node(Point2D center, String name, int sizeModifier) {
-        super(center.getX(), center.getY(), gap * sizeModifier, gap * sizeModifier);
-        this.name = name;
-        // adapter = null;
+    public ArkShape(Ark ark, int sizeModifier) {
+        addPoint((int) ark.getStart().getPosition().getX(), (int) ark.getStart().getPosition().getY());
+        addPoint((int) ark.getEnd().getPosition().getX(), (int) ark.getEnd().getPosition().getY());
         adapter = new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                System.out.println("Mouse clicked on " + name);
+                System.out.println("Mouse clicked on " + ark.getStart().getName() + " - > " + ark.getEnd().getName());
             }
         };
     }
@@ -31,6 +31,10 @@ public class Node extends Ellipse2D.Double {
     public void resetOnClickListener() {
         this.adapter = null;
     }
+
+
+
+
 
 
 
