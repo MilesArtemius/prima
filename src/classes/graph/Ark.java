@@ -1,12 +1,16 @@
 package classes.graph;
 
 public class Ark {
-    private Node start, end;
-    double weight;
 
-    public void setStart(Node start, Node end) {
+    private final Node start, end;
+    private final int weight;
+    //private boolean isTargeted;
+
+    public Ark(Node start, Node end, int weight){
         this.start = start;
         this.end = end;
+        this.weight = weight;
+
     }
 
     public Node getStart() {
@@ -17,13 +21,23 @@ public class Ark {
         return end;
     }
 
-    public double getWeight() {
+    public int getWeight(){
+
         return weight;
     }
+/////////////////////////////////////
+    //public void setStart(Node start, Node end) {
+    //    this.start = start;
+    //    this.end = end;
+    // }
 
-    public Ark(Node start, Node end, double weight) {
-        this.start = start;
-        this.end = end;
-        this.weight = weight;
-    }
+
+//что это
+    //public boolean isTargeted() {
+    //    return isTargeted;
+    //}
+
+    //public void setTargeted(boolean targeted) {
+    //    isTargeted = targeted;
+    // }
 }
