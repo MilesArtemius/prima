@@ -24,7 +24,7 @@ public class Prima {
 
     public static void main(String[] args) {
         JFrame f = new JFrame("GraphShape");
-        f.setMinimumSize(new Dimension(801, 601));
+        f.setMinimumSize(new Dimension(1200, 900));
         f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         GraphShape shape = new GraphShape(prepareInput());
