@@ -11,13 +11,14 @@ public class Prima {
     static Graph prepareInput() {
         Graph graph = new Graph();
 
-        graph.addNode(new Point2D.Double(10, 20), "1");
-        graph.addNode(new Point2D.Double(40, 60), "2");
-        graph.addNode(new Point2D.Double(100, 200), "3");
-        graph.addNode(new Point2D.Double(278, 347), "4");
+        graph.addNode(new Point2D.Double(200, 400), "A");
+        graph.addNode(new Point2D.Double(800, 400), "B");
+        graph.addNode(new Point2D.Double(500, 700), "C");
+        graph.addNode(new Point2D.Double(500, 100), "D");
 
-        graph.addArk("1", "2", 8);
-        graph.addArk("3", "4", 8);
+        graph.addArk("A", "B", 8);
+        graph.addArk("B", "C", 8);
+        graph.addArk("C", "D", 8);
 
         return graph;
     }

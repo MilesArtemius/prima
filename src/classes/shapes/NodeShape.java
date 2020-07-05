@@ -3,6 +3,7 @@ package classes.shapes;
 import classes.graph.Node;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -10,7 +11,8 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 
 public class NodeShape extends Ellipse2D.Double implements GraphPart {
-    private static final int gap = 5;
+    private static final int gap = 7;
+    private static final int stroke = 2;
 
     Node node;
 
@@ -19,10 +21,26 @@ public class NodeShape extends Ellipse2D.Double implements GraphPart {
     }
 
     @Override
-    public void invalidate(GraphShape parent) {
+    public void invalidate(GraphShape parent, Graphics2D graphics) {
         Point2D position = node.getPosition();
         double diameter = gap * parent.getSizeModifier();
+
         setFrame(position.getX() - diameter/2, position.getY() - diameter/2, diameter, diameter);
+
+        Paint paint = graphics.getPaint();
+        graphics.setPaint(Color.DARK_GRAY);
+        graphics.fill(this);
+
+        setFrame(getX() + stroke, getY() + stroke, getWidth() - 2*stroke, getHeight() - 2*stroke);
+
+        graphics.setPaint(Color.yellow);
+        graphics.fill(this);
+
+        graphics.setPaint(Color.DARK_GRAY);
+        double textRadius = Math.sqrt(Math.pow(diameter / 2, 2) / 2);
+        GraphShape.drawCenteredString(graphics, node.getName(), position.getX() - textRadius, position.getY() - textRadius, textRadius * 2, textRadius * 2);
+
+        graphics.setPaint(paint);
     }
 
     @Override
@@ -31,7 +49,7 @@ public class NodeShape extends Ellipse2D.Double implements GraphPart {
         if (e.isPopupTrigger()) {
             MenuPopUp popUp = new MenuPopUp(parent);
             popUp.show(e.getComponent(), e.getX(), e.getY());
-        }
+        } else parent.registerMoving(this.node);
         return true;
     }
 
@@ -42,7 +60,14 @@ public class NodeShape extends Ellipse2D.Double implements GraphPart {
             MenuPopUp popUp = new MenuPopUp(parent);
             popUp.show(e.getComponent(), e.getX(), e.getY());
         }
+        parent.unRegisterMoving(this.node);
         return true;
+    }
+
+    public void movedMouse(GraphShape parent, MouseEvent e) {
+        System.out.println("Node " + node.getName() + " moved to (" + e.getX() + ", " + e.getY() + ")");
+        node.setPosition(e.getPoint());
+        parent.repaint();
     }
 
 

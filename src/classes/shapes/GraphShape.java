@@ -11,22 +11,23 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.Random;
-import java.util.function.Predicate;
 
 public class GraphShape extends JPanel {
-    Graph graph;
-    Graph step;
+    private Graph graph;
+    private Graph step;
     private LinkedList<NodeShape> nodes;
     private LinkedList<ArkShape> arks;
+    private Node movingNode;
 
     public GraphShape(Graph graph) {
         this.graph = graph;
         nodes = new LinkedList<>();
         arks = new LinkedList<>();
 
-        addMouseListener(new MouseAdapter() {
+        MouseAdapter adapter = new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 System.out.println("Mouse pressed");
@@ -48,7 +49,29 @@ public class GraphShape extends JPanel {
                     popUp.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
-        });
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (movingNode != null) for (NodeShape shape: nodes) if (shape.node == movingNode) shape.movedMouse(GraphShape.this, e);
+            }
+        };
+
+        addMouseListener(adapter);
+        addMouseMotionListener(adapter);
+    }
+
+    public void registerMoving(Node node) {
+        if (movingNode == null) {
+            System.out.println("New node moving: " + node.getName());
+            movingNode = node;
+        }
+    }
+
+    public void unRegisterMoving(Node node) {
+        if (movingNode == node) {
+            System.out.println("Node stopped: " + node.getName());
+            movingNode = null;
+        }
     }
 
 
@@ -69,14 +92,9 @@ public class GraphShape extends JPanel {
         refillGraph();
 
         Graphics2D g2d = (Graphics2D) graphics;
-        for (ArkShape s : arks) {
-            s.invalidate(this);
-            g2d.draw(s);
-        }
-        for (NodeShape s : nodes) {
-            s.invalidate(this);
-            g2d.draw(s);
-        }
+        g2d.setPaint(Color.DARK_GRAY);
+        for (ArkShape s : arks) s.invalidate(this, g2d);
+        for (NodeShape s : nodes) s.invalidate(this, g2d);
     }
 
     public int getSizeModifier() {
@@ -85,6 +103,21 @@ public class GraphShape extends JPanel {
 
     public Graph getGraph() {
         return graph;
+    }
+
+
+
+    public static void drawCenteredString(Graphics2D g, String string, double x, double y, double width, double height) {
+        Rectangle2D fontMetrics = g.getFontMetrics(g.getFont()).getStringBounds(string, g);
+        double mod = (fontMetrics.getWidth() > fontMetrics.getHeight()) ? (width / fontMetrics.getWidth()) : (height / fontMetrics.getHeight());
+        double fontSize = mod * g.getFont().getSize();
+        Font font = g.getFont().deriveFont((float) fontSize);
+
+        g.setFont(font);
+        FontMetrics metrics = g.getFontMetrics(font);
+        x += (width - metrics.stringWidth(string)) / 2;
+        y += ((height - metrics.getHeight()) / 2) + metrics.getAscent();
+        g.drawString(string, (float) x, (float) y);
     }
 
 
