@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
@@ -22,12 +23,19 @@ public class GraphShape extends JPanel {
     private Graph graph;
     private LinkedList<NodeShape> nodes;
     private LinkedList<ArkShape> arks;
+
+    private Point2D movingMousePos;
+    private Point2D transform;
+
     private Node movingNode;
 
     public GraphShape() {
         graph = new Graph();
         nodes = new LinkedList<>();
         arks = new LinkedList<>();
+
+        movingMousePos = new Point2D.Double(0, 0);
+        transform = new Point2D.Double(0, 0);
 
         setBackground(Settings.getColor("graph_shape_background_color"));
 
@@ -57,6 +65,12 @@ public class GraphShape extends JPanel {
             @Override
             public void mouseDragged(MouseEvent e) { // TODO: add View drag.
                 if (movingNode != null) for (NodeShape shape: nodes) if (shape.getNode() == movingNode) shape.movedMouse(GraphShape.this, e);
+                else {
+                    double x = movingMousePos.getX() - e.getX();
+                    double y = movingMousePos.getY() - e.getY();
+                    transform.setLocation(transform.getX() + x, transform.getY() + y);
+                    movingMousePos.setLocation(e.getPoint());
+                }
             }
         };
 
@@ -98,6 +112,10 @@ public class GraphShape extends JPanel {
         arks.clear();
 
         Graphics2D g2d = (Graphics2D) graphics;
+        AffineTransform affine = g2d.getTransform();
+        affine.translate(transform.getX(), transform.getY());
+        g2d.setTransform(affine);
+
         for (Ark ark: graph.getArks()) arks.push(new ArkShape(ark, this, g2d));
         for (Node node: graph.getNodes()) nodes.push(new NodeShape(node, this, g2d));
     }
