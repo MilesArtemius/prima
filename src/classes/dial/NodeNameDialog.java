@@ -10,7 +10,8 @@ import java.awt.event.ActionListener;
 public class NodeNameDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
-    private JTextField textField1;
+    private JTextField nodeName;
+    private JPanel contentPanel;
     private ActionListener listener;
 
     public NodeNameDialog(Window owner, String title) {
@@ -20,7 +21,7 @@ public class NodeNameDialog extends JDialog {
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
-        textField1.setToolTipText(Settings.getString("create_node_dialog_prompt"));
+        nodeName.setToolTipText(Settings.getString("create_node_dialog_prompt"));
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -34,6 +35,6 @@ public class NodeNameDialog extends JDialog {
     }
 
     public String getResult() {
-        return textField1.getText();
+        return nodeName.getText();
     }
 }

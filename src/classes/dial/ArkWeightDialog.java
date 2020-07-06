@@ -9,7 +9,8 @@ import java.text.ParseException;
 public class ArkWeightDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
-    private JSpinner spinner1;
+    private JSpinner weightSpinner;
+    private JPanel contentPanel;
     private ActionListener listener;
 
     public ArkWeightDialog(Window owner, String title) {
@@ -19,7 +20,7 @@ public class ArkWeightDialog extends JDialog {
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
-        spinner1.setModel(new SpinnerNumberModel(0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1));
+        weightSpinner.setModel(new SpinnerNumberModel(0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1));
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -33,7 +34,7 @@ public class ArkWeightDialog extends JDialog {
     }
 
     public int getResult() throws ParseException {
-        spinner1.commitEdit();
-        return (Integer) spinner1.getValue();
+        weightSpinner.commitEdit();
+        return (Integer) weightSpinner.getValue();
     }
 }

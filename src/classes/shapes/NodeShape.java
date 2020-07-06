@@ -16,15 +16,17 @@ import java.text.ParseException;
 
 public class NodeShape extends Ellipse2D.Double {
     private Node node;
+    private double radius;
+
 
     public NodeShape(Node node, GraphShape parent, Graphics2D graphics) {
         this.node = node;
 
         Point2D position = node.getPosition();
-        double diameter = Settings.getLong("node_shape_gap") * parent.getSizeModifier();
+        radius = Settings.getLong("node_shape_gap") * parent.getSizeModifier() / 2.0;
         int stroke = Settings.getInt("node_shape_stroke");
 
-        setFrame(position.getX() - diameter/2, position.getY() - diameter/2, diameter, diameter);
+        setFrame(position.getX() - radius, position.getY() - radius, radius*2, radius*2);
 
         graphics.setPaint(node.isHidden() ? Settings.getColor("node_shape_stroke_hidden_color") : Settings.getColor("node_shape_stroke_color"));
         graphics.fill(this);
@@ -35,7 +37,7 @@ public class NodeShape extends Ellipse2D.Double {
         graphics.fill(this);
 
         graphics.setPaint(node.isHidden() ? Settings.getColor("node_shape_text_hidden_color") : Settings.getColor("node_shape_text_color"));
-        double textRadius = Math.sqrt(Math.pow(diameter / 2, 2) / 2);
+        double textRadius = Math.sqrt(Math.pow(radius, 2) / 2);
         GraphShape.drawCenteredString(graphics, node.getName(), position.getX() - textRadius, position.getY() - textRadius, textRadius * 2, textRadius * 2);
     }
 
@@ -65,7 +67,12 @@ public class NodeShape extends Ellipse2D.Double {
     }
 
     public void movedMouse(GraphShape parent, MouseEvent e) {
-        node.setPosition(e.getPoint());
+        Point2D.Double point = new Point2D.Double();
+        if (e.getX() > radius) point.x = e.getX();
+        else point.x = radius;
+        if (e.getY() > radius) point.y = e.getY();
+        else point.y = radius;
+        node.setPosition(point);
         parent.repaint();
     }
 

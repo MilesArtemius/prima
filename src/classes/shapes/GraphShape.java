@@ -29,6 +29,8 @@ public class GraphShape extends JPanel {
         nodes = new LinkedList<>();
         arks = new LinkedList<>();
 
+        setBackground(Settings.getColor("graph_shape_background_color"));
+
         MouseAdapter adapter = new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -53,7 +55,7 @@ public class GraphShape extends JPanel {
             }
 
             @Override
-            public void mouseDragged(MouseEvent e) {
+            public void mouseDragged(MouseEvent e) { // TODO: add View drag.
                 if (movingNode != null) for (NodeShape shape: nodes) if (shape.getNode() == movingNode) shape.movedMouse(GraphShape.this, e);
             }
         };

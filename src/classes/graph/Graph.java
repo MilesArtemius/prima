@@ -84,8 +84,7 @@ public class Graph {
     }
 
     public ArrayList<Node> getNodes() {
-        if (nodes.isEmpty()) return null;
-        else return new ArrayList<Node>(nodes.values());
+        return new ArrayList<Node>(nodes.values());
 
         /* старая часть для тестов
         ArrayList<Node> nodesArr = new ArrayList<Node>(nodes.values());
