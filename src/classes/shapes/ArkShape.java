@@ -81,21 +81,17 @@ public class ArkShape extends Polygon {
 
 
 
-    public boolean pressMouse(GraphShape parent, MouseEvent e) {
+    public boolean pressMouse(GraphShape parent, MouseEvent e, Point2D absolute) {
         Log.in().say("Mouse pressed on ark '", ark.getStart(), "' - > '", ark.getEnd(), "'");
-        if (e.isPopupTrigger()) {
+        if (SwingUtilities.isRightMouseButton(e)) {
             MenuPopUp popUp = new MenuPopUp(parent);
-            popUp.show(e.getComponent(), e.getX(), e.getY());
+            popUp.show(e.getComponent(), (int) absolute.getX(), (int) absolute.getY());
         }
         return true;
     }
 
-    public boolean releaseMouse(GraphShape parent, MouseEvent e) {
+    public boolean releaseMouse(GraphShape parent, MouseEvent e, Point2D absolute) {
         Log.in().say("Mouse released from '", ark.getStart(), "' - > '", ark.getEnd(), "'");
-        if (e.isPopupTrigger()) {
-            MenuPopUp popUp = new MenuPopUp(parent);
-            popUp.show(e.getComponent(), e.getX(), e.getY());
-        }
         return true;
     }
 

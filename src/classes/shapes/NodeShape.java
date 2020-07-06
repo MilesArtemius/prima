@@ -47,26 +47,22 @@ public class NodeShape extends Ellipse2D.Double {
 
 
 
-    public boolean pressMouse(GraphShape parent, MouseEvent e) {
+    public boolean pressMouse(GraphShape parent, MouseEvent e, Point2D absolute) {
         Log.in().say("Mouse pressed on node '", node, "'");
-        if (e.isPopupTrigger()) {
+        if (SwingUtilities.isRightMouseButton(e)) {
             MenuPopUp popUp = new MenuPopUp(parent);
-            popUp.show(e.getComponent(), e.getX(), e.getY());
+            popUp.show(e.getComponent(), (int) absolute.getX(), (int) absolute.getY());
         } else parent.registerMoving(this.node, e);
         return true;
     }
 
-    public boolean releaseMouse(GraphShape parent, MouseEvent e) {
+    public boolean releaseMouse(GraphShape parent, MouseEvent e, Point2D absolute) {
         Log.in().say("Mouse released from node '", node, "'");
-        if (e.isPopupTrigger()) {
-            MenuPopUp popUp = new MenuPopUp(parent);
-            popUp.show(e.getComponent(), e.getX(), e.getY());
-        }
-        parent.unRegisterMoving(this.node, e);
+        if (SwingUtilities.isLeftMouseButton(e)) parent.unRegisterMoving(this.node, e);
         return true;
     }
 
-    public void movedMouse(GraphShape parent, MouseEvent e) {
+    public void movedMouse(GraphShape parent, MouseEvent e, Point2D absolute) {
         node.setPosition(e.getPoint());
         parent.repaint();
     }

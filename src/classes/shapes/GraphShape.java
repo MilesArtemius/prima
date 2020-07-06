@@ -38,46 +38,54 @@ public class GraphShape extends JPanel {
 
         setBackground(Settings.getColor("graph_shape_background_color"));
 
-        MouseAdapter adapter = new MouseAdapter() {
+        MouseAdapter adapter = new MouseAdapter() { // Fix cursor issues!!
             @Override
             public void mousePressed(MouseEvent e) {
+                Point2D absolute = e.getPoint();
                 e.translatePoint((int) -transform.getX(), (int) -transform.getY());
+
                 Log.in().say("Mouse pressed at (", e.getX(), ", ", e.getY(), ")");
-                for (NodeShape node: nodes) if (node.contains(e.getPoint()) && node.pressMouse(GraphShape.this, e)) return;
-                for (ArkShape ark: arks) if (ark.contains(e.getPoint()) && ark.pressMouse(GraphShape.this, e)) return;
-                if (e.isPopupTrigger()) {
+                for (NodeShape node: nodes) if (node.contains(e.getPoint()) && node.pressMouse(GraphShape.this, e, absolute)) return;
+                for (ArkShape ark: arks) if (ark.contains(e.getPoint()) && ark.pressMouse(GraphShape.this, e, absolute)) return;
+                if (SwingUtilities.isRightMouseButton(e)) {
                     MenuPopUp popUp = new MenuPopUp(new Point2D.Double(e.getX(), e.getY()));
-                    popUp.show(e.getComponent(), e.getX(), e.getY());
+                    popUp.show(e.getComponent(), (int) absolute.getX(), (int) absolute.getY());
                 } else {
-                    e.translatePoint((int) transform.getX(), (int) transform.getY());
-                    movingMousePos = e.getPoint();
+                    setCursor(new Cursor(Cursor.MOVE_CURSOR));
+                    movingMousePos = absolute;
                 }
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
+                Point2D absolute = e.getPoint();
                 e.translatePoint((int) -transform.getX(), (int) -transform.getY());
+
                 Log.in().say("Mouse released at (", e.getX(), ", ", e.getY(), ")");
-                for (NodeShape node: nodes) if (node.contains(e.getPoint()) && node.releaseMouse(GraphShape.this, e)) return;
-                for (ArkShape ark: arks) if (ark.contains(e.getPoint()) && ark.releaseMouse(GraphShape.this, e)) return;
-                if (e.isPopupTrigger()) {
-                    MenuPopUp popUp = new MenuPopUp(new Point2D.Double(e.getX(), e.getY()));
-                    popUp.show(e.getComponent(), e.getX(), e.getY());
+                for (NodeShape node: nodes) if (node.contains(e.getPoint()) && node.releaseMouse(GraphShape.this, e, absolute)) return;
+                for (ArkShape ark: arks) if (ark.contains(e.getPoint()) && ark.releaseMouse(GraphShape.this, e, absolute)) return;
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    movingMousePos = null;
                 }
             }
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                if (movingNode != null) {
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    Point2D absolute = e.getPoint();
                     e.translatePoint((int) -transform.getX(), (int) -transform.getY());
-                    for (NodeShape shape : nodes) if (shape.getNode() == movingNode) shape.movedMouse(GraphShape.this, e);
-                } else {
-                    double x = e.getX() - movingMousePos.getX();
-                    double y = e.getY() - movingMousePos.getY();
-                    transform.setLocation(transform.getX() + x, transform.getY() + y);
-                    movingMousePos.setLocation(e.getPoint());
-                    System.out.println(transform);
-                    repaint();
+
+                    if (movingNode != null) {
+                        for (NodeShape shape : nodes)
+                            if (shape.getNode() == movingNode) shape.movedMouse(GraphShape.this, e, absolute);
+                    } else if (movingMousePos != null) {
+                        double x = absolute.getX() - movingMousePos.getX();
+                        double y = absolute.getY() - movingMousePos.getY();
+                        transform.setLocation(transform.getX() + x, transform.getY() + y);
+                        movingMousePos.setLocation(absolute);
+                        repaint();
+                    }
                 }
             }
         };
@@ -98,6 +106,7 @@ public class GraphShape extends JPanel {
         if (movingNode == null) {
             Log.in().say("Node '", node, "' moving from (", e.getX(), ", ", e.getY(), ")");
             movingNode = node;
+            setCursor(new Cursor(Cursor.HAND_CURSOR));
         }
     }
 
@@ -105,6 +114,7 @@ public class GraphShape extends JPanel {
         if (movingNode == node) {
             Log.in().say("Node '", node, "' stopped at (", e.getX(), ", ", e.getY(), ")");
             movingNode = null;
+            setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
     }
 
@@ -120,13 +130,12 @@ public class GraphShape extends JPanel {
         arks.clear();
 
         Graphics2D g2d = (Graphics2D) graphics;
-        //AffineTransform affine = g2d.getTransform();
         g2d.translate((int) transform.getX(), (int) transform.getY());
 
         for (Ark ark: graph.getArks()) arks.push(new ArkShape(ark, this, g2d));
         for (Node node: graph.getNodes()) nodes.push(new NodeShape(node, this, g2d));
 
-        //g2d.setTransform(affine);
+        if (graph.getNodes().isEmpty()) drawCenteredString(g2d, Settings.getString("no_nodes_prompt"), -transform.getX(), -transform.getY(), getWidth(), getHeight());
     }
 
     public int getSizeModifier() {
