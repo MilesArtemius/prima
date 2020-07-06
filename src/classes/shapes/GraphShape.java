@@ -1,5 +1,7 @@
 package classes.shapes;
 
+import classes.Settings;
+import classes.dial.NodeNameDialog;
 import classes.graph.Ark;
 import classes.graph.Graph;
 import classes.graph.Node;
@@ -16,14 +18,13 @@ import java.util.LinkedList;
 import java.util.Random;
 
 public class GraphShape extends JPanel {
-    private Graph graph;
-    private Graph step;
+    private Graph graph, step;
     private LinkedList<NodeShape> nodes;
     private LinkedList<ArkShape> arks;
     private Node movingNode;
 
-    public GraphShape(Graph graph) {
-        this.graph = graph;
+    public GraphShape() {
+        graph = step = new Graph();
         nodes = new LinkedList<>();
         arks = new LinkedList<>();
 
@@ -60,6 +61,18 @@ public class GraphShape extends JPanel {
         addMouseMotionListener(adapter);
     }
 
+
+
+    public void setGraph(Graph graph) {
+        this.graph = graph;
+    }
+
+    public void setStep(Graph step) {
+        this.step = step;
+    }
+
+
+
     public void registerMoving(Node node) {
         if (movingNode == null) {
             System.out.println("New node moving: " + node.getName());
@@ -92,13 +105,12 @@ public class GraphShape extends JPanel {
         refillGraph();
 
         Graphics2D g2d = (Graphics2D) graphics;
-        g2d.setPaint(Color.DARK_GRAY);
-        for (ArkShape s : arks) s.invalidate(this, g2d);
-        for (NodeShape s : nodes) s.invalidate(this, g2d);
+        for (ArkShape s : arks) s.invalidate(this, g2d, ((step.getArks() != null) && (step.getArks().contains(s.ark))));
+        for (NodeShape s : nodes) s.invalidate(this, g2d, ((step.getNodes() != null) && (step.getNodes().contains(s.node))));
     }
 
     public int getSizeModifier() {
-        return Math.min(getSize().width, getSize().height) / 100;
+        return Math.min(getSize().width, getSize().height) / Settings.getInt("graph_shape_size_modifier");
     }
 
     public Graph getGraph() {
@@ -124,12 +136,26 @@ public class GraphShape extends JPanel {
 
     private class MenuPopUp extends JPopupMenu {
         public MenuPopUp(Point2D position) {
-            JMenuItem item = new JMenuItem("Create Node");
+            JMenuItem item = new JMenuItem(Settings.getString("create_node_action"));
             item.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    GraphShape.this.getGraph().addNode(position, "Node " + (new Random()).nextInt());
-                    GraphShape.this.repaint();
+                    NodeNameDialog dialog = new NodeNameDialog(SwingUtilities.getWindowAncestor(GraphShape.this), Settings.getString("create_node_dialog_name"));
+                    dialog.setListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String nodeName = Settings.getString("create_node_dialog_default_node_name", (new Random()).nextInt() % Settings.getInt("graph_shape_random_node_name_length"));
+                            if (!dialog.getResult().equals("")) nodeName = dialog.getResult();
+                            dialog.dispose();
+
+                            System.out.println("Created new node: " + nodeName);
+                            GraphShape.this.getGraph().addNode(position, nodeName);
+                            GraphShape.this.repaint();
+                        }
+                    });
+                    dialog.pack();
+                    dialog.setLocationRelativeTo(GraphShape.this);
+                    dialog.setVisible(true);
                 }
             });
             add(item);

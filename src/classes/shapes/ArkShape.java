@@ -1,5 +1,6 @@
 package classes.shapes;
 
+import classes.Settings;
 import classes.graph.Ark;
 
 import javax.swing.*;
@@ -10,8 +11,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
 public class ArkShape extends Polygon implements GraphPart {
-    private static final int gap = 2;
-    private static final int stroke = 2;
 
     Ark ark;
 
@@ -21,8 +20,8 @@ public class ArkShape extends Polygon implements GraphPart {
     }
 
     @Override
-    public void invalidate(GraphShape parent, Graphics2D graphics) {
-        double size = gap * parent.getSizeModifier();
+    public void invalidate(GraphShape parent, Graphics2D graphics, boolean highlight) {
+        double size = Settings.getInt("ark_shape_gap") * parent.getSizeModifier();
 
         Point2D posStart = ark.getStart().getPosition(), posEnd = ark.getEnd().getPosition(), perFirst, perSecond,
                 center = new Point2D.Double(posStart.getX() + (posEnd.getX() - posStart.getX()) / 2, posStart.getY() + (posEnd.getY() - posStart.getY()) / 2);
@@ -53,8 +52,10 @@ public class ArkShape extends Polygon implements GraphPart {
         invalidate();
 
         Paint paint = graphics.getPaint();
-        graphics.setPaint(Color.DARK_GRAY);
+        graphics.setPaint(highlight ? Color.BLUE : Color.DARK_GRAY);
         graphics.fill(this);
+
+        int stroke = Settings.getInt("ark_shape_stroke");
 
         double len = Math.sqrt(Math.pow(center.getX() - posStart.getX(), 2) + Math.pow(center.getY() - posStart.getY(), 2));
         double wid = Math.sqrt(Math.pow(center.getX() - perFirst.getX(), 2) + Math.pow(center.getY() - perFirst.getY(), 2));
@@ -68,10 +69,10 @@ public class ArkShape extends Polygon implements GraphPart {
         ypoints[3] = (int) ((wid - stroke) * (ypoints[3] - center.getY()) / wid + center.getY());
         invalidate();
 
-        graphics.setPaint(Color.DARK_GRAY);
+        graphics.setPaint(highlight ? Color.BLUE : Color.DARK_GRAY);
         graphics.fill(this);
 
-        graphics.setPaint(Color.WHITE);
+        graphics.setPaint(highlight ? Color.YELLOW : Color.WHITE);
         GraphShape.drawCenteredString(graphics, String.valueOf(ark.getWeight()), center.getX() - wid/2, center.getY() - wid/2, wid, wid);
 
         graphics.setPaint(paint);
@@ -101,7 +102,7 @@ public class ArkShape extends Polygon implements GraphPart {
 
     private class MenuPopUp extends JPopupMenu {
         public MenuPopUp(GraphShape parent) {
-            JMenuItem item = new JMenuItem("Remove Ark");
+            JMenuItem item = new JMenuItem(Settings.getString("remove_ark_action"));
             item.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {

@@ -24,11 +24,15 @@ public class Prima {
     }
 
     public static void main(String[] args) {
-        JFrame f = new JFrame("GraphShape");
-        f.setMinimumSize(new Dimension(1200, 900));
+        System.out.println();
+        Settings.setup();
+
+        JFrame f = new JFrame(Settings.getString("app_name"));
+        f.setMinimumSize(new Dimension(Settings.getInt("default_screen_width"), Settings.getInt("default_screen_height")));
         f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        GraphShape shape = new GraphShape(prepareInput());
+        GraphShape shape = new GraphShape();
+        shape.setGraph(prepareInput());
 
         f.add(shape);
         f.setVisible(true);

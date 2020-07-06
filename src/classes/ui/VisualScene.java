@@ -1,4 +1,4 @@
-package classes;
+package classes.ui;
 
 import javax.swing.*;
 import java.awt.*;
