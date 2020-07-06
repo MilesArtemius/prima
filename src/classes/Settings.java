@@ -1,5 +1,6 @@
 package classes;
 
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class Settings {
-    private HashMap<String, Double> constants;
+    private HashMap<String, Long> constants;
     private ResourceBundle dictionary;
     private static Settings instance;
 
@@ -18,10 +19,11 @@ public class Settings {
     private void initializeDefaultConstants() {
         try {
             String fileName = "constants";
-            ResourceBundle constantsBundle = ResourceBundle.getBundle(fileName, new UTF8Control());
+            ResourceBundle constantsBundle = ResourceBundle.getBundle(fileName, new UTF16Control());
             constants = new HashMap<>();
             for (String key: constantsBundle.keySet()) {
-                constants.put(key, Double.parseDouble(constantsBundle.getString(key)));
+                System.out.println(key + " -> " + constantsBundle.getString(key));
+                constants.put(key, Long.decode(constantsBundle.getString(key)));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -31,7 +33,7 @@ public class Settings {
     private void initializeDictionary(Locale locale) {
         try {
             String fileName = "localization";
-            dictionary = ResourceBundle.getBundle(fileName, locale, new UTF8Control());
+            dictionary = ResourceBundle.getBundle(fileName, locale, new UTF16Control());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -59,12 +61,20 @@ public class Settings {
         return String.format(get().dictionary.getString(key), args);
     }
 
-    public static int getInt(String key) {
-        return (int) get().constants.get(key).doubleValue();
+    public static long getLong(String key) {
+        return get().constants.get(key);
     }
 
-    public static double getDouble(String key) {
-        return get().constants.get(key);
+    public static int getInt(String key) {
+        return (int) get().constants.get(key).longValue();
+    }
+
+    public static Color getColor(String key) {
+        long code = getLong(key);
+        int r = (int) ((code & 0xff0000) >> 32);
+        int g = (int) ((code & 0x00ff00) >> 16);
+        int b = (int) (code & 0x0000ff);
+        return new Color(r, g, b);
     }
 
 
@@ -73,7 +83,7 @@ public class Settings {
         get().initializeDictionary(Locale.forLanguageTag(locales[localePosition]));
     }
 
-    public static boolean changeParameter(String name, double value) {
+    public static boolean changeParameter(String name, long value) {
         if (get().constants.containsKey(name)) {
             get().constants.put(name, value);
             return true;
@@ -82,9 +92,8 @@ public class Settings {
 
 
 
-    private static class UTF8Control extends ResourceBundle.Control {
-        public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
-                throws IllegalAccessException, InstantiationException, IOException {
+    private static class UTF16Control extends ResourceBundle.Control {
+        public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload) throws IOException {
             // The below is a copy of the default implementation.
             String bundleName = toBundleName(baseName, locale);
             String resourceName = toResourceName(bundleName, "properties");

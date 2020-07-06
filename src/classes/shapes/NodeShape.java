@@ -13,38 +13,37 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.text.ParseException;
 
-public class NodeShape extends Ellipse2D.Double implements GraphPart {
-    Node node;
+public class NodeShape extends Ellipse2D.Double {
+    private Node node;
 
-    public NodeShape(Node node) {
+    public NodeShape(Node node, GraphShape parent, Graphics2D graphics) {
         this.node = node;
-    }
 
-    @Override
-    public void invalidate(GraphShape parent, Graphics2D graphics, boolean highlight) {
         Point2D position = node.getPosition();
-        double diameter = Settings.getInt("node_shape_gap") * parent.getSizeModifier();
+        double diameter = Settings.getLong("node_shape_gap") * parent.getSizeModifier();
         int stroke = Settings.getInt("node_shape_stroke");
 
         setFrame(position.getX() - diameter/2, position.getY() - diameter/2, diameter, diameter);
 
-        Paint paint = graphics.getPaint();
-        graphics.setPaint(highlight ? Color.BLACK : Color.DARK_GRAY);
+        graphics.setPaint(node.isHidden() ? Settings.getColor("node_shape_stroke_hidden_color") : Settings.getColor("node_shape_stroke_color"));
         graphics.fill(this);
 
         setFrame(getX() + stroke, getY() + stroke, getWidth() - 2*stroke, getHeight() - 2*stroke);
 
-        graphics.setPaint(highlight ? Color.GREEN : Color.YELLOW);
+        graphics.setPaint(node.isHidden() ? Settings.getColor("node_shape_hidden_color") : Settings.getColor("node_shape_color"));
         graphics.fill(this);
 
-        graphics.setPaint(highlight ? Color.BLACK : Color.DARK_GRAY);
+        graphics.setPaint(node.isHidden() ? Settings.getColor("node_shape_text_hidden_color") : Settings.getColor("node_shape_text_color"));
         double textRadius = Math.sqrt(Math.pow(diameter / 2, 2) / 2);
         GraphShape.drawCenteredString(graphics, node.getName(), position.getX() - textRadius, position.getY() - textRadius, textRadius * 2, textRadius * 2);
-
-        graphics.setPaint(paint);
     }
 
-    @Override
+    public Node getNode() {
+        return node;
+    }
+
+
+
     public boolean pressMouse(GraphShape parent, MouseEvent e) {
         System.out.println("Mouse pressed on " + node.getName());
         if (e.isPopupTrigger()) {
@@ -54,7 +53,6 @@ public class NodeShape extends Ellipse2D.Double implements GraphPart {
         return true;
     }
 
-    @Override
     public boolean releaseMouse(GraphShape parent, MouseEvent e) {
         System.out.println("Mouse released from " + node.getName());
         if (e.isPopupTrigger()) {
@@ -87,7 +85,7 @@ public class NodeShape extends Ellipse2D.Double implements GraphPart {
 
             JMenu connect = new JMenu(Settings.getString("create_ark_action"));
             for (Node node: parent.getGraph().getNodes()) {
-                if (node == NodeShape.this.node) continue;
+                if ((node == NodeShape.this.node) || (NodeShape.this.node.getArkTo(node) != null)) continue;
                 JMenuItem item = new JMenuItem(node.getName());
                 item.addActionListener(new ActionListener() {
                     @Override

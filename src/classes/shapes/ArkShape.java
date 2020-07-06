@@ -10,18 +10,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
-public class ArkShape extends Polygon implements GraphPart {
+public class ArkShape extends Polygon {
+    private Ark ark;
 
-    Ark ark;
-
-    public ArkShape(Ark ark) {
+    public ArkShape(Ark ark, GraphShape parent, Graphics2D graphics) {
         this.npoints = 4;
         this.ark = ark;
-    }
 
-    @Override
-    public void invalidate(GraphShape parent, Graphics2D graphics, boolean highlight) {
-        double size = Settings.getInt("ark_shape_gap") * parent.getSizeModifier();
+        double size = Settings.getLong("ark_shape_gap") * parent.getSizeModifier();
 
         Point2D posStart = ark.getStart().getPosition(), posEnd = ark.getEnd().getPosition(), perFirst, perSecond,
                 center = new Point2D.Double(posStart.getX() + (posEnd.getX() - posStart.getX()) / 2, posStart.getY() + (posEnd.getY() - posStart.getY()) / 2);
@@ -52,7 +48,7 @@ public class ArkShape extends Polygon implements GraphPart {
         invalidate();
 
         Paint paint = graphics.getPaint();
-        graphics.setPaint(highlight ? Color.BLUE : Color.DARK_GRAY);
+        graphics.setPaint(ark.isHidden() ? Settings.getColor("ark_shape_stroke_hidden_color") : Settings.getColor("ark_shape_stroke_color"));
         graphics.fill(this);
 
         int stroke = Settings.getInt("ark_shape_stroke");
@@ -69,16 +65,21 @@ public class ArkShape extends Polygon implements GraphPart {
         ypoints[3] = (int) ((wid - stroke) * (ypoints[3] - center.getY()) / wid + center.getY());
         invalidate();
 
-        graphics.setPaint(highlight ? Color.BLUE : Color.DARK_GRAY);
+        graphics.setPaint(ark.isHidden() ? Settings.getColor("ark_shape_hidden_color") : Settings.getColor("ark_shape_color"));
         graphics.fill(this);
 
-        graphics.setPaint(highlight ? Color.YELLOW : Color.WHITE);
+        graphics.setPaint(ark.isHidden() ? Settings.getColor("ark_shape_text_hidden_color") : Settings.getColor("ark_shape_text_color"));
         GraphShape.drawCenteredString(graphics, String.valueOf(ark.getWeight()), center.getX() - wid/2, center.getY() - wid/2, wid, wid);
 
         graphics.setPaint(paint);
     }
 
-    @Override
+    public Ark getArk() {
+        return ark;
+    }
+
+
+
     public boolean pressMouse(GraphShape parent, MouseEvent e) {
         System.out.println("Mouse pressed on " + ark.getStart().getName() + " - > " + ark.getEnd().getName());
         if (e.isPopupTrigger()) {
@@ -88,7 +89,6 @@ public class ArkShape extends Polygon implements GraphPart {
         return true;
     }
 
-    @Override
     public boolean releaseMouse(GraphShape parent, MouseEvent e) {
         System.out.println("Mouse released from " + ark.getStart().getName() + " - > " + ark.getEnd().getName());
         if (e.isPopupTrigger()) {

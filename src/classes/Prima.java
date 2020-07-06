@@ -1,6 +1,5 @@
 package classes;
 
-import classes.algorithm.Algorithm;
 import classes.algorithm.PrimaAlgorithm;
 import classes.graph.Graph;
 import classes.shapes.GraphShape;
@@ -26,21 +25,21 @@ public class Prima {
     }
 
     public static void main(String[] args) {
-        System.out.println();
         Settings.setup();
 
         JFrame f = new JFrame(Settings.getString("app_name"));
         f.setMinimumSize(new Dimension(Settings.getInt("default_screen_width"), Settings.getInt("default_screen_height")));
         f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
+        Graph graph = prepareInput();
         GraphShape shape = new GraphShape();
-        shape.setGraph(prepareInput());
+        shape.setGraph(graph);
+
+        PrimaAlgorithm alg = new PrimaAlgorithm();
+        alg.solve(graph);
 
         f.add(shape);
         f.setVisible(true);
         f.pack();
-
-        //PrimaAlgorithm alg = new PrimaAlgorithm();
-        //alg.solve(prepareInput());
     }
 }

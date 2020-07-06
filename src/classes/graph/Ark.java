@@ -4,12 +4,13 @@ public class Ark {
 
     private final Node start, end;
     private final double weight;
-    private boolean hidden = false;
+    private boolean hidden;
 
     public Ark(Node start, Node end, double weight){
         this.start = start;
         this.end = end;
         this.weight = weight;
+        this.hidden = true;
 
     }
 

@@ -18,13 +18,13 @@ import java.util.LinkedList;
 import java.util.Random;
 
 public class GraphShape extends JPanel {
-    private Graph graph, step;
+    private Graph graph;
     private LinkedList<NodeShape> nodes;
     private LinkedList<ArkShape> arks;
     private Node movingNode;
 
     public GraphShape() {
-        graph = step = new Graph();
+        graph = new Graph();
         nodes = new LinkedList<>();
         arks = new LinkedList<>();
 
@@ -53,7 +53,7 @@ public class GraphShape extends JPanel {
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                if (movingNode != null) for (NodeShape shape: nodes) if (shape.node == movingNode) shape.movedMouse(GraphShape.this, e);
+                if (movingNode != null) for (NodeShape shape: nodes) if (shape.getNode() == movingNode) shape.movedMouse(GraphShape.this, e);
             }
         };
 
@@ -65,10 +65,6 @@ public class GraphShape extends JPanel {
 
     public void setGraph(Graph graph) {
         this.graph = graph;
-    }
-
-    public void setStep(Graph step) {
-        this.step = step;
     }
 
 
@@ -88,25 +84,19 @@ public class GraphShape extends JPanel {
     }
 
 
-
-    private void refillGraph() {
-        nodes.clear();
-        arks.clear();
-
-        for (Node node: graph.getNodes()) nodes.push(new NodeShape(node));
-        for (Ark ark: graph.getArks()) arks.push(new ArkShape(ark));
-    }
-
-
-
+    /**
+     * Use GraphShape.repaint() method to redraw graph!
+     */
     @Override
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
-        refillGraph();
+
+        nodes.clear();
+        arks.clear();
 
         Graphics2D g2d = (Graphics2D) graphics;
-        for (ArkShape s : arks) s.invalidate(this, g2d, ((step.getArks() != null) && (step.getArks().contains(s.ark))));
-        for (NodeShape s : nodes) s.invalidate(this, g2d, ((step.getNodes() != null) && (step.getNodes().contains(s.node))));
+        for (Ark ark: graph.getArks()) arks.push(new ArkShape(ark, this, g2d));
+        for (Node node: graph.getNodes()) nodes.push(new NodeShape(node, this, g2d));
     }
 
     public int getSizeModifier() {
@@ -144,7 +134,7 @@ public class GraphShape extends JPanel {
                     dialog.setListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            String nodeName = Settings.getString("create_node_dialog_default_node_name", (new Random()).nextInt() % Settings.getInt("graph_shape_random_node_name_length"));
+                            String nodeName = Settings.getString("create_node_dialog_default_node_name", (new Random()).nextInt() % Settings.getLong("graph_shape_random_node_name_length"));
                             if (!dialog.getResult().equals("")) nodeName = dialog.getResult();
                             dialog.dispose();
 
