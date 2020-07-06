@@ -1,5 +1,6 @@
 package classes.shapes;
 
+import classes.Log;
 import classes.Settings;
 import classes.graph.Ark;
 
@@ -81,7 +82,7 @@ public class ArkShape extends Polygon {
 
 
     public boolean pressMouse(GraphShape parent, MouseEvent e) {
-        System.out.println("Mouse pressed on " + ark.getStart().getName() + " - > " + ark.getEnd().getName());
+        Log.in().say("Mouse pressed on ark '", ark.getStart(), "' - > '", ark.getEnd(), "'");
         if (e.isPopupTrigger()) {
             MenuPopUp popUp = new MenuPopUp(parent);
             popUp.show(e.getComponent(), e.getX(), e.getY());
@@ -90,7 +91,7 @@ public class ArkShape extends Polygon {
     }
 
     public boolean releaseMouse(GraphShape parent, MouseEvent e) {
-        System.out.println("Mouse released from " + ark.getStart().getName() + " - > " + ark.getEnd().getName());
+        Log.in().say("Mouse released from '", ark.getStart(), "' - > '", ark.getEnd(), "'");
         if (e.isPopupTrigger()) {
             MenuPopUp popUp = new MenuPopUp(parent);
             popUp.show(e.getComponent(), e.getX(), e.getY());

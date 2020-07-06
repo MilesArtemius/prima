@@ -1,5 +1,6 @@
 package classes.shapes;
 
+import classes.Log;
 import classes.Settings;
 import classes.dial.ArkWeightDialog;
 import classes.graph.Node;
@@ -45,26 +46,25 @@ public class NodeShape extends Ellipse2D.Double {
 
 
     public boolean pressMouse(GraphShape parent, MouseEvent e) {
-        System.out.println("Mouse pressed on " + node.getName());
+        Log.in().say("Mouse pressed on node '", node, "'");
         if (e.isPopupTrigger()) {
             MenuPopUp popUp = new MenuPopUp(parent);
             popUp.show(e.getComponent(), e.getX(), e.getY());
-        } else parent.registerMoving(this.node);
+        } else parent.registerMoving(this.node, e);
         return true;
     }
 
     public boolean releaseMouse(GraphShape parent, MouseEvent e) {
-        System.out.println("Mouse released from " + node.getName());
+        Log.in().say("Mouse released from node '", node, "'");
         if (e.isPopupTrigger()) {
             MenuPopUp popUp = new MenuPopUp(parent);
             popUp.show(e.getComponent(), e.getX(), e.getY());
         }
-        parent.unRegisterMoving(this.node);
+        parent.unRegisterMoving(this.node, e);
         return true;
     }
 
     public void movedMouse(GraphShape parent, MouseEvent e) {
-        System.out.println("Node " + node.getName() + " moved to (" + e.getX() + ", " + e.getY() + ")");
         node.setPosition(e.getPoint());
         parent.repaint();
     }
@@ -98,7 +98,7 @@ public class NodeShape extends Ellipse2D.Double {
                                     int arkWeight = dialog.getResult();
                                     dialog.dispose();
 
-                                    System.out.println("Connecting " + NodeShape.this.node.getName() + " with " + node.getName());
+                                    Log.in().say("Connecting node '", NodeShape.this.node, "' with node '", node, "'");
                                     parent.getGraph().addArk(NodeShape.this.node.getName(), node.getName(), arkWeight);
                                     parent.repaint();
                                 } catch (ParseException pe) {

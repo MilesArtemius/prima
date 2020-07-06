@@ -25,6 +25,7 @@ public class Prima {
     }
 
     public static void main(String[] args) {
+        Log.in().say("Uptime started");
         Settings.setup();
 
         JFrame f = new JFrame(Settings.getString("app_name"));

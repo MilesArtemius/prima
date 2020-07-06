@@ -19,10 +19,11 @@ public class Settings {
     private void initializeDefaultConstants() {
         try {
             String fileName = "constants";
+            Log.in().say("Loading constants from file ", fileName, ":");
             ResourceBundle constantsBundle = ResourceBundle.getBundle(fileName, new UTF16Control());
             constants = new HashMap<>();
             for (String key: constantsBundle.keySet()) {
-                System.out.println(key + " -> " + constantsBundle.getString(key));
+                Log.in().beg("\t").say(key, " -> ", constantsBundle.getString(key));
                 constants.put(key, Long.decode(constantsBundle.getString(key)));
             }
         } catch (Exception e) {
@@ -33,6 +34,7 @@ public class Settings {
     private void initializeDictionary(Locale locale) {
         try {
             String fileName = "localization";
+            Log.in().say("Loading localization from file ", fileName, ":");
             dictionary = ResourceBundle.getBundle(fileName, locale, new UTF16Control());
         } catch (Exception e) {
             e.printStackTrace();
@@ -42,6 +44,7 @@ public class Settings {
 
 
     private Settings() {
+        Log.in().say("Initializing settings...");
         initializeDictionary(Locale.forLanguageTag("Ru"));
         initializeDefaultConstants();
     }
@@ -71,8 +74,8 @@ public class Settings {
 
     public static Color getColor(String key) {
         long code = getLong(key);
-        int r = (int) ((code & 0xff0000) >> 32);
-        int g = (int) ((code & 0x00ff00) >> 16);
+        int r = (int) ((code & 0xff0000) >> 16);
+        int g = (int) ((code & 0x00ff00) >> 8);
         int b = (int) (code & 0x0000ff);
         return new Color(r, g, b);
     }
