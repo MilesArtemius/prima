@@ -7,7 +7,7 @@ public class Node {
     private Point2D position;
     private final String name;
     private LinkedList<Ark> arks = new LinkedList<Ark>();
-
+    private boolean hidden = false;
 
     public String getName() {
         return name;
@@ -37,7 +37,20 @@ public class Node {
         this.name = name;
     }
 
+    public void hideNode(){
 
+        this.hidden = true;
+    }
+
+    public void showNode(){
+
+        this.hidden = false;
+    }
+
+    public boolean isHidden(){
+
+        return hidden;
+    }
 
     public Point2D getPosition() {
         return position;

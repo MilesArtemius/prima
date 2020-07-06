@@ -1,5 +1,7 @@
 package classes;
 
+import classes.algorithm.Algorithm;
+import classes.algorithm.PrimaAlgorithm;
 import classes.graph.Graph;
 import classes.shapes.GraphShape;
 
@@ -16,10 +18,10 @@ public class Prima {
         graph.addNode(new Point2D.Double(500, 700), "C");
         graph.addNode(new Point2D.Double(500, 100), "D");
 
-        graph.addArk("A", "B", 8);
-        graph.addArk("B", "C", 8);
+        graph.addArk("A", "B", 6);
+        graph.addArk("B", "C", 7);
         graph.addArk("C", "D", 8);
-
+        graph.addArk("A", "D", 5);
         return graph;
     }
 
@@ -37,5 +39,8 @@ public class Prima {
         f.add(shape);
         f.setVisible(true);
         f.pack();
+
+        //PrimaAlgorithm alg = new PrimaAlgorithm();
+        //alg.solve(prepareInput());
     }
 }

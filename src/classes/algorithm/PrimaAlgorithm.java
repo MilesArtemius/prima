@@ -9,18 +9,25 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class PrimaAlgorithm implements Algorithm {
 
-    private Graph startGraph;
-    private Graph currentGraph;
+    private Graph graph;
     private ArrayList<Node> nodesForSearch = new ArrayList<Node>();
-    private ArrayList<Ark> addedArks = new ArrayList<Ark>();
+
+    private void logResult(){
+        for (Ark ark: graph.getArks()){
+
+            System.out.println("Ребро с весом " + Double.toString(ark.getWeight()) + (ark.isHidden()? " не добавлено.": " добавлено."));
+        }
+
+
+    }
 
     @Override
     public Graph solve(Graph graph){//сюда изначальный целый граф. Само запустит функции подготовки и решения.
-
-        Graph nextGraph = prepareGraph(graph);
+        prepareGraph(graph);
         while (solveStep() != null) {
             //решаем
         }
+        logResult();
         return graph;
     }
 
@@ -48,6 +55,7 @@ public class PrimaAlgorithm implements Algorithm {
 
                 minArk.showArk();
                 nodesForSearch.add(isStartInArrMin? minArk.getEnd() : minArk.getStart());
+                nodesForSearch.get(nodesForSearch.size()-1).showNode();
 
             }
             else
@@ -69,9 +77,14 @@ public class PrimaAlgorithm implements Algorithm {
         for (Ark ark: graph.getArks()) {
             ark.hideArk();
         }
+        for (Node node: graph.getNodes()){
+            node.hideNode();
+        }
         int randomNum = ThreadLocalRandom.current().nextInt(0, graph.getNodes().size());
         nodesForSearch.add(graph.getNodes().get(randomNum));
+        nodesForSearch.get(0).showNode();
         solveStep();
         return graph;
     }
+
 }
