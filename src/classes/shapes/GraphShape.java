@@ -34,7 +34,6 @@ public class GraphShape extends JPanel {
         nodes = new LinkedList<>();
         arks = new LinkedList<>();
 
-        movingMousePos = new Point2D.Double(0, 0);
         transform = new Point2D.Double(0, 0);
 
         setBackground(Settings.getColor("graph_shape_background_color"));
@@ -42,17 +41,22 @@ public class GraphShape extends JPanel {
         MouseAdapter adapter = new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                e.translatePoint((int) -transform.getX(), (int) -transform.getY());
                 Log.in().say("Mouse pressed at (", e.getX(), ", ", e.getY(), ")");
                 for (NodeShape node: nodes) if (node.contains(e.getPoint()) && node.pressMouse(GraphShape.this, e)) return;
                 for (ArkShape ark: arks) if (ark.contains(e.getPoint()) && ark.pressMouse(GraphShape.this, e)) return;
                 if (e.isPopupTrigger()) {
                     MenuPopUp popUp = new MenuPopUp(new Point2D.Double(e.getX(), e.getY()));
                     popUp.show(e.getComponent(), e.getX(), e.getY());
+                } else {
+                    e.translatePoint((int) transform.getX(), (int) transform.getY());
+                    movingMousePos = e.getPoint();
                 }
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
+                e.translatePoint((int) -transform.getX(), (int) -transform.getY());
                 Log.in().say("Mouse released at (", e.getX(), ", ", e.getY(), ")");
                 for (NodeShape node: nodes) if (node.contains(e.getPoint()) && node.releaseMouse(GraphShape.this, e)) return;
                 for (ArkShape ark: arks) if (ark.contains(e.getPoint()) && ark.releaseMouse(GraphShape.this, e)) return;
@@ -63,13 +67,17 @@ public class GraphShape extends JPanel {
             }
 
             @Override
-            public void mouseDragged(MouseEvent e) { // TODO: add View drag.
-                if (movingNode != null) for (NodeShape shape: nodes) if (shape.getNode() == movingNode) shape.movedMouse(GraphShape.this, e);
-                else {
-                    double x = movingMousePos.getX() - e.getX();
-                    double y = movingMousePos.getY() - e.getY();
+            public void mouseDragged(MouseEvent e) {
+                if (movingNode != null) {
+                    e.translatePoint((int) -transform.getX(), (int) -transform.getY());
+                    for (NodeShape shape : nodes) if (shape.getNode() == movingNode) shape.movedMouse(GraphShape.this, e);
+                } else {
+                    double x = e.getX() - movingMousePos.getX();
+                    double y = e.getY() - movingMousePos.getY();
                     transform.setLocation(transform.getX() + x, transform.getY() + y);
                     movingMousePos.setLocation(e.getPoint());
+                    System.out.println(transform);
+                    repaint();
                 }
             }
         };
@@ -112,12 +120,13 @@ public class GraphShape extends JPanel {
         arks.clear();
 
         Graphics2D g2d = (Graphics2D) graphics;
-        AffineTransform affine = g2d.getTransform();
-        affine.translate(transform.getX(), transform.getY());
-        g2d.setTransform(affine);
+        //AffineTransform affine = g2d.getTransform();
+        g2d.translate((int) transform.getX(), (int) transform.getY());
 
         for (Ark ark: graph.getArks()) arks.push(new ArkShape(ark, this, g2d));
         for (Node node: graph.getNodes()) nodes.push(new NodeShape(node, this, g2d));
+
+        //g2d.setTransform(affine);
     }
 
     public int getSizeModifier() {

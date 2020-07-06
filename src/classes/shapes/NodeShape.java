@@ -67,12 +67,7 @@ public class NodeShape extends Ellipse2D.Double {
     }
 
     public void movedMouse(GraphShape parent, MouseEvent e) {
-        Point2D.Double point = new Point2D.Double();
-        if (e.getX() > radius) point.x = e.getX();
-        else point.x = radius;
-        if (e.getY() > radius) point.y = e.getY();
-        else point.y = radius;
-        node.setPosition(point);
+        node.setPosition(e.getPoint());
         parent.repaint();
     }
 
