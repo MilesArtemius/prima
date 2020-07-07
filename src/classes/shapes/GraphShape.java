@@ -13,7 +13,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
@@ -35,8 +34,6 @@ public class GraphShape extends JPanel {
         arks = new LinkedList<>();
 
         transform = new Point2D.Double(0, 0);
-
-        setBackground(Settings.getColor("graph_shape_background_color"));
 
         MouseAdapter adapter = new MouseAdapter() { // Fix cursor issues!!
             @Override
@@ -131,6 +128,8 @@ public class GraphShape extends JPanel {
 
         Graphics2D g2d = (Graphics2D) graphics;
         g2d.translate((int) transform.getX(), (int) transform.getY());
+
+        setBackground(Settings.getColor("graph_shape_background_color"));
 
         for (Ark ark: graph.getArks()) arks.push(new ArkShape(ark, this, g2d));
         for (Node node: graph.getNodes()) nodes.push(new NodeShape(node, this, g2d));

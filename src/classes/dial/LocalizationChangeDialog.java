@@ -3,12 +3,12 @@ package classes.dial;
 import javax.swing.*;
 import java.awt.event.*;
 
-public class FileRootDialog extends JDialog {
+public class LocalizationChangeDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
 
-    public FileRootDialog() {
+    public LocalizationChangeDialog() {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);

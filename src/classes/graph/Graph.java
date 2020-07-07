@@ -109,12 +109,5 @@ public class Graph {
          */
     }
 
-    private void setPosition(int total, int number) {//для чего? этот метод позволяет расставить начальные позиции для узлов, если они не заданы. если у нас создание узлов только по щелчку, можешь удалять.
-        double ang = 360.0 / total * number;
-        double trueAng = Math.toRadians(90) - Math.toRadians(ang);
-        int x = 401 + (int) (Math.cos(trueAng) * 200);
-        int y = 301 - (int) (Math.sin(trueAng) * 200);
-    }
-
 
 }

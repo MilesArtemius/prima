@@ -1,15 +1,14 @@
 package classes;
 
-import classes.algorithm.PrimaAlgorithm;
 import classes.graph.Graph;
-import classes.shapes.GraphShape;
-import classes.ui.PrimaVisual;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
 
 public class Prima {
+    private static PrimaVisual visual;
+
     public static Graph prepareInput() {
         Graph graph = new Graph();
 
@@ -35,7 +34,7 @@ public class Prima {
             e.printStackTrace();
         }
 
-        JFrame f = new JFrame(Settings.getString("app_name"));
+        JFrame f = new JFrame();
         f.setMinimumSize(new Dimension(Settings.getInt("default_screen_width"), Settings.getInt("default_screen_height")));
         f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -48,10 +47,15 @@ public class Prima {
 
         f.add(shape);*/
 
-        f.setContentPane(new PrimaVisual().getMainPanel());
+        visual = new PrimaVisual(f);
+        f.setContentPane(visual.getMainPanel());
 
         f.pack();
         f.setLocationByPlatform(true);
         f.setVisible(true);
+    }
+
+    public static PrimaVisual getVisual() {
+        return visual;
     }
 }

@@ -12,8 +12,9 @@ public class Log {
     private String suf;
     private PrintStream out;
     private PrintStream file;
+    boolean isGUILog;
 
-    public Log() {
+    private Log() {
         this.pref = (new SimpleDateFormat("dd-MM-yyyy HH:mm:ss")).format(Calendar.getInstance().getTime()) + ": ";
         this.beg = "";
         this.sep = "";
@@ -21,6 +22,7 @@ public class Log {
         this.suf = "";
         this.out = System.out;
         this.file = null; // TODO: implement file logging.
+        this.isGUILog = false;
     }
 
     public static Log in() {
@@ -64,6 +66,11 @@ public class Log {
         return this;
     }
 
+    public Log gui(boolean GUI) {
+        isGUILog = GUI;
+        return this;
+    }
+
 
 
     public void say(Object... words) {
@@ -80,5 +87,7 @@ public class Log {
         String result = argument.toString();
         if (out != null) out.println(result);
         if (file != null) file.println(result);
+
+        if (isGUILog && (Prima.getVisual() != null)) Prima.getVisual().appendTextToLog(result);
     }
 }
