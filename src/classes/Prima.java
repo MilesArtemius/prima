@@ -2,14 +2,17 @@ package classes;
 
 import classes.algorithm.PrimaAlgorithm;
 import classes.graph.Graph;
+import classes.io.SavedGraph;
 import classes.shapes.GraphShape;
-import classes.ui.PrimaVisual;
+import classes.PrimaVisual;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
 
 public class Prima {
+    private static PrimaVisual visual;
+
     public static Graph prepareInput() {
         Graph graph = new Graph();
 
@@ -22,6 +25,12 @@ public class Prima {
         graph.addArk("B", "C", 7);
         graph.addArk("C", "D", 8);
         graph.addArk("A", "D", 5);
+
+        //пример сохранения-загрузки
+        //SavedGraph sg = new SavedGraph(graph);
+        //sg.save();
+        //Graph ng = sg.load();
+
         return graph;
     }
 
@@ -48,10 +57,16 @@ public class Prima {
 
         f.add(shape);*/
 
-        f.setContentPane(new PrimaVisual().getMainPanel());
+        visual = new PrimaVisual(f);
+
+        f.setContentPane(visual.getMainPanel());
 
         f.pack();
         f.setLocationByPlatform(true);
         f.setVisible(true);
+    }
+
+    public static PrimaVisual getVisual() {
+        return visual;
     }
 }

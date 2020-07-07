@@ -214,7 +214,7 @@ public class Settings {
                 }
             }
         } else {
-            // LOg
+            Log.in().say("Can not alter - no such parameter found!");
         }
     }
 
