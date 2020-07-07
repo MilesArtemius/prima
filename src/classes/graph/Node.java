@@ -1,9 +1,12 @@
 package classes.graph;
 
 import java.awt.geom.Point2D;
+import java.io.Serializable;
 import java.util.LinkedList;
 
-public class Node {
+public class Node implements Serializable {
+
+    private static final long serialVersionUID = 3L;
     private Point2D position;
     private final String name;
     private LinkedList<Ark> arks = new LinkedList<Ark>();

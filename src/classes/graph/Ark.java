@@ -1,7 +1,10 @@
 package classes.graph;
 
-public class Ark {
+import java.io.Serializable;
 
+public class Ark implements Serializable {
+
+    private static final long serialVersionUID = 2L;
     private final Node start, end;
     private final double weight;
     private boolean hidden;

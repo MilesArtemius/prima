@@ -4,10 +4,12 @@ import classes.algorithm.PrimaAlgorithm;
 import classes.graph.Graph;
 import classes.shapes.GraphShape;
 import classes.ui.PrimaVisual;
+import classes.io.SavedGraph;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.io.IOException;
 
 public class Prima {
     public static Graph prepareInput() {
@@ -22,6 +24,11 @@ public class Prima {
         graph.addArk("B", "C", 7);
         graph.addArk("C", "D", 8);
         graph.addArk("A", "D", 5);
+
+        //пример сохранения-загрузки
+        //SavedGraph sg = new SavedGraph(graph);
+        //sg.save();
+        //Graph ng = sg.load();
 
         return graph;
     }

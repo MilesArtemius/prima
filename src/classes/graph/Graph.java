@@ -1,13 +1,15 @@
 package classes.graph;
 
 import java.awt.geom.Point2D;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 
-public class Graph {
+public class Graph implements Serializable {
 
+    private static final long serialVersionUID = 1L;
 
     private HashMap<String, Node> nodes = new HashMap<String, Node>();
     private LinkedList<Ark> arks = new LinkedList<Ark>(); // я бы предложил создавать массив в момент вызова getArks(), чтобы избежать хранения лишнего, хотя так быстрее
