@@ -1,5 +1,6 @@
 package classes.algorithm;
 
+import classes.Log;
 import classes.graph.Graph;
 import classes.graph.Ark;
 import classes.graph.Node;
@@ -68,10 +69,12 @@ public class PrimaAlgorithm implements Algorithm {
                 minArk.showArk();
                 nodesForSearch.add(isStartInArrMin? minArk.getEnd() : minArk.getStart());
                 nodesForSearch.get(nodesForSearch.size()-1).showNode();
+                Log.in().say("Найдено ребро ", minArk);
 
             }
             else{
                 //решение завершено
+                Log.in().say("Решение завершено");
                 return null;
             }
 
@@ -96,6 +99,7 @@ public class PrimaAlgorithm implements Algorithm {
             node.hideNode();
         }
         int randomNum = ThreadLocalRandom.current().nextInt(0, graph.getNodes().size());
+        Log.in().say("Начальный узел: ", graph.getNodes().get(randomNum).getName());
         nodesForSearch.add(graph.getNodes().get(randomNum));
         nodesForSearch.get(0).showNode();
         solveStep();
