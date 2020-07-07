@@ -12,7 +12,6 @@ import java.util.prefs.Preferences;
 
 public class Settings {
     private static final String constantsName = "constants";
-    private static final String constantsDescriptionName = "constants_description";
     private static final String dictionaryName = "localization";
 
     private static final String userPath = "USER_PATH";
@@ -151,7 +150,7 @@ public class Settings {
         }
     }
 
-    public static void removeUserPath() {
+    public static void removeUserPath() { // FIXME!!
         try {
             Preferences prefs = Preferences.userNodeForPackage(Prima.class);
             String path = prefs.get(userPath, "");
@@ -219,13 +218,8 @@ public class Settings {
     }
 
     public static HashMap<String, String> getConstantsDescription() {
-        Log.in().say("Loading constants description from file ", constantsDescriptionName, ":");
-        ResourceBundle constantsBundle = ResourceBundle.getBundle(constantsDescriptionName, new UTF16Control());
-        HashMap<String, String> constantsDescription = new HashMap<>(constantsBundle.keySet().size());
-        for (String key: constantsBundle.keySet()) {
-            Log.in().beg("\t").say(key, " -> ", constantsBundle.getString(key));
-            constantsDescription.put(key, constantsBundle.getString(key));
-        }
+        HashMap<String, String> constantsDescription = new HashMap<>(get().constants.size());
+        for (String key: get().dictionary.keySet()) if (get().constants.containsKey(key)) constantsDescription.put(key, get().dictionary.get(key));
         return constantsDescription;
     }
 

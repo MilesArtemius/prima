@@ -9,7 +9,7 @@ public class GraphTest {
     public static void runTest() {
         boolean successful = true;
 
-        Log.in().gui(true).say("Тест начался!");
+        Log.in().gui(true).attr(Log.Attributes.BOLD).say("Тест начался!");
         Graph graph = new Graph();
 
         Log.in().gui(true).say("Проверяем, пустой ли граф:");
@@ -20,6 +20,6 @@ public class GraphTest {
         graph.addNode(new Point2D.Double(0, 0), "Node");
         successful &= (graph.getNodes().size() == 1);
 
-        Log.in().gui(true).end("!").say("Тестирование прошло ", successful ? "успешно" : "провально");
+        Log.in().gui(true).attr(Log.Attributes.BOLD).end("!").say("Тестирование прошло ", successful ? "успешно" : "провально");
     }
 }

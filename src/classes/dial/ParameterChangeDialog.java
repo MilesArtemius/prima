@@ -61,7 +61,7 @@ public class ParameterChangeDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 spinner1.validate();
-                Settings.alterParameter(input.getText(), (int) spinner1.getValue());
+                if (!input.getText().equals("")) Settings.alterParameter(input.getText(), (int) spinner1.getValue());
                 if (!Settings.isUserPathSet()) System.out.println("Warning! Path for parameter storing not found, parameter changed until session end!");
                 graph.repaint();
                 dispose();
@@ -71,7 +71,7 @@ public class ParameterChangeDialog extends JDialog {
 
     public void addEntry(String key, String value) {
         String txt = text.getText();
-        txt += "<code>" + key + "</code> - " + value + "<br><br>";
+        txt += "<p><b><code>" + key + "</b> - </code>" + value + "</p><br>";
         text.setText(txt);
     }
 }

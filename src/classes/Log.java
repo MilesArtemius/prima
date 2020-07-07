@@ -3,6 +3,7 @@ package classes;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.LinkedList;
 
 public class Log {
     private String pref;
@@ -12,7 +13,20 @@ public class Log {
     private String suf;
     private PrintStream out;
     private PrintStream file;
-    boolean isGUILog;
+    private boolean isGUILog;
+    private LinkedList<String> attr;
+
+    public enum Attributes {
+        BOLD("b"), ITALIC("i"), MARKED("mark"), LINED("ins");
+        private String attribute;
+
+        Attributes(String attr) {
+            this.attribute = attr;
+        }
+        public String getAttribute() {
+            return attribute;
+        }
+    }
 
     private Log() {
         this.pref = (new SimpleDateFormat("dd-MM-yyyy HH:mm:ss")).format(Calendar.getInstance().getTime()) + ": ";
@@ -23,6 +37,8 @@ public class Log {
         this.out = System.out;
         this.file = null; // TODO: implement file logging.
         this.isGUILog = false;
+        this.attr = new LinkedList<>();
+
     }
 
     public static Log in() {
@@ -71,23 +87,24 @@ public class Log {
         return this;
     }
 
+    public Log attr(Attributes... attributes) {
+        for (Attributes attribute: attributes) attr.addLast(attribute.getAttribute());
+        return this;
+    }
+
 
 
     public void say(Object... words) {
-        StringBuilder argument = new StringBuilder(pref);
-        argument.append(beg);
-        for (int i = 0; i < words.length - 1; i++) {
-            argument.append(words[i]);
-            argument.append(sep);
-        }
-        argument.append(words[words.length - 1]);
-        argument.append(end);
-        argument.append(suf);
+        StringBuilder argument = new StringBuilder(pref).append(beg);
+        for (int i = 0; i < words.length - 1; i++) argument.append(words[i]).append(sep);
+        argument.append(words[words.length - 1]).append(end).append(suf);
+
+        attr.addFirst("p");
 
         String result = argument.toString();
         if (out != null) out.println(result);
         if (file != null) file.println(result);
 
-        if (isGUILog && (Prima.getVisual() != null)) Prima.getVisual().appendTextToLog(result);
+        if (isGUILog && (Prima.getVisual() != null)) Prima.getVisual().appendTextToLog(result, attr);
     }
 }

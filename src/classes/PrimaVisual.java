@@ -1,7 +1,5 @@
 package classes;
 
-import classes.Prima;
-import classes.Settings;
 import classes.dial.ParameterChangeDialog;
 import classes.graph.Graph;
 import classes.shapes.GraphShape;
@@ -11,6 +9,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class PrimaVisual {
     private JFrame parent;
@@ -60,6 +62,8 @@ public class PrimaVisual {
         graphShapePanel.add(graph, new GridBagConstraints(GridBagConstraints.RELATIVE, GridBagConstraints.RELATIVE,
                 GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1.0, 1.0, GridBagConstraints.CENTER,
                 GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+
+        logs.setText("<html>");
 
         newGraph = new JMenuItem();
         newGraph.addActionListener(new ActionListener() {
@@ -214,9 +218,17 @@ public class PrimaVisual {
         return root;
     }
 
-    public void appendTextToLog(String text) {
-        String log = logs.getText();
-        log += "\n" + text;
-        logs.setText(log);
+    public void appendTextToLog(String text, List<String> attributes) {
+        StringBuilder log = new StringBuilder(logs.getText());
+        for (String attr: attributes) {
+            log.append('<').append(attr).append('>');
+        }
+        log.append(text);
+        Collections.reverse(attributes);
+        for (String attr: attributes) {
+            log.append("</").append(attr).append('>');
+        }
+
+        logs.setText(log.toString());
     }
 }
