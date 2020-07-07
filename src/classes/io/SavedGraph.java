@@ -20,12 +20,12 @@ public class SavedGraph {
 
     }
     public void save() {
-        save(DEFAULT_NAME);
+        save(DEFAULT_NAME, "");
     }
-    public void save(String saveName) {
+    public void save(String saveName, String path) {
 
         try{
-            FileOutputStream outputStream = new FileOutputStream(saveName+".sv");
+            FileOutputStream outputStream = new FileOutputStream(path+saveName+".sv");
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 
             objectOutputStream.writeObject(graph);
@@ -40,12 +40,12 @@ public class SavedGraph {
 
     }
     public Graph load() {
-        return load(DEFAULT_NAME);
+        return load(DEFAULT_NAME, "");
     }
-    public Graph load(String saveName) {
+    public Graph load(String saveName, String path) {
 
         try{
-            FileInputStream fileInputStream = new FileInputStream(saveName+".sv");
+            FileInputStream fileInputStream = new FileInputStream(path + saveName+".sv");
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 
 
