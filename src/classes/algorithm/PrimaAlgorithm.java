@@ -20,7 +20,13 @@ public class PrimaAlgorithm implements Algorithm {
 
 
     }
+    public Thread threadSolve(Graph graph){
 
+        Thread thread = new Thread(() -> solveStep(graph));
+        thread.start();
+        return thread;
+    }
+    
     @Override
     public Graph solve(Graph graph){//сюда изначальный целый граф. Само запустит функции подготовки и решения.
         prepareGraph(graph);
@@ -58,8 +64,11 @@ public class PrimaAlgorithm implements Algorithm {
                 nodesForSearch.get(nodesForSearch.size()-1).showNode();
 
             }
-            else
+            else{
+                //решение завершено
                 return null;
+            }
+
 
         }
 
