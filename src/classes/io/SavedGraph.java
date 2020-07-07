@@ -12,7 +12,7 @@ import java.util.LinkedList;
 public class SavedGraph {
 
     private Graph graph;
-
+    private static final String DEFAULT_NAME = "save.sv";
 
 
     public SavedGraph(Graph graph){
@@ -20,7 +20,7 @@ public class SavedGraph {
 
     }
     public void save() {
-        save("save.sv");
+        save(DEFAULT_NAME);
     }
     public void save(String saveName) {
 
@@ -40,7 +40,7 @@ public class SavedGraph {
 
     }
     public Graph load() {
-        return load("save.sv");
+        return load(DEFAULT_NAME);
     }
     public Graph load(String saveName) {
 
