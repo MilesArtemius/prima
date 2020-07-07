@@ -1,7 +1,10 @@
 package classes.graph;
 
-public class Ark {
+import java.io.Serializable;
 
+public class Ark implements Serializable {
+
+    private static final long serialVersionUID = 2L;
     private final Node start, end;
     private final double weight;
     private boolean hidden;
@@ -41,11 +44,12 @@ public class Ark {
 
         return hidden;
     }
-/////////////////////////////////////
-    //public void setStart(Node start, Node end) {
-    //    this.start = start;
-    //    this.end = end;
-    // }
+
+    @Override
+    public String toString(){
+
+        return "Ребро "+ start.getName() + "<->" + end.getName() + ", вес: " + Double.toString(weight);
+    }
 
 
 }
