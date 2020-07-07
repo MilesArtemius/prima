@@ -26,7 +26,13 @@ public class PrimaAlgorithm implements Algorithm {
         thread.start();
         return thread;
     }
-    
+
+    public Thread threadSolveAll(Graph graph){
+        Thread thread = new Thread(() -> solve(graph));
+        thread.start();
+        return thread;
+
+    }
     @Override
     public Graph solve(Graph graph){//сюда изначальный целый граф. Само запустит функции подготовки и решения.
         prepareGraph(graph);
