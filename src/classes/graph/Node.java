@@ -8,7 +8,7 @@ public class Node implements Serializable {
 
     private static final long serialVersionUID = 3L;
     private Point2D position;
-    private final String name;
+    private String name;
     private LinkedList<Ark> arks = new LinkedList<Ark>();
     private boolean hidden;
 
@@ -33,6 +33,11 @@ public class Node implements Serializable {
         }
 
         return null;
+    }
+
+    public void setName(String name){
+
+        this.name = name;
     }
 
     public Node(Point2D position, String name) {
