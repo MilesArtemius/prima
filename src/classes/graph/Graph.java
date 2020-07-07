@@ -116,5 +116,12 @@ public class Graph {
         int y = 301 - (int) (Math.sin(trueAng) * 200);
     }
 
-
+    @Override
+    public String toString(){
+        String str = "Граф из ребер:\n";
+        for (Ark ark: arks){
+            str += ark + "\n";
+        }
+        return str;
+    }
 }

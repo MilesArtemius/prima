@@ -22,6 +22,7 @@ public class Prima {
         graph.addArk("B", "C", 7);
         graph.addArk("C", "D", 8);
         graph.addArk("A", "D", 5);
+
         return graph;
     }
 

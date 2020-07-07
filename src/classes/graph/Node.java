@@ -60,4 +60,10 @@ public class Node {
     public void setPosition(Point2D position) {
         this.position = position;
     }
+
+    @Override
+    public String toString(){
+
+        return "Узел "+ name;
+    }
 }
