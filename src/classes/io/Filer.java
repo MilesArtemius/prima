@@ -10,9 +10,13 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Properties;
 
 public class Filer {
-
     public static void printToFile(String string, String fileName, OnPerformed listener) {
-
+        try {
+            Files.write(Paths.get(fileName), string.getBytes(), fileExists(fileName) ? StandardOpenOption.APPEND : StandardOpenOption.CREATE);
+            listener.onFinished(null);
+        } catch (IOException e) {
+            listener.onFinished(e);
+        }
     }
 
 
