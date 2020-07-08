@@ -2,7 +2,7 @@ package classes;
 
 import classes.algorithm.PrimaAlgorithm;
 import classes.graph.Graph;
-import classes.io.SavedGraph;
+
 import classes.shapes.GraphShape;
 import classes.PrimaVisual;
 
