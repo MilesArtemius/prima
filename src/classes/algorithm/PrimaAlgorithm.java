@@ -21,6 +21,19 @@ public class PrimaAlgorithm implements Algorithm {
 
 
     }
+
+    public int CountHidden(){//для тестов
+        int count = 0;
+        for (Ark ark: graph.getArks()){
+            if (ark.isHidden()) {
+
+            } else {
+                count++;
+            }
+        }
+        return count;
+    }
+
     public Thread threadSolve(Graph graph){
 
         Thread thread = new Thread(() -> solveStep(graph));
@@ -69,12 +82,12 @@ public class PrimaAlgorithm implements Algorithm {
                 minArk.showArk();
                 nodesForSearch.add(isStartInArrMin? minArk.getEnd() : minArk.getStart());
                 nodesForSearch.get(nodesForSearch.size()-1).showNode();
-                Log.cui().say("Найдено ребро ", minArk);
+                Log.in().say("Найдено ребро ", minArk);
 
             }
             else{
                 //решение завершено
-                Log.cui().say("Решение завершено");
+                Log.in().say("Решение завершено");
                 return null;
             }
 
@@ -99,7 +112,7 @@ public class PrimaAlgorithm implements Algorithm {
             node.hideNode();
         }
         int randomNum = ThreadLocalRandom.current().nextInt(0, graph.getNodes().size());
-        Log.cui().say("Начальный узел: ", graph.getNodes().get(randomNum).getName());
+        Log.in().say("Начальный узел: ", graph.getNodes().get(randomNum).getName());
         nodesForSearch.add(graph.getNodes().get(randomNum));
         nodesForSearch.get(0).showNode();
         solveStep();
