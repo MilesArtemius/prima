@@ -1,10 +1,6 @@
 package classes;
 
-import classes.algorithm.PrimaAlgorithm;
 import classes.graph.Graph;
-import classes.io.SavedGraph;
-import classes.shapes.GraphShape;
-import classes.PrimaVisual;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,14 +31,17 @@ public class Prima {
     }
 
     public static void main(String[] args) {
-        Log.in().say("Uptime started");
-        Settings.setup();
+        Log.cui().say("Uptime started");
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        visual = new PrimaVisual();
+        Log.gui().say("GUI launched...");
+        Settings.setup();
 
         JFrame f = new JFrame(Settings.getString("app_name"));
         f.setMinimumSize(new Dimension(Settings.getInt("default_screen_width"), Settings.getInt("default_screen_height")));
@@ -56,8 +55,6 @@ public class Prima {
         alg.solve(graph);
 
         f.add(shape);*/
-
-        visual = new PrimaVisual(f);
 
         f.setContentPane(visual.getMainPanel());
 

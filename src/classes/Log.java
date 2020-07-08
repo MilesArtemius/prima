@@ -1,8 +1,11 @@
 package classes;
 
+import classes.io.Filer;
+
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 
 public class Log {
@@ -12,12 +15,12 @@ public class Log {
     private String end;
     private String suf;
     private PrintStream out;
-    private PrintStream file;
+    private String file;
     private boolean isGUILog;
     private LinkedList<String> attr;
 
     public enum Attributes {
-        BOLD("b"), ITALIC("i"), MARKED("mark"), LINED("ins");
+        BOLD("b"), ITALIC("i"), MARKED("mark"), CODE("code");
         private String attribute;
 
         Attributes(String attr) {
@@ -28,21 +31,26 @@ public class Log {
         }
     }
 
-    private Log() {
-        this.pref = (new SimpleDateFormat("dd-MM-yyyy HH:mm:ss")).format(Calendar.getInstance().getTime()) + ": ";
+    private Log(boolean isGUISet) {
+        Date current = Calendar.getInstance().getTime();
+        this.pref = (new SimpleDateFormat("dd-MM-yyyy HH:mm:ss")).format(current) + ": ";
         this.beg = "";
         this.sep = "";
         this.end = "";
         this.suf = "";
         this.out = System.out;
-        this.file = null; // TODO: implement file logging.
-        this.isGUILog = false;
+        this.file = (new SimpleDateFormat("dd-MM-yyyy")).format(current) + "_uptime.log";
+        this.isGUILog = isGUISet;
         this.attr = new LinkedList<>();
 
     }
 
-    public static Log in() {
-        return new Log();
+    public static Log cui() {
+        return new Log(false);
+    }
+
+    public static Log gui(Attributes... attributes) {
+        return (new Log(true)).attr(attributes);
     }
 
 
@@ -77,13 +85,8 @@ public class Log {
         return this;
     }
 
-    public Log file(PrintStream fileOutput) {
-        file = fileOutput;
-        return this;
-    }
-
-    public Log gui(boolean GUI) {
-        isGUILog = GUI;
+    public Log file(String fileName) {
+        file = fileName;
         return this;
     }
 
@@ -95,7 +98,7 @@ public class Log {
 
 
     public void say(Object... words) {
-        StringBuilder argument = new StringBuilder(pref).append(beg);
+        StringBuilder argument = (new StringBuilder(pref)).append(beg);
         for (int i = 0; i < words.length - 1; i++) argument.append(words[i]).append(sep);
         argument.append(words[words.length - 1]).append(end).append(suf);
 
@@ -103,7 +106,12 @@ public class Log {
 
         String result = argument.toString();
         if (out != null) out.println(result);
-        if (file != null) file.println(result);
+        if (file != null) Filer.printToFile(result, file, new Filer.OnPerformed() {
+            @Override
+            public void onFinished(Exception reason) {
+                if (reason != null) reason.printStackTrace();
+            }
+        });
 
         if (isGUILog && (Prima.getVisual() != null)) Prima.getVisual().appendTextToLog(result, attr);
     }

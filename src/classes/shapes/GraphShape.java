@@ -41,7 +41,7 @@ public class GraphShape extends JPanel {
                 Point2D absolute = e.getPoint();
                 e.translatePoint((int) -transform.getX(), (int) -transform.getY());
 
-                Log.in().say("Mouse pressed at (", e.getX(), ", ", e.getY(), ")");
+                Log.cui().say("Mouse pressed at (", e.getX(), ", ", e.getY(), ")");
                 for (NodeShape node: nodes) if (node.contains(e.getPoint()) && node.pressMouse(GraphShape.this, e, absolute)) return;
                 for (ArkShape ark: arks) if (ark.contains(e.getPoint()) && ark.pressMouse(GraphShape.this, e, absolute)) return;
                 if (SwingUtilities.isRightMouseButton(e)) {
@@ -58,7 +58,7 @@ public class GraphShape extends JPanel {
                 Point2D absolute = e.getPoint();
                 e.translatePoint((int) -transform.getX(), (int) -transform.getY());
 
-                Log.in().say("Mouse released at (", e.getX(), ", ", e.getY(), ")");
+                Log.cui().say("Mouse released at (", e.getX(), ", ", e.getY(), ")");
                 for (NodeShape node: nodes) if (node.contains(e.getPoint()) && node.releaseMouse(GraphShape.this, e, absolute)) return;
                 for (ArkShape ark: arks) if (ark.contains(e.getPoint()) && ark.releaseMouse(GraphShape.this, e, absolute)) return;
                 if (SwingUtilities.isLeftMouseButton(e)) {
@@ -101,7 +101,7 @@ public class GraphShape extends JPanel {
 
     public void registerMoving(Node node, MouseEvent e) {
         if (movingNode == null) {
-            Log.in().say("Node '", node, "' moving from (", e.getX(), ", ", e.getY(), ")");
+            Log.cui().say("Node '", node, "' moving from (", e.getX(), ", ", e.getY(), ")");
             movingNode = node;
             setCursor(new Cursor(Cursor.HAND_CURSOR));
         }
@@ -109,7 +109,7 @@ public class GraphShape extends JPanel {
 
     public void unRegisterMoving(Node node, MouseEvent e) {
         if (movingNode == node) {
-            Log.in().say("Node '", node, "' stopped at (", e.getX(), ", ", e.getY(), ")");
+            Log.cui().say("Node '", node, "' stopped at (", e.getX(), ", ", e.getY(), ")");
             movingNode = null;
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
@@ -168,7 +168,8 @@ public class GraphShape extends JPanel {
             item.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    NodeNameDialog dialog = new NodeNameDialog(SwingUtilities.getWindowAncestor(GraphShape.this), Settings.getString("create_node_dialog_name"));
+                    NodeNameDialog dialog = new NodeNameDialog(SwingUtilities.getWindowAncestor(GraphShape.this),
+                            Settings.getString("create_node_dialog_name"), false);
                     dialog.setListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -177,7 +178,7 @@ public class GraphShape extends JPanel {
                             if (!dialog.getResult().equals("")) nodeName = dialog.getResult();
                             dialog.dispose();
 
-                            Log.in().say("Created new node: '", nodeName, "'");
+                            Log.cui().say("Created new node: '", nodeName, "'");
                             GraphShape.this.getGraph().addNode(position, nodeName);
                             GraphShape.this.repaint();
                         }

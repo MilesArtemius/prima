@@ -14,14 +14,14 @@ public class NodeNameDialog extends JDialog {
     private JPanel contentPanel;
     private ActionListener listener;
 
-    public NodeNameDialog(Window owner, String title) {
+    public NodeNameDialog(Window owner, String title, boolean rename) {
         super(owner, title);
 
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
-        nodeName.setToolTipText(Settings.getString("create_node_dialog_prompt"));
+        nodeName.setToolTipText(rename ?Settings.getString("rename_node_dialog_prompt") : Settings.getString("create_node_dialog_prompt"));
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

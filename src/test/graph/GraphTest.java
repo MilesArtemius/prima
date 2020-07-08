@@ -9,17 +9,17 @@ public class GraphTest {
     public static void runTest() {
         boolean successful = true;
 
-        Log.in().gui(true).attr(Log.Attributes.BOLD).say("Тест начался!");
+        Log.gui(Log.Attributes.BOLD).say("Тест начался!");
         Graph graph = new Graph();
 
-        Log.in().gui(true).say("Проверяем, пустой ли граф:");
+        Log.gui().say("Проверяем, пустой ли граф:");
         successful &= graph.isEmpty();
-        Log.in().say(graph.isEmpty());
+        Log.gui().say(graph.isEmpty());
 
-        Log.in().gui(true).say("Создаём узел с именем 'Node':");
+        Log.gui().say("Создаём узел с именем 'Node':");
         graph.addNode(new Point2D.Double(0, 0), "Node");
         successful &= (graph.getNodes().size() == 1);
 
-        Log.in().gui(true).attr(Log.Attributes.BOLD).end("!").say("Тестирование прошло ", successful ? "успешно" : "провально");
+        Log.gui(Log.Attributes.BOLD).end("!").say("Тестирование прошло ", successful ? "успешно" : "провально");
     }
 }

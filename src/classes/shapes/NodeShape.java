@@ -3,6 +3,7 @@ package classes.shapes;
 import classes.Log;
 import classes.Settings;
 import classes.dial.ArkWeightDialog;
+import classes.dial.NodeNameDialog;
 import classes.graph.Node;
 
 import javax.swing.*;
@@ -13,6 +14,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.text.ParseException;
+import java.util.Random;
 
 public class NodeShape extends Ellipse2D.Double {
     private Node node;
@@ -48,7 +50,7 @@ public class NodeShape extends Ellipse2D.Double {
 
 
     public boolean pressMouse(GraphShape parent, MouseEvent e, Point2D absolute) {
-        Log.in().say("Mouse pressed on node '", node, "'");
+        Log.cui().say("Mouse pressed on node '", node, "'");
         if (SwingUtilities.isRightMouseButton(e)) {
             MenuPopUp popUp = new MenuPopUp(parent);
             popUp.show(e.getComponent(), (int) absolute.getX(), (int) absolute.getY());
@@ -57,7 +59,7 @@ public class NodeShape extends Ellipse2D.Double {
     }
 
     public boolean releaseMouse(GraphShape parent, MouseEvent e, Point2D absolute) {
-        Log.in().say("Mouse released from node '", node, "'");
+        Log.cui().say("Mouse released from node '", node, "'");
         if (SwingUtilities.isLeftMouseButton(e)) parent.unRegisterMoving(this.node, e);
         return true;
     }
@@ -81,6 +83,32 @@ public class NodeShape extends Ellipse2D.Double {
             });
             add(remove);
 
+            JMenuItem rename = new JMenuItem(Settings.getString("rename_node_action"));
+            rename.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    NodeNameDialog dialog = new NodeNameDialog(SwingUtilities.getWindowAncestor(parent),
+                            Settings.getString("rename_node_dialog_name"), true);
+                    dialog.setListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            if (!dialog.getResult().equals("")) {
+                                String nodeName = dialog.getResult();
+                                dialog.dispose();
+
+                                Log.cui().say("Renamed node: '", NodeShape.this.node.getName(), "' to '" + nodeName + "'");
+                                parent.getGraph().changeNode(NodeShape.this.node.getName(), nodeName);
+                                parent.repaint();
+                            }
+                        }
+                    });
+                    dialog.pack();
+                    dialog.setLocationRelativeTo(parent);
+                    dialog.setVisible(true);
+                }
+            });
+            add(rename);
+
             JMenu connect = new JMenu(Settings.getString("create_ark_action"));
             for (Node node: parent.getGraph().getNodes()) {
                 if ((node == NodeShape.this.node) || (NodeShape.this.node.getArkTo(node) != null)) continue;
@@ -96,7 +124,7 @@ public class NodeShape extends Ellipse2D.Double {
                                     int arkWeight = dialog.getResult();
                                     dialog.dispose();
 
-                                    Log.in().say("Connecting node '", NodeShape.this.node, "' with node '", node, "'");
+                                    Log.cui().say("Connecting node '", NodeShape.this.node, "' with node '", node, "'");
                                     parent.getGraph().addArk(NodeShape.this.node.getName(), node.getName(), arkWeight);
                                     parent.repaint();
                                 } catch (ParseException pe) {

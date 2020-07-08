@@ -1,20 +1,22 @@
 package classes;
 
+import classes.io.Filer;
+
 import java.awt.*;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 public class Settings {
     private static final String constantsName = "constants";
     private static final String dictionaryName = "localization";
 
-    private static final String userPath = "USER_PATH";
+    public static final String userPath = "USER_PATH";
+    public static final String userLocalization = "USING_USER_LOCALIZATION";
 
     private static final String userPathDir = "PrimaConfigurationFolder";
     private static final String userPathConstants = File.separator + userPathDir + File.separator + constantsName + ".properties";
@@ -24,43 +26,58 @@ public class Settings {
     private HashMap<String, String> dictionary;
     private static Settings instance;
 
-    private static String [] locales = new String [] {"User", "", "De", "La", "Ru"};
+    public enum Locales {
+        USER("*Dummy string, will be replaced later*", "User"), ENGLISH("English", "En"),
+        GERMAN("Deutsch", "De"), LATIN("Lingua latina", "La"), RUSSIAN("Русский язык", "");
+        private String locale, symbol;
+
+        Locales(String locale, String symbol) {
+            this.locale = locale;
+            this.symbol = symbol;
+        }
+        public String getLocale() {
+            return locale;
+        }
+        public String getSymbol() {
+            return symbol;
+        }
+    }
 
     private void initializeDefaultConstants() {
         try {
-            Log.in().say("Loading constants from file ", constantsName, ":");
+            Log.cui().say("Loading constants from file ", constantsName, ":");
             ResourceBundle constantsBundle = ResourceBundle.getBundle(constantsName, new UTF16Control());
             constants = new HashMap<>();
             for (String key: constantsBundle.keySet()) {
-                Log.in().beg("\t").say(key, " -> ", constantsBundle.getString(key));
+                Log.cui().beg("\t").say(key, " -> ", constantsBundle.getString(key));
                 constants.put(key, Long.decode(constantsBundle.getString(key)));
-            }
-
-            Preferences prefs = Preferences.userNodeForPackage(Prima.class);
-            String pathToUserConstants = prefs.get(userPath, "");
-            if (!pathToUserConstants.equals("")) {
-                Log.in().say("Loading user defined constants:");
-                Properties prop = new Properties();
-                if (Files.exists(Paths.get(pathToUserConstants + userPathConstants)))
-                    prop.load(new InputStreamReader(new FileInputStream(pathToUserConstants + userPathConstants), StandardCharsets.UTF_16));
-                else Log.in().say("File exists, but empty!");
-                for (Object key: prop.keySet()) {
-                    Log.in().beg("\t").say(key, " -> ", prop.get(key.toString()).toString());
-                    if (constants.containsKey(key.toString())) constants.put(key.toString(), Long.decode(prop.get(key.toString()).toString()));
-                }
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        if (checkPref(userPath)) {
+            Log.cui().say("Loading user defined constants:");
+
+            Filer.loadPropertiesFromFile(getPref(userPath) + userPathConstants, new Filer.OnPropertiesLoaded() {
+                @Override
+                public void onFinished(Properties properties, Exception reason) {
+                    if (reason == null) for (Object key : properties.keySet()) {
+                        Log.cui().beg("\t").say(key, " -> ", properties.get(key.toString()).toString());
+                        if (constants.containsKey(key.toString())) constants.put(key.toString(), Long.decode(properties.get(key.toString()).toString()));
+                    } else Log.cui().say("Directory exists, but not file!");
+                }
+            });
         }
     }
 
     private void initializeDictionary(Locale locale) {
         try {
-            Log.in().say("Loading localization from file ", dictionaryName, ":");
+            Log.cui().say("Loading localization from file ", dictionaryName, ":");
             ResourceBundle dictionaryBundle = ResourceBundle.getBundle(dictionaryName, locale, new UTF16Control());
             dictionary = new HashMap<>();
             for (String key: dictionaryBundle.keySet()) {
-                Log.in().beg("\t").say(key, " -> ", dictionaryBundle.getString(key));
+                Log.cui().beg("\t").say(key, " -> ", dictionaryBundle.getString(key));
                 dictionary.put(key, dictionaryBundle.getString(key));
             }
         } catch (Exception e) {
@@ -68,32 +85,30 @@ public class Settings {
         }
     }
 
-    private void initializeUserDictionary() {
-        initializeDictionary(Locale.forLanguageTag("Ru"));
-        try {
-            Preferences prefs = Preferences.userNodeForPackage(Prima.class);
-            String pathToUserDictionary = prefs.get(userPath, "");
-            if (!pathToUserDictionary.equals("")) {
-                Log.in().say("Loading user defined localization:");
-                Properties prop = new Properties();
-                if (Files.exists(Paths.get(pathToUserDictionary + userPathDictionary)))
-                    prop.load(new InputStreamReader(new FileInputStream(pathToUserDictionary + userPathDictionary), StandardCharsets.UTF_16));
-                else Log.in().say("File exists, but empty!");
-                for (Object key: prop.keySet()) {
-                    Log.in().beg("\t").say(key, " -> ", prop.get(key).toString());
-                    if (dictionary.containsKey(key.toString())) dictionary.put(key.toString(), prop.get(key).toString());
+    private void initializeUserDictionary(OnLongActionFinished listener) { // TODO: thread?
+        initializeDictionary(Locale.forLanguageTag(""));
+
+        if (checkPref(userPath) && checkPref(userLocalization)) {
+            Log.cui().say("Loading user defined localization:");
+
+            Filer.loadPropertiesFromFile(getPref(userPath) + userPathDictionary, new Filer.OnPropertiesLoaded() {
+                @Override
+                public void onFinished(Properties properties, Exception reason) {
+                    if (reason == null) for (Object key : properties.keySet()) {
+                        Log.cui().beg("\t").say(key, " -> ", properties.get(key).toString());
+                        if (dictionary.containsKey(key.toString())) dictionary.put(key.toString(), properties.get(key).toString());
+                    } else Log.cui().say("Directory exists, but not file!");
+                    if (listener != null) listener.onFinished();
                 }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            });
+        } else if (listener != null) listener.onFinished();
     }
 
 
 
     private Settings() {
-        Log.in().say("Initializing settings...");
-        initializeUserDictionary();
+        Log.cui().say("Initializing settings...");
+        initializeUserDictionary(null);
         initializeDefaultConstants();
     }
 
@@ -128,99 +143,175 @@ public class Settings {
         return new Color(r, g, b);
     }
 
-
-
-    public static void changeLocalization(int localePosition) { // TODO: thread?
-        if (localePosition == 0) get().initializeUserDictionary();
-        else get().initializeDictionary(Locale.forLanguageTag(locales[localePosition]));
-    }
-
-
-
-    public static void alterUserPath(String path) {
-        try {
-            Preferences prefs = Preferences.userNodeForPackage(Prima.class);
-            prefs.put(userPath, path);
-            prefs.sync();
-            prefs.flush();
-
-            Files.createDirectory(Paths.get(path + File.separator + userPathDir));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void removeUserPath() { // FIXME!!
-        try {
-            Preferences prefs = Preferences.userNodeForPackage(Prima.class);
-            String path = prefs.get(userPath, "");
-            if (!path.equals("")) Files.walkFileTree(Paths.get(path + File.separator + userPathDir), new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.delete(file);
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    Files.delete(dir);
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-
-            prefs.clear();
-            prefs.removeNode();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static boolean isUserPathSet() {
-        Preferences prefs = Preferences.userNodeForPackage(Prima.class);
-        return !prefs.get(userPath, "").equals("");
-    }
-
-
-
-    public static void alterLocalization(String name) { // TODO: thread?
-        try {
-            Preferences prefs = Preferences.userNodeForPackage(Prima.class);
-            String pathToUserDictionary = prefs.get(userPath, "");
-            if (!pathToUserDictionary.equals("")) {
-                Files.copy(Paths.get(name), Paths.get(pathToUserDictionary + userPathDictionary));
-            }
-            changeLocalization(0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void alterParameter(String name, long value) { // TODO: thread?
-        if (get().constants.containsKey(name)) {
-            get().constants.put(name, value);
-
-            Preferences prefs = Preferences.userNodeForPackage(Prima.class);
-            String pathToUserConstants = prefs.get(userPath, "");
-            if (!pathToUserConstants.equals("")) {
-                try {
-                    Properties prop = new Properties();
-                    if (Files.exists(Paths.get(pathToUserConstants + userPathConstants)))
-                        prop.load(new InputStreamReader(new FileInputStream(pathToUserConstants + userPathConstants), StandardCharsets.UTF_16));
-                    prop.setProperty(name, String.valueOf(value));
-                    prop.store(new OutputStreamWriter(new FileOutputStream(pathToUserConstants + userPathConstants), StandardCharsets.UTF_16), null);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else {
-            Log.in().say("Can not alter - no such parameter found!");
-        }
-    }
-
     public static HashMap<String, String> getConstantsDescription() {
         HashMap<String, String> constantsDescription = new HashMap<>(get().constants.size());
         for (String key: get().dictionary.keySet()) if (get().constants.containsKey(key)) constantsDescription.put(key, get().dictionary.get(key));
         return constantsDescription;
+    }
+
+
+
+    public static void changeLocalization(Locales locale, OnLongActionFinished listener) { // TODO: thread?
+        if (locale == Locales.USER) {
+            setPref(userLocalization, userLocalization);
+            get().initializeUserDictionary(new OnLongActionFinished() {
+                @Override
+                public void onFinished() {
+                    if (listener != null) listener.onFinished();
+                }
+            });
+        } else {
+            resetPref(userLocalization);
+            get().initializeDictionary(Locale.forLanguageTag(locale.getSymbol()));
+            if (listener != null) listener.onFinished();
+        }
+    }
+
+
+
+    public static void alterUserPath(String path, OnLongActionFinished listener) { // TODO: thread?
+        setPref(userPath, path);
+        Filer.addFolder(path + File.separator + userPathDir, new Filer.OnPerformed() {
+            @Override
+            public void onFinished(Exception reason) {
+                if (reason != null) reason.printStackTrace();
+                if (listener != null) listener.onFinished();
+            }
+        });
+    }
+
+    public static void removeUserPath(OnLongActionFinished listener) { // TODO: thread?
+        if (checkPref(userPath)) Filer.removeFolder(getPref(userPath) + File.separator + userPathDir, new Filer.OnPerformed() {
+            @Override
+            public void onFinished(Exception reason) {
+                if (reason != null) reason.printStackTrace();
+                else {
+                    clearPrefs();
+                    get().initializeDefaultConstants();
+                    get().initializeUserDictionary(null);
+                }
+                if (listener != null) listener.onFinished();
+            }
+        });
+        else if (listener != null) listener.onFinished();
+    }
+
+    public static void resetConstants(OnLongActionFinished listener) {
+        if (checkPref(userPath)) Filer.deleteFile(getPref(userPath) + userPathConstants, new Filer.OnPerformed() {
+            @Override
+            public void onFinished(Exception reason) {
+                get().initializeDefaultConstants();
+                if (listener != null) listener.onFinished();
+            }
+        });
+        else if (listener != null) listener.onFinished();
+    }
+
+    public static void resetDictionary(OnLongActionFinished listener) {
+        if (checkPref(userPath)) Filer.deleteFile(getPref(userPath) + userPathDictionary, new Filer.OnPerformed() {
+            @Override
+            public void onFinished(Exception reason) {
+                resetPref(userLocalization);
+                get().initializeUserDictionary(null);
+                if (listener != null) listener.onFinished();
+            }
+        });
+        else if (listener != null) listener.onFinished();
+    }
+
+
+
+    public static boolean checkPref(String key) {
+        Preferences prefs = Preferences.userNodeForPackage(Prima.class);
+        return !prefs.get(key, "").equals("");
+    }
+
+    public static String getPref(String key) {
+        Preferences prefs = Preferences.userNodeForPackage(Prima.class);
+        return prefs.get(key, "");
+    }
+
+    public static void setPref(String key, String value) {
+        try {
+            Preferences prefs = Preferences.userNodeForPackage(Prima.class);
+            prefs.put(key, value);
+            prefs.flush();
+            prefs.sync();
+        } catch (BackingStoreException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void resetPref(String key) {
+        try {
+            Preferences prefs = Preferences.userNodeForPackage(Prima.class);
+            prefs.remove(key);
+            prefs.flush();
+            prefs.sync();
+        } catch (BackingStoreException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void clearPrefs() {
+        try {
+            Preferences prefs = Preferences.userNodeForPackage(Prima.class);
+            prefs.clear();
+            prefs.removeNode();
+        } catch (BackingStoreException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    public static void alterLocalization(String file, OnLongActionFinished listener) { // TODO: thread?
+        if (checkPref(userPath)) Filer.copyFile(file, getPref(userPath) + userPathDictionary, new Filer.OnPerformed() {
+            @Override
+            public void onFinished(Exception reason) {
+                if (reason != null) reason.printStackTrace();
+                else changeLocalization(Locales.USER, new OnLongActionFinished() {
+                    @Override
+                    public void onFinished() {
+                        if (listener != null) listener.onFinished();
+                    }
+                });
+            }
+        });
+        else if (listener != null) listener.onFinished();
+    }
+
+    public static void alterParameter(String name, long value, OnLongActionFinished listener) { // TODO: thread?
+        if (get().constants.containsKey(name)) {
+            get().constants.put(name, value);
+
+            if (checkPref(userPath)) {
+                Filer.loadPropertiesFromFile(getPref(userPath) + userPathConstants, new Filer.OnPropertiesLoaded() {
+                    @Override
+                    public void onFinished(Properties properties, Exception reason) {
+                        Properties prop = new Properties();
+                        if (reason == null) prop = properties;
+                        prop.setProperty(name, String.valueOf(value));
+                        Filer.savePropertiesToFile(prop, getPref(userPath) + userPathConstants, new Filer.OnPerformed() {
+                            @Override
+                            public void onFinished(Exception reason) {
+                                if (reason != null) reason.printStackTrace();
+                                if (listener != null) listener.onFinished();
+                            }
+                        });
+                    }
+                });
+            }
+        } else{
+            Log.cui().say("Can not alter - no such parameter found!");
+            if (listener != null) listener.onFinished();
+        }
+    }
+
+
+
+    public interface OnLongActionFinished {
+        void onFinished();
     }
 
 
@@ -242,9 +333,7 @@ public class Settings {
                         stream = connection.getInputStream();
                     }
                 }
-            } else {
-                stream = loader.getResourceAsStream(resourceName);
-            }
+            } else stream = loader.getResourceAsStream(resourceName);
             if (stream != null) {
                 try {
                     // Only this line is changed to make it to read properties files as UTF-8.

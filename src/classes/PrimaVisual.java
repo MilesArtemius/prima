@@ -6,17 +6,16 @@ import classes.shapes.GraphShape;
 import test.PrimaTest;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
 public class PrimaVisual {
-    private JFrame parent;
-
     private JPanel root;
     private JButton test;
     private JButton launch;
@@ -47,16 +46,23 @@ public class PrimaVisual {
     private JMenuItem preserveGraph;
 
     private JMenuItem setParameter;
-    private JMenuItem changeLocalization;
+    private JMenu changeLocalization;
+    private JMenuItem userLocale;
+    private JMenuItem englishLocale;
+    private JMenuItem russianLocale;
+    private JMenuItem germanLocale;
+    private JMenuItem latinLocale;
     private JMenuItem setFilePath;
-    private JMenuItem clearFilePath;
+    private JMenuItem addUserLocale;
+    private JMenu clearFilePath;
+    private JMenuItem clearAll;
+    private JMenuItem clearConstants;
+    private JMenuItem clearDictionary;
 
     private JMenuItem aboutApp;
     private JMenuItem aboutUs;
 
-    public PrimaVisual(JFrame parent) {
-        this.parent = parent;
-
+    public PrimaVisual() {
         graph = new GraphShape();
         graph.setGraph(Prima.prepareInput());
         graphShapePanel.add(graph, new GridBagConstraints(GridBagConstraints.RELATIVE, GridBagConstraints.RELATIVE,
@@ -65,6 +71,15 @@ public class PrimaVisual {
 
         logs.setText("<html>");
 
+        initFileMenu();
+        initSettingsMenu();
+        initAboutMenu();
+
+        reEnableAll();
+        resetAllNames();
+    }
+
+    private void initFileMenu() {
         newGraph = new JMenuItem();
         newGraph.addActionListener(new ActionListener() {
             @Override
@@ -99,25 +114,85 @@ public class PrimaVisual {
         fileMenu.add(saveGraphAs);
         fileMenu.add(saveGraph);
         fileMenu.add(preserveGraph); // Save to Settings.getFileRoot if exists.
+    }
 
+    private void initSettingsMenu() {
         setParameter = new JMenuItem();
         setParameter.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ParameterChangeDialog pcd = new ParameterChangeDialog(graph);
+                ParameterChangeDialog pcd = new ParameterChangeDialog(graph, SwingUtilities.getWindowAncestor(root), "Reset setting");
                 pcd.pack();
                 pcd.setLocationRelativeTo(root);
                 pcd.setVisible(true);
             }
         });
-        changeLocalization = new JMenuItem();
-        changeLocalization.addActionListener(new ActionListener() {
+        changeLocalization = new JMenu();
+        userLocale = new JMenuItem();
+        userLocale.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                resetAllNames();
+                Settings.changeLocalization(Settings.Locales.USER, new Settings.OnLongActionFinished() {
+                    @Override
+                    public void onFinished() {
+                        resetAllNames();
+                    }
+                });
             }
         });
+        englishLocale = new JMenuItem();
+        englishLocale.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Settings.changeLocalization(Settings.Locales.ENGLISH, new Settings.OnLongActionFinished() {
+                    @Override
+                    public void onFinished() {
+                        resetAllNames();
+                    }
+                });
+            }
+        });
+        russianLocale = new JMenuItem();
+        russianLocale.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Settings.changeLocalization(Settings.Locales.RUSSIAN, new Settings.OnLongActionFinished() {
+                    @Override
+                    public void onFinished() {
+                        resetAllNames();
+                    }
+                });
+            }
+        });
+        germanLocale = new JMenuItem();
+        germanLocale.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Settings.changeLocalization(Settings.Locales.GERMAN, new Settings.OnLongActionFinished() {
+                    @Override
+                    public void onFinished() {
+                        resetAllNames();
+                    }
+                });
+            }
+        });
+        latinLocale = new JMenuItem();
+        latinLocale.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Settings.changeLocalization(Settings.Locales.LATIN, new Settings.OnLongActionFinished() {
+                    @Override
+                    public void onFinished() {
+                        resetAllNames();
+                    }
+                });
+            }
+        });
+        changeLocalization.add(userLocale);
+        changeLocalization.add(englishLocale);
+        changeLocalization.add(russianLocale);
+        changeLocalization.add(germanLocale);
+        changeLocalization.add(latinLocale);
         setFilePath = new JMenuItem();
         setFilePath.addActionListener(new ActionListener() {
             @Override
@@ -127,30 +202,94 @@ public class PrimaVisual {
                 fileDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 fileDialog.setAcceptAllFileFilterUsed(false);
 
-                int status = fileDialog.showOpenDialog(null);
+                int status = fileDialog.showOpenDialog(root);
                 if (status == JFileChooser.APPROVE_OPTION) {
                     System.out.println(fileDialog.getSelectedFile().getAbsolutePath());
-                    Settings.alterUserPath(fileDialog.getSelectedFile().getAbsolutePath());
-                    reEnableAll();
+                    Settings.alterUserPath(fileDialog.getSelectedFile().getAbsolutePath(), new Settings.OnLongActionFinished() {
+                        @Override
+                        public void onFinished() {
+                            reEnableAll();
+                        }
+                    });
                 } else if (status == JFileChooser.CANCEL_OPTION) {
-                    System.out.println("User directory not set!");
+                    System.out.println("User directory not chosen!");
                 }
             }
         });
-        clearFilePath = new JMenuItem();
-        clearFilePath.addActionListener(new ActionListener() {
+        addUserLocale = new JMenuItem();
+        addUserLocale.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Settings.removeUserPath();
-                reEnableAll();
+                JFileChooser fileDialog = new JFileChooser();
+                fileDialog.setDialogTitle("Choose localization file");
+                fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fileDialog.setFileFilter(new FileNameExtensionFilter("PROPERTIES FILES", "properties"));
+                fileDialog.setAcceptAllFileFilterUsed(false);
+
+                int status = fileDialog.showOpenDialog(root);
+                if (status == JFileChooser.APPROVE_OPTION) {
+                    System.out.println(fileDialog.getSelectedFile().getAbsolutePath());
+                    Settings.alterLocalization(fileDialog.getSelectedFile().getAbsolutePath(), new Settings.OnLongActionFinished() {
+                        @Override
+                        public void onFinished() {
+                            resetAllNames();
+                        }
+                    });
+                } else if (status == JFileChooser.CANCEL_OPTION) {
+                    System.out.println("Localization file not chosen!");
+                }
             }
         });
+        clearFilePath = new JMenu();
+        clearAll = new JMenuItem();
+        clearAll.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Settings.removeUserPath(new Settings.OnLongActionFinished() {
+                    @Override
+                    public void onFinished() {
+                        reEnableAll();
+                        resetAllNames();
+                    }
+                });
+            }
+        });
+        clearConstants = new JMenuItem();
+        clearConstants.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Settings.resetConstants(new Settings.OnLongActionFinished() {
+                    @Override
+                    public void onFinished() {
+                        graph.repaint();
+                    }
+                });
+            }
+        });
+        clearDictionary = new JMenuItem();
+        clearDictionary.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Settings.resetDictionary(new Settings.OnLongActionFinished() {
+                    @Override
+                    public void onFinished() {
+                        resetAllNames();
+                    }
+                });
+            }
+        });
+        clearFilePath.add(clearAll);
+        clearFilePath.add(clearConstants);
+        clearFilePath.add(clearDictionary);
 
         settingsMenu.add(setParameter);
         settingsMenu.add(changeLocalization);
         settingsMenu.add(setFilePath);
+        settingsMenu.add(addUserLocale);
         settingsMenu.add(clearFilePath);
+    }
 
+    private void initAboutMenu() {
         aboutApp = new JMenuItem();
         aboutApp.addActionListener(new ActionListener() {
             @Override
@@ -175,18 +314,20 @@ public class PrimaVisual {
 
         helpMenu.add(aboutApp);
         helpMenu.add(aboutUs);
-
-        reEnableAll();
-        resetAllNames();
     }
 
+
+
     private void reEnableAll() {
-        preserveGraph.setEnabled(Settings.isUserPathSet());
-        clearFilePath.setEnabled(Settings.isUserPathSet());
+        boolean enabled = Settings.checkPref(Settings.userPath);
+        preserveGraph.setEnabled(enabled);
+        addUserLocale.setEnabled(enabled);
+        clearFilePath.setEnabled(enabled);
     }
 
     private void resetAllNames() {
-        parent.setTitle(Settings.getString("app_name"));
+        if (SwingUtilities.getWindowAncestor(root) != null)
+            ((JFrame) SwingUtilities.getWindowAncestor(root)).setTitle(Settings.getString("app_name"));
 
         fileMenu.setText("File");
         newGraph.setText("New...");
@@ -197,8 +338,17 @@ public class PrimaVisual {
         settingsMenu.setText("Settings");
         setParameter.setText("Set parameter");
         changeLocalization.setText("Change localization");
+        userLocale.setText(Settings.getString("user_defined_localization_name"));
+        englishLocale.setText(Settings.Locales.ENGLISH.getLocale());
+        russianLocale.setText(Settings.Locales.RUSSIAN.getLocale());
+        germanLocale.setText(Settings.Locales.GERMAN.getLocale());
+        latinLocale.setText(Settings.Locales.LATIN.getLocale());
         setFilePath.setText("Set default file path");
+        addUserLocale.setText("Add user-defined localization");
         clearFilePath.setText("Clear default file path");
+        clearAll.setText("Clear everything");
+        clearConstants.setText("Clear user-defined constants");
+        clearDictionary.setText("Clear user-defined localization");
 
         helpMenu.setText("Help");
         aboutApp.setText("About app");

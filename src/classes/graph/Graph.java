@@ -34,6 +34,16 @@ public class Graph {
         }
     }
 
+    public void changeNode(String originName, String newName){
+
+        Node node = nodes.get(originName);
+        if (node != null){
+            nodes.remove(originName);
+            nodes.put(newName, node);
+            node.setName(newName);
+        }
+    }
+
     public void addArk(Node start, Node end, int weight){
         if (start.getArkTo(end) == null){//обратной тоже не будет, у нас тут неориентированный граф
             Ark ark = new Ark(start, end, weight);
