@@ -42,7 +42,6 @@ public class Log {
         this.file = (new SimpleDateFormat("dd-MM-yyyy")).format(current) + "_uptime.log";
         this.isGUILog = isGUISet;
         this.attr = new LinkedList<>();
-
     }
 
     public static Log cui() {

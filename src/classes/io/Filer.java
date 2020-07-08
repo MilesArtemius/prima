@@ -12,7 +12,7 @@ import java.util.Properties;
 public class Filer {
     public static void printToFile(String string, String fileName, OnPerformed listener) {
         try {
-            Files.write(Paths.get(fileName), string.getBytes(), fileExists(fileName) ? StandardOpenOption.APPEND : StandardOpenOption.CREATE);
+            Files.write(Paths.get(fileName), (string + "\n").getBytes(), fileExists(fileName) ? StandardOpenOption.APPEND : StandardOpenOption.CREATE);
             listener.onFinished(null);
         } catch (IOException e) {
             listener.onFinished(e);
@@ -22,16 +22,15 @@ public class Filer {
 
 
     public static void saveGraphToFile(Graph g, String fileName, OnPerformed listener) {
-        try{
-            FileOutputStream outputStream = new FileOutputStream(fileName+".sv");
+        try {
+            FileOutputStream outputStream = new FileOutputStream(fileName + ".sv");
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 
             objectOutputStream.writeObject(g);
 
             objectOutputStream.close();
             listener.onFinished(null);
-        }
-        catch (IOException e){
+        } catch (IOException e){
             Log.gui().say("Файл не найден или содержимое файла повреждено.");
             System.out.println("Файл не найден или содержимое файла повреждено.");
             listener.onFinished(e);

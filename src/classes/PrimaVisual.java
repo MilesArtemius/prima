@@ -68,9 +68,7 @@ public class PrimaVisual {
         graphShapePanel.add(graph, new GridBagConstraints(GridBagConstraints.RELATIVE, GridBagConstraints.RELATIVE,
                 GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1.0, 1.0, GridBagConstraints.CENTER,
                 GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-
         algorithm = new PrimaAlgorithm();
-        algorithm.prepareGraph(graph.getGraph());
 
         logs.setText("<html>");
 
@@ -91,7 +89,6 @@ public class PrimaVisual {
             public void actionPerformed(ActionEvent e) {
                 graph.setGraph(new Graph());
                 algorithm = new PrimaAlgorithm();
-                algorithm.prepareGraph(graph.getGraph());
                 graph.repaint();
             }
         });
@@ -327,6 +324,7 @@ public class PrimaVisual {
         launch.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                algorithm.prepareGraph(graph.getGraph());
                 algorithm.solve(graph.getGraph());
                 graph.repaint();
             }
@@ -335,6 +333,7 @@ public class PrimaVisual {
         forward.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                algorithm.prepareGraph(graph.getGraph());
                 algorithm.solveStep();
                 graph.repaint();
             }
