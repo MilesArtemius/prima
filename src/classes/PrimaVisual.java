@@ -40,7 +40,7 @@ public class PrimaVisual {
     private PrimaAlgorithm algorithm;
     private GraphShape graph;
 
-    private JMenuItem newGraph;
+    private JMenuItem newGraph; // TODO: add submenu: load, choose from samples.
     private JMenuItem saveGraphAs;
     private JMenuItem saveGraph;
     private JMenuItem preserveGraph;
@@ -62,15 +62,27 @@ public class PrimaVisual {
     private JMenuItem aboutApp;
     private JMenuItem aboutUs;
 
-    public PrimaVisual() {
-        graph = new GraphShape();
-        graph.setGraph(Prima.prepareInput());
-        graphShapePanel.add(graph, new GridBagConstraints(GridBagConstraints.RELATIVE, GridBagConstraints.RELATIVE,
-                GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1.0, 1.0, GridBagConstraints.CENTER,
-                GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-        algorithm = new PrimaAlgorithm();
-
+    public PrimaVisual(String fileName) {
         logs.setText("<html>");
+
+        graph = new GraphShape();
+        if (fileName.equals("")) graph.setGraph(Prima.prepareInput());
+        else Filer.loadGraphFromFile(fileName, new Filer.OnGraphLoaded() {
+            @Override
+            public void onFinished(Graph loadedGraph, Exception reason) {
+                if (reason != null) {
+                    reason.printStackTrace();
+                    graph.setGraph(Prima.prepareInput());
+                } else {
+                    graph.setGraph(loadedGraph);
+                }
+
+                graphShapePanel.add(graph, new GridBagConstraints(GridBagConstraints.RELATIVE, GridBagConstraints.RELATIVE,
+                        GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1.0, 1.0, GridBagConstraints.CENTER,
+                        GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+                algorithm = new PrimaAlgorithm();
+            }
+        });
 
         initFileMenu();
         initSettingsMenu();

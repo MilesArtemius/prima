@@ -10,7 +10,11 @@ import java.awt.geom.Point2D;
 public class Prima {
     private static PrimaVisual visual;
 
-    public static Graph prepareInput() {
+    public enum LogLevel {
+        NO_LOG, CONSOLE, FILE, GUI;
+    }
+
+    public static Graph prepareInput() { // TODO: replace with graph samples
         Graph graph = new Graph();
 
         graph.addNode(new Point2D.Double(200, 400), "A");
@@ -35,6 +39,36 @@ public class Prima {
     }
 
     public static void main(String[] args) {
+        if (args.length == 0) {
+            launchGUI("");
+        } else if (args[0].equals("-noGUI")) {
+            Settings.setup(LogLevel.NO_LOG);
+            if (args.length == 4) {
+                String pathToInputFile = args[1];
+                String pathToOutputFile = args[2];
+                LogLevel level = LogLevel.valueOf(args[3]);
+                // TODO: launch algorithm.
+            } else if (args.length == 3) {
+                String pathToInputFile = args[1];
+                String pathToOutputFile = args[2];
+                LogLevel level = LogLevel.CONSOLE;
+                // TODO: launch algorithm.
+            } else Log.cui().file(null).say("Wrong arguments provided! Aborting execution.");
+        } else if (args[0].equals("-GUI")) {
+            if (args.length == 2) {
+                Settings.setup(LogLevel.GUI);
+                launchGUI(args[1]);
+            } else {
+                Settings.setup(LogLevel.NO_LOG);
+                Log.cui().file(null).say("Wrong arguments provided! Aborting execution.");
+            }
+        } else {
+            Settings.setup(LogLevel.NO_LOG);
+            Log.cui().file(null).say("Wrong arguments provided! Aborting execution.");
+        }
+    }
+
+    private static void launchGUI(String saveFile) {
         Log.cui().say("Uptime started");
 
         try {
@@ -43,9 +77,9 @@ public class Prima {
             e.printStackTrace();
         }
 
-        visual = new PrimaVisual();
+        visual = new PrimaVisual(saveFile);
         Log.gui().say("GUI launched...");
-        Settings.setup();
+        Settings.setup(LogLevel.GUI);
 
         JFrame f = new JFrame(Settings.getString("app_name"));
         f.setMinimumSize(new Dimension(Settings.getInt("default_screen_width"), Settings.getInt("default_screen_height")));

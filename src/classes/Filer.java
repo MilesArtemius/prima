@@ -1,6 +1,5 @@
-package classes.io;
+package classes;
 
-import classes.Log;
 import classes.graph.Graph;
 
 import java.io.*;

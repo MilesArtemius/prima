@@ -1,7 +1,5 @@
 package classes;
 
-import classes.io.Filer;
-
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -86,6 +84,11 @@ public class Log {
 
     public Log file(String fileName) {
         file = fileName;
+        return this;
+    }
+
+    public Log gui(boolean enable) {
+        this.isGUILog = enable;
         return this;
     }
 

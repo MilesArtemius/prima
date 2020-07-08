@@ -1,7 +1,5 @@
 package classes;
 
-import classes.io.Filer;
-
 import java.awt.*;
 import java.io.*;
 import java.net.URL;
@@ -117,7 +115,7 @@ public class Settings {
         return instance;
     }
 
-    public static void setup() {
+    public static void setup(Prima.LogLevel level) {
         get();
     }
 
