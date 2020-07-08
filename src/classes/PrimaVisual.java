@@ -36,6 +36,7 @@ public class PrimaVisual {
     private JMenu helpMenu;
     private JPanel menuSeparator;
     private JLabel menuText;
+    private JScrollPane textScroll;
 
     private PrimaAlgorithm algorithm;
     private GraphShape graph;
@@ -76,13 +77,13 @@ public class PrimaVisual {
                 } else {
                     graph.setGraph(loadedGraph);
                 }
-
-                graphShapePanel.add(graph, new GridBagConstraints(GridBagConstraints.RELATIVE, GridBagConstraints.RELATIVE,
-                        GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1.0, 1.0, GridBagConstraints.CENTER,
-                        GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-                algorithm = new PrimaAlgorithm();
             }
         });
+
+        graphShapePanel.add(graph, new GridBagConstraints(GridBagConstraints.RELATIVE, GridBagConstraints.RELATIVE,
+                GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1.0, 1.0, GridBagConstraints.CENTER,
+                GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+        algorithm = new PrimaAlgorithm();
 
         initFileMenu();
         initSettingsMenu();

@@ -115,7 +115,7 @@ public class Settings {
         return instance;
     }
 
-    public static void setup(Prima.LogLevel level) {
+    public static void setup(Prima.LogLevel level) { // TODO: add logging.
         get();
     }
 
