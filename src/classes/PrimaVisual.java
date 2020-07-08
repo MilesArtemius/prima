@@ -331,6 +331,7 @@ public class PrimaVisual {
             @Override
             public void actionPerformed(ActionEvent e) {
                 PrimaAlgorithm alg = new PrimaAlgorithm();
+
                 alg.prepareGraph(graph.getGraph());
                 alg.solveStep();
                 graph.repaint();
