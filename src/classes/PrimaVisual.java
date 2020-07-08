@@ -1,5 +1,6 @@
 package classes;
 
+import classes.algorithm.PrimaAlgorithm;
 import classes.dial.ParameterChangeDialog;
 import classes.graph.Graph;
 import classes.shapes.GraphShape;
@@ -77,6 +78,8 @@ public class PrimaVisual {
 
         reEnableAll();
         resetAllNames();
+
+
     }
 
     private void initFileMenu() {
@@ -305,6 +308,11 @@ public class PrimaVisual {
             }
         });
 
+        helpMenu.add(aboutApp);
+        helpMenu.add(aboutUs);
+    }
+
+    private void initializeButtons() {
         test.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -312,8 +320,24 @@ public class PrimaVisual {
             }
         });
 
-        helpMenu.add(aboutApp);
-        helpMenu.add(aboutUs);
+        launch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                PrimaAlgorithm alg = new PrimaAlgorithm();
+                alg.solve(graph.getGraph());
+                graph.repaint();
+            }
+        });
+
+        forward.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                PrimaAlgorithm alg = new PrimaAlgorithm();
+                alg.prepareGraph(graph.getGraph());
+                alg.solveStep();
+                graph.repaint();
+            }
+        });
     }
 
 
