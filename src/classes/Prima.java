@@ -11,7 +11,7 @@ public class Prima {
     private static PrimaVisual visual;
 
     public enum LogLevel {
-        NO_LOG, CONSOLE, FILE, GUI;
+        NO_LOG, CONSOLE, FILE, GUI
     }
 
     public static Graph prepareInput() { // TODO: replace with graph samples
@@ -38,6 +38,13 @@ public class Prima {
         return graph;
     }
 
+    /**
+     * There are four available command line argument configurations:
+     * 1. "" - Empty configuration launches default GUI app with empty graph.
+     * 2. "-GUI path_to_file.sv" - Launches GUI app, loading graph from "path_to_file.sv".
+     * 3. "-noGUI path_to_input_file.sv path_to_output_file.sv" - Launches console algorithm, getting graph from "path_to_input_file.sv" and loading result "to path_to_output_file.sv".
+     * 4. "-noGUI path_to_input_file.sv path_to_output_file.sv log_level" - the same as above, setting algorithm log level to one of four: NO_LOG, CONSOLE, FILE, GUI.
+     */
     public static void main(String[] args) {
         if (args.length == 0) {
             launchGUI("");
