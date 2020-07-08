@@ -12,7 +12,7 @@ public class PrimaAlgorithm implements Algorithm {
 
     private Graph graph;
     private ArrayList<Node> nodesForSearch = new ArrayList<Node>();
-
+    private boolean isPrepared = false;
     private void logResult(){
         for (Ark ark: graph.getArks()){
 
@@ -105,6 +105,10 @@ public class PrimaAlgorithm implements Algorithm {
     @Override
     public Graph prepareGraph(Graph graph) {//сюда изначальный целый граф. Превращает граф в граф без ребер и добавляет стартовое ребро.
         this.graph = graph;
+        if (isPrepared){
+            return null;
+        }
+        isPrepared = true;
         for (Ark ark: graph.getArks()) {
             ark.hideArk();
         }
@@ -119,4 +123,11 @@ public class PrimaAlgorithm implements Algorithm {
         return graph;
     }
 
+    public boolean isPrepared() {
+        return isPrepared;
+    }
+
+    public void setPrepared(boolean prepared) {
+        isPrepared = prepared;
+    }
 }
