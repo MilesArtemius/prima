@@ -32,7 +32,6 @@ public class Filer {
             listener.onFinished(null);
         } catch (IOException e){
             Log.gui().say("Файл не найден или содержимое файла повреждено.");
-            System.out.println("Файл не найден или содержимое файла повреждено.");
             listener.onFinished(e);
         }
     }
@@ -41,7 +40,7 @@ public class Filer {
 
 
         try{
-            FileInputStream fileInputStream = new FileInputStream(fileName+".sv");
+            FileInputStream fileInputStream = new FileInputStream(fileName + ".sv");
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 
 
@@ -50,7 +49,6 @@ public class Filer {
         }
         catch (IOException | ClassNotFoundException e){
             Log.gui().say("Файл не найден или содержимое файла повреждено.");
-            System.out.println("Файл не найден или содержимое файла повреждено.");
             listener.onFinished(null, e);
         }
 
