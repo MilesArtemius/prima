@@ -28,7 +28,7 @@ public class Filer {
             listener.onFinished(null);
         }
         catch (IOException e){
-            Log.cui().say("Файл не найден или содержимое файла повреждено.");
+            Log.gui().say("Файл не найден или содержимое файла повреждено.");
             System.out.println("Файл не найден или содержимое файла повреждено.");
             listener.onFinished(e);
         }
@@ -46,7 +46,7 @@ public class Filer {
             listener.onFinished(graph, null);
         }
         catch (IOException | ClassNotFoundException e){
-            Log.cui().say("Файл не найден или содержимое файла повреждено.");
+            Log.gui().say("Файл не найден или содержимое файла повреждено.");
             System.out.println("Файл не найден или содержимое файла повреждено.");
             listener.onFinished(null, e);
         }
