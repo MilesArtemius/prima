@@ -1,5 +1,6 @@
 package classes.io;
 
+import classes.Log;
 import classes.graph.Graph;
 
 import java.io.*;
@@ -9,6 +10,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Properties;
 
 public class Filer {
+
     public static void printToFile(String string, String fileName, OnPerformed listener) {
 
     }
@@ -16,10 +18,38 @@ public class Filer {
 
 
     public static void saveGraphToFile(Graph g, String fileName, OnPerformed listener) {
+        try{
+            FileOutputStream outputStream = new FileOutputStream(fileName+".sv");
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 
+            objectOutputStream.writeObject(g);
+
+            objectOutputStream.close();
+            listener.onFinished(null);
+        }
+        catch (IOException e){
+            Log.cui().say("Файл не найден или содержимое файла повреждено.");
+            System.out.println("Файл не найден или содержимое файла повреждено.");
+            listener.onFinished(e);
+        }
     }
 
     public static void loadGraphFromFile(String fileName, OnGraphLoaded listener) {
+
+
+        try{
+            FileInputStream fileInputStream = new FileInputStream(fileName+".sv");
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+
+
+            Graph graph = (Graph) objectInputStream.readObject();
+            listener.onFinished(graph, null);
+        }
+        catch (IOException | ClassNotFoundException e){
+            Log.cui().say("Файл не найден или содержимое файла повреждено.");
+            System.out.println("Файл не найден или содержимое файла повреждено.");
+            listener.onFinished(null, e);
+        }
 
     }
 
