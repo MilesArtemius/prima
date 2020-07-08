@@ -50,18 +50,7 @@ public class Prima {
         JFrame f = new JFrame(Settings.getString("app_name"));
         f.setMinimumSize(new Dimension(Settings.getInt("default_screen_width"), Settings.getInt("default_screen_height")));
         f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-        /*Graph graph = prepareInput();
-        GraphShape shape = new GraphShape();
-        shape.setGraph(graph);
-
-        PrimaAlgorithm alg = new PrimaAlgorithm();
-        alg.solve(graph);
-
-        f.add(shape);*/
-
         f.setContentPane(visual.getMainPanel());
-
         f.pack();
         f.setLocationByPlatform(true);
         f.setVisible(true);
