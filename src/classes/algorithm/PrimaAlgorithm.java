@@ -166,6 +166,7 @@ public class PrimaAlgorithm implements Algorithm {
                 minArk.showArk();
                 nodesForSearch.add(isStartInArrMin? graph.getNode(minArk.getEnd()) : graph.getNode(minArk.getStart()));
                 nodesForSearch.get(nodesForSearch.size()-1).showNode();
+                graph.addHistory(nodesForSearch.get(nodesForSearch.size()-1), minArk);
                 Log.getForLevel(logLevel).say("Найдено ребро ", minArk);
 
             }
@@ -190,6 +191,16 @@ public class PrimaAlgorithm implements Algorithm {
         return solveStep(graph);
     }
 
+    public void stepBack(){
+        if (graph!=null){
+            graph.restoreHistory();
+            if (nodesForSearch.size() == 1){
+                isPrepared = false;
+            }
+            if (!nodesForSearch.isEmpty())
+                nodesForSearch.remove(nodesForSearch.size()-1);
+        }
+    }
     @Override
     public Graph prepareGraph(Graph graph) {//сюда изначальный целый граф. Превращает граф в граф без ребер и добавляет стартовое ребро.
         this.graph = graph;
@@ -209,10 +220,12 @@ public class PrimaAlgorithm implements Algorithm {
         for (Node node: graph.getNodes()){
             node.hideNode();
         }
+        graph.clearHistory();
         int randomNum = ThreadLocalRandom.current().nextInt(0, graph.getNodes().size());
         Log.getForLevel(logLevel).say("Начальный узел: ", graph.getNodes().get(randomNum).getName());
         nodesForSearch.add(graph.getNodes().get(randomNum));
         nodesForSearch.get(0).showNode();
+        graph.addHistory(nodesForSearch.get(0));
         solveStep();
         return graph;
     }

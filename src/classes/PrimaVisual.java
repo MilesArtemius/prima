@@ -425,6 +425,14 @@ public class PrimaVisual {
                 }, null);
             }
         });
+
+        backward.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                algorithm.stepBack();
+                graph.repaint();
+            }
+        });
     }
 
 

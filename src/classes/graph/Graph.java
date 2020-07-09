@@ -1,5 +1,7 @@
 package classes.graph;
 
+import classes.Log;
+
 import java.awt.geom.Point2D;
 import java.util.*;
 
@@ -9,6 +11,7 @@ public class Graph {
     private LinkedList<Ark> arks = new LinkedList<Ark>(); // я бы предложил создавать массив в момент вызова getArks(), чтобы избежать хранения лишнего, хотя так быстрее
 
 
+    private History history = new History();
     private boolean recentlyChanged = true;
 
     public Node getNode(String name){
@@ -141,11 +144,35 @@ public class Graph {
             for (Node node: getNodes()){
                 node.hideNode();
             }
+            history.clearHistory();
         }
         this.recentlyChanged = recentlyChanged;
     }
+    public void addHistory(Node node){
 
+        history.addHistory(node);
+    }
+    public void addHistory(Node node, Ark ark){
 
+        history.addHistory(node, ark);
+    }
+
+    public void restoreHistory(){
+        History.NodePlusArk val = history.restore();
+        if (val != null){
+            if (val.ark!=null)
+                val.ark.hideArk();
+            val.node.hideNode();
+
+        }
+        else {
+            Log.gui().say("Начало уже достигнуто");
+        }
+    }
+
+    public void clearHistory(){
+        history.clearHistory();
+    }
 
     @Override
     public String toString() {
