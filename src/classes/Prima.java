@@ -99,7 +99,7 @@ public class Prima {
         Log.gui().col(Log.Colors.GREEN).say("GUI launched!");
         Settings.setup(Log.Level.GUI);
 
-        JFrame f = new JFrame(Settings.getString("app_name"));
+        JFrame f = new JFrame(Settings.getString("app_name") + " - " + saveFile);
         f.setMinimumSize(new Dimension(Settings.getInt("default_screen_width"), Settings.getInt("default_screen_height")));
         f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         f.setContentPane(visual.getMainPanel());

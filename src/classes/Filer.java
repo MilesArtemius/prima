@@ -14,6 +14,10 @@ public class Filer {
     public static final String PROPERTIES_FILE_EXTENSION = "properties";
     public static final String GRAPH_FILE_EXTENSION = "sv";
 
+    public static final String SAMPLE_GRAPH = "GraphSample.sv";
+    public static final String BIPARTITE_GRAPH = "GraphBipartite.sv";
+    public static final String PETERSON_GRAPH = "GraphPeterson.sv";
+
     public static void printToFile(String string, String fileName, OnPerformed listener) {
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
@@ -86,7 +90,35 @@ public class Filer {
                 else name = fileName;
                 FileInputStream fileInputStream = new FileInputStream(name);
                 ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-                return Graph.readFromMap((Map<String, Object>) objectInputStream.readObject(), graphic);
+                Map<String, Object> map = (Map<String, Object>) objectInputStream.readObject();
+                fileInputStream.close();
+                return Graph.readFromMap(map, graphic);
+            }
+            @Override
+            public void done() {
+                try {
+                    Graph graph = get();
+                    listener.onFinished(graph, null);
+                } catch (Exception e) {
+                    listener.onFinished(null, e);
+                }
+            }
+        };
+
+        worker.execute();
+    }
+
+    public static void loadGraphFromResources(String fileName, OnGraphLoaded listener) {
+        SwingWorker<Graph, Void> worker = new SwingWorker<>() {
+            @Override
+            public Graph doInBackground() throws Exception {
+                InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
+                if (inputStream != null) {
+                    ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+                    Map<String, Object> map = (Map<String, Object>) objectInputStream.readObject();
+                    inputStream.close();
+                    return Graph.readFromMap(map, true);
+                } else throw new IOException("No resource file exists!");
             }
             @Override
             public void done() {

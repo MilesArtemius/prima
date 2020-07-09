@@ -46,7 +46,11 @@ public class PrimaVisual {
     private GraphShape graph;
     private String openedFileName;
 
-    private JMenuItem newGraph; // TODO: add submenu: load, choose from samples.
+    private JMenu newGraph;
+    private JMenuItem emptyGraph;
+    private JMenuItem sampleGraph;
+    private JMenuItem bipartiteGraph;
+    private JMenuItem petersonGraph;
     private JMenuItem openGraph;
     private JMenuItem saveGraphAs;
     private JMenuItem saveGraph;
@@ -105,13 +109,45 @@ public class PrimaVisual {
     }
 
     private void initFileMenu() {
-        newGraph = new JMenuItem();
-        newGraph.addActionListener(e -> {
-            saveGraph.setEnabled(false);
+        newGraph = new JMenu();
+        emptyGraph = new JMenuItem();
+        emptyGraph.addActionListener(e -> {
+            setOpenFileName("");
             graph.setGraph(new Graph());
             algorithm = new PrimaAlgorithm();
             graph.repaint();
         });
+        Filer.OnGraphLoaded listener = new Filer.OnGraphLoaded() {
+            @Override
+            public void onFinished(Graph graph, Exception reason) {
+                if (reason == null) {
+                    PrimaVisual.this.graph.setGraph(graph);
+                    PrimaVisual.this.algorithm = new PrimaAlgorithm();
+                    PrimaVisual.this.graph.repaint();
+                } else{
+                    Log.consumeException("Ошибка при загрузке графа из ресурсов программы", reason);
+                }
+            }
+        };
+        sampleGraph = new JMenuItem();
+        sampleGraph.addActionListener(e -> {
+            setOpenFileName("");
+            Filer.loadGraphFromResources(Filer.SAMPLE_GRAPH, listener);
+        });
+        bipartiteGraph = new JMenuItem();
+        bipartiteGraph.addActionListener(e -> {
+            setOpenFileName("");
+            Filer.loadGraphFromResources(Filer.BIPARTITE_GRAPH, listener);
+        });
+        petersonGraph = new JMenuItem();
+        petersonGraph.addActionListener(e -> {
+            setOpenFileName("");
+            Filer.loadGraphFromResources(Filer.PETERSON_GRAPH, listener);
+        });
+        newGraph.add(emptyGraph);
+        newGraph.add(sampleGraph);
+        newGraph.add(bipartiteGraph);
+        newGraph.add(petersonGraph);
         openGraph = new JMenuItem();
         openGraph.addActionListener(e -> {
             JFileChooser fileDialog = new JFileChooser();
@@ -124,8 +160,7 @@ public class PrimaVisual {
             int status = fileDialog.showOpenDialog(root);
             if (status == JFileChooser.APPROVE_OPTION) {
                 System.out.println(fileDialog.getSelectedFile().getAbsolutePath());
-                PrimaVisual.this.openedFileName = fileDialog.getSelectedFile().getName();
-                PrimaVisual.this.saveGraph.setEnabled(true);
+                PrimaVisual.this.setOpenFileName(fileDialog.getSelectedFile().getAbsolutePath());
 
                 Filer.loadGraphFromFile(fileDialog.getSelectedFile().getAbsolutePath(), true, (graph, reason) -> {
                     if (reason != null) {
@@ -151,8 +186,7 @@ public class PrimaVisual {
             int status = fileDialog.showOpenDialog(root);
             if (status == JFileChooser.APPROVE_OPTION) {
                 System.out.println(fileDialog.getSelectedFile().getAbsolutePath());
-                PrimaVisual.this.openedFileName = fileDialog.getSelectedFile().getName();
-                PrimaVisual.this.saveGraph.setEnabled(true);
+                PrimaVisual.this.setOpenFileName(fileDialog.getSelectedFile().getAbsolutePath());
 
                 Filer.saveGraphToFile(PrimaVisual.this.graph.getGraph(), fileDialog.getSelectedFile().getAbsolutePath(), reason -> {
                     if (reason == null) {
@@ -285,12 +319,9 @@ public class PrimaVisual {
     private void initButtons() {
         test.addActionListener(e -> PrimaTest.runTests());
 
-        reset.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                graph.getGraph().reset();
-                graph.repaint();
-            }
+        reset.addActionListener(e -> {
+            graph.getGraph().reset();
+            graph.repaint();
         });
 
         launch.addActionListener(e -> algorithm.threadSolveAll(graph.getGraph(), () -> graph.repaint(), null));
@@ -307,21 +338,28 @@ public class PrimaVisual {
 
     public void preserve(boolean isFinal) {
         String date = (new SimpleDateFormat("dd-MM-yyyy_HH-mm-ss")).format(Calendar.getInstance().getTime());
-        openedFileName = Settings.getPref(Settings.userPath) + File.separator + Settings.userPathDir + File.separator + date + "_graph";
-        Settings.setPref(Settings.preservedGraph, openedFileName);
+        String fileName = Settings.getPref(Settings.userPath) + File.separator + Settings.userPathDir + File.separator + date + "_graph";
+        Settings.setPref(Settings.preservedGraph, fileName);
         Filer.OnPerformed listener = reason -> {
             if (reason == null) {
-                Log.gui(Log.Attributes.BOLD).col(Log.Colors.GREEN).say("Graph saved as " + openedFileName + "!");
+                Log.gui(Log.Attributes.BOLD).col(Log.Colors.GREEN).say("Graph saved as " + fileName + "!");
             } else {
                 Log.consumeException("Файл не может быть сохранён", reason);
             }
         };
-        if (!isFinal) Filer.saveGraphToFile(graph.getGraph(), openedFileName, listener);
-        else Filer.saveGraphToFileNoThread(graph.getGraph(), openedFileName, listener);
+        if (!isFinal) Filer.saveGraphToFile(graph.getGraph(), fileName, listener);
+        else Filer.saveGraphToFileNoThread(graph.getGraph(), fileName, listener);
     }
 
     public Dimension getGraphShapeDimension() {
         return graph.getSize();
+    }
+
+    private void setOpenFileName(String name) {
+        openedFileName = name;
+        if (SwingUtilities.getWindowAncestor(root) != null)
+            ((JFrame) SwingUtilities.getWindowAncestor(root)).setTitle(Settings.getString("app_name") + (openedFileName.equals("") ? "" : " - " + openedFileName));
+        saveGraph.setEnabled(!openedFileName.equals(""));
     }
 
 
@@ -335,12 +373,15 @@ public class PrimaVisual {
     }
 
     private void resetAllNames() {
-        if (SwingUtilities.getWindowAncestor(root) != null)
-            ((JFrame) SwingUtilities.getWindowAncestor(root)).setTitle(Settings.getString("app_name"));
+        setOpenFileName(openedFileName);
 
         fileMenu.setText("File");
-        openGraph.setText("Open...");
         newGraph.setText("New...");
+        emptyGraph.setText("Empty graph");
+        sampleGraph.setText("Sample graph");
+        bipartiteGraph.setText("Sample bipartite graph");
+        petersonGraph.setText("Peterson graph");
+        openGraph.setText("Open...");
         saveGraphAs.setText("Save as...");
         saveGraph.setText("Save");
         preserveGraph.setText("Preserve");
