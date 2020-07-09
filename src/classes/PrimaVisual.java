@@ -11,6 +11,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,8 +43,10 @@ public class PrimaVisual {
 
     private PrimaAlgorithm algorithm;
     private GraphShape graph;
+    private String openedFileName;
 
     private JMenuItem newGraph; // TODO: add submenu: load, choose from samples.
+    private JMenuItem openGraph;
     private JMenuItem saveGraphAs;
     private JMenuItem saveGraph;
     private JMenuItem preserveGraph;
@@ -64,16 +69,18 @@ public class PrimaVisual {
     private JMenuItem aboutUs;
 
     public PrimaVisual(String fileName) {
+        this.openedFileName = fileName;
+
         logs.setText("<html>");
 
         graph = new GraphShape();
-        if (fileName.equals("")) graph.setGraph(Prima.prepareInput());
-        else Filer.loadGraphFromFile(fileName, true, new Filer.OnGraphLoaded() {
+        if (openedFileName.equals("")) graph.setGraph(Prima.prepareInput());
+        else Filer.loadGraphFromFile(openedFileName, true, new Filer.OnGraphLoaded() {
             @Override
             public void onFinished(Graph loadedGraph, Exception reason) {
                 if (reason != null) {
                     reason.printStackTrace();
-                    graph.setGraph(Prima.prepareInput());
+                    graph.setGraph(new Graph());
                 } else {
                     graph.setGraph(loadedGraph);
                 }
@@ -89,6 +96,8 @@ public class PrimaVisual {
         initSettingsMenu();
         initAboutMenu();
 
+        saveGraph.setEnabled(openedFileName.equals(""));
+
         reEnableAll();
         resetAllNames();
 
@@ -100,30 +109,97 @@ public class PrimaVisual {
         newGraph.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                saveGraph.setEnabled(false);
                 graph.setGraph(new Graph());
                 algorithm = new PrimaAlgorithm();
                 graph.repaint();
+            }
+        });
+        openGraph = new JMenuItem();
+        openGraph.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileDialog = new JFileChooser();
+                fileDialog.setDialogTitle("Choose graph file");
+                fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fileDialog.setDialogType(JFileChooser.OPEN_DIALOG);
+                fileDialog.setFileFilter(new FileNameExtensionFilter("GRAPH FILES", "sv"));
+                fileDialog.setAcceptAllFileFilterUsed(false);
+
+                int status = fileDialog.showOpenDialog(root);
+                if (status == JFileChooser.APPROVE_OPTION) {
+                    System.out.println(fileDialog.getSelectedFile().getAbsolutePath());
+                    PrimaVisual.this.openedFileName = fileDialog.getSelectedFile().getName();
+                    PrimaVisual.this.saveGraph.setEnabled(true);
+
+                    Filer.loadGraphFromFile(fileDialog.getSelectedFile().getAbsolutePath(), true, new Filer.OnGraphLoaded() {
+                        @Override
+                        public void onFinished(Graph graph, Exception reason) {
+                            if (reason != null) {
+                                Log.consumeException(reason);
+                            } else {
+                                PrimaVisual.this.graph.setGraph(graph);
+                                PrimaVisual.this.graph.repaint();
+                            }
+                        }
+                    });
+                } else if (status == JFileChooser.CANCEL_OPTION) {
+                    System.out.println("Graph file not chosen!");
+                }
             }
         });
         saveGraphAs = new JMenuItem();
         saveGraphAs.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO: implement;
+                JFileChooser fileDialog = new JFileChooser();
+                fileDialog.setDialogTitle("Save graph file as");
+                fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fileDialog.setDialogType(JFileChooser.SAVE_DIALOG);
+                fileDialog.setFileFilter(new FileNameExtensionFilter("GRAPH FILES", "sv"));
+                fileDialog.setAcceptAllFileFilterUsed(false);
+
+                int status = fileDialog.showOpenDialog(root);
+                if (status == JFileChooser.APPROVE_OPTION) {
+                    System.out.println(fileDialog.getSelectedFile().getAbsolutePath());
+                    PrimaVisual.this.openedFileName = fileDialog.getSelectedFile().getName();
+                    PrimaVisual.this.saveGraph.setEnabled(true);
+
+                    Filer.saveGraphToFile(PrimaVisual.this.graph.getGraph(), fileDialog.getSelectedFile().getAbsolutePath(), new Filer.OnPerformed() {
+                        @Override
+                        public void onFinished(Exception reason) {
+                            System.out.println("Graph saved!");
+                        }
+                    });
+                } else if (status == JFileChooser.CANCEL_OPTION) {
+                    System.out.println("Graph file not chosen!");
+                }
             }
         });
         saveGraph = new JMenuItem();
         saveGraph.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO: implement;
+                Filer.saveGraphToFile(graph.getGraph(), openedFileName, new Filer.OnPerformed() {
+                    @Override
+                    public void onFinished(Exception reason) {
+                        System.out.println("Graph saved!");
+                    }
+                });
             }
         });
         preserveGraph = new JMenuItem();
         preserveGraph.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO: implement;
+                String date = (new SimpleDateFormat("dd-MM-yyyy HH:mm:ss")).format(Calendar.getInstance().getTime());
+                String saveName = Settings.getPref(Settings.userPath) + File.separator + Settings.userPathDir + File.separator + date + "_graph";
+                Filer.saveGraphToFile(graph.getGraph(), saveName, new Filer.OnPerformed() {
+                    @Override
+                    public void onFinished(Exception reason) {
+                        System.out.println("Graph saved as " + saveName + "!");
+                    }
+                });
             }
         });
 
@@ -216,6 +292,7 @@ public class PrimaVisual {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fileDialog = new JFileChooser();
                 fileDialog.setDialogTitle("Set directory");
+                fileDialog.setDialogType(JFileChooser.OPEN_DIALOG);
                 fileDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 fileDialog.setAcceptAllFileFilterUsed(false);
 
@@ -239,6 +316,7 @@ public class PrimaVisual {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fileDialog = new JFileChooser();
                 fileDialog.setDialogTitle("Choose localization file");
+                fileDialog.setDialogType(JFileChooser.OPEN_DIALOG);
                 fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 fileDialog.setFileFilter(new FileNameExtensionFilter("PROPERTIES FILES", "properties"));
                 fileDialog.setAcceptAllFileFilterUsed(false);
@@ -375,6 +453,7 @@ public class PrimaVisual {
             ((JFrame) SwingUtilities.getWindowAncestor(root)).setTitle(Settings.getString("app_name"));
 
         fileMenu.setText("File");
+        openGraph.setText("Open...");
         newGraph.setText("New...");
         saveGraphAs.setText("Save as...");
         saveGraph.setText("Save");

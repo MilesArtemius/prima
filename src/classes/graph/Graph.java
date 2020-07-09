@@ -39,6 +39,10 @@ public class Graph {
 
         Node node = nodes.get(originName);
         if (node != null){
+            for (Ark ark: node.getArks()) {
+                if (ark.getStart().equals(originName)) ark.setStart(newName);
+                else if (ark.getEnd().equals(originName)) ark.setEnd(newName);
+            }
             nodes.remove(originName);
             nodes.put(newName, node);
             node.setName(newName);

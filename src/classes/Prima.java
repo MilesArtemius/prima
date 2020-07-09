@@ -43,7 +43,7 @@ public class Prima {
      * 4. "-noGUI path_to_input_file.sv path_to_output_file.sv log_level" - the same as above, setting algorithm log level to one of four: NO_LOG, CONSOLE, FILE, GUI.
      */
     public static void main(String[] args) {
-        Graph g = prepareInput();
+        /*Graph g = prepareInput();
         Filer.saveGraphToFile(g, "graph.sv", new Filer.OnPerformed() {
             @Override
             public void onFinished(Exception reason) {
@@ -54,7 +54,7 @@ public class Prima {
                     }
                 });
             }
-        });
+        });*/
 
         if (args.length == 0) {
             launchGUI("");

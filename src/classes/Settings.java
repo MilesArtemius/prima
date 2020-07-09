@@ -16,7 +16,7 @@ public class Settings {
     public static final String userPath = "USER_PATH";
     public static final String userLocalization = "USING_USER_LOCALIZATION";
 
-    private static final String userPathDir = "PrimaConfigurationFolder";
+    public static final String userPathDir = "PrimaConfigurationFolder";
     private static final String userPathConstants = File.separator + userPathDir + File.separator + constantsName + ".properties";
     private static final String userPathDictionary = File.separator + userPathDir + File.separator + dictionaryName + ".properties";
 

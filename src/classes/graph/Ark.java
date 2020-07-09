@@ -5,7 +5,6 @@ import java.util.Map;
 
 public class Ark {
 
-    private static final long serialVersionUID = 2L;
     private String start, end;
     private double weight;
     private boolean hidden;
@@ -18,6 +17,14 @@ public class Ark {
         this.weight = weight;
         this.hidden = true;
 
+    }
+
+    public void setStart(String start) {
+        this.start = start;
+    }
+
+    public void setEnd(String end) {
+        this.end = end;
     }
 
     public String getStart() {
