@@ -6,6 +6,8 @@ import classes.graph.NodePlus;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 
 public class Prima {
@@ -105,6 +107,11 @@ public class Prima {
         f.pack();
         f.setLocationByPlatform(true);
         f.setVisible(true);
+        f.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent winEvt) {
+                if (Settings.checkPref(Settings.userPath)) visual.preserve(visual.openedFileName, true);
+            }
+        });
     }
 
     public static PrimaVisual getVisual() {

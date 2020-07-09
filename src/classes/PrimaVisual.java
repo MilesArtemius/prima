@@ -43,7 +43,7 @@ public class PrimaVisual {
 
     private PrimaAlgorithm algorithm;
     private GraphShape graph;
-    private String openedFileName;
+    public String openedFileName;
 
     private JMenuItem newGraph; // TODO: add submenu: load, choose from samples.
     private JMenuItem openGraph;
@@ -74,8 +74,7 @@ public class PrimaVisual {
         logs.setText("<html>");
 
         graph = new GraphShape();
-        if (openedFileName.equals("")) graph.setGraph(Prima.prepareInput());
-        else Filer.loadGraphFromFile(openedFileName, true, new Filer.OnGraphLoaded() {
+        Filer.OnGraphLoaded loadListner = new Filer.OnGraphLoaded() {
             @Override
             public void onFinished(Graph loadedGraph, Exception reason) {
                 if (reason != null) {
@@ -85,7 +84,10 @@ public class PrimaVisual {
                     graph.setGraph(loadedGraph);
                 }
             }
-        });
+        };
+        if (!openedFileName.equals("")) Filer.loadGraphFromFile(openedFileName, true, loadListner);
+        else if (!Settings.getPref(Settings.preservedGraph).equals("")) Filer.loadGraphFromFile(Settings.getPref(Settings.preservedGraph), true, loadListner);
+        else graph.setGraph(Prima.prepareInput());
 
         graphShapePanel.add(graph, new GridBagConstraints(GridBagConstraints.RELATIVE, GridBagConstraints.RELATIVE,
                 GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1.0, 1.0, GridBagConstraints.CENTER,
@@ -192,14 +194,7 @@ public class PrimaVisual {
         preserveGraph.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String date = (new SimpleDateFormat("dd-MM-yyyy HH:mm:ss")).format(Calendar.getInstance().getTime());
-                String saveName = Settings.getPref(Settings.userPath) + File.separator + Settings.userPathDir + File.separator + date + "_graph";
-                Filer.saveGraphToFile(graph.getGraph(), saveName, new Filer.OnPerformed() {
-                    @Override
-                    public void onFinished(Exception reason) {
-                        System.out.println("Graph saved as " + saveName + "!");
-                    }
-                });
+                preserve("", false);
             }
         });
 
@@ -416,9 +411,6 @@ public class PrimaVisual {
         launch.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //algorithm.prepareGraph(graph.getGraph());
-                //algorithm.solve(graph.getGraph());
-                //graph.repaint();
                 algorithm.threadSolveAll(graph.getGraph(), () -> {
                     graph.repaint();
                 }, null);
@@ -428,14 +420,30 @@ public class PrimaVisual {
         forward.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //algorithm.prepareGraph(graph.getGraph());
-                //algorithm.solveStep(graph.getGraph());
-                //graph.repaint();
                 algorithm.threadSolveStep(graph.getGraph(), () -> {
                     graph.repaint();
                 }, null);
             }
         });
+    }
+
+
+
+    public void preserve(String preserveName, boolean isFinal) {
+        String saveName;
+        if (preserveName.equals("")) {
+            String date = (new SimpleDateFormat("dd-MM-yyyy_HH-mm-ss")).format(Calendar.getInstance().getTime());
+            saveName = Settings.getPref(Settings.userPath) + File.separator + Settings.userPathDir + File.separator + date + "_graph";
+        } else saveName = preserveName;
+        Settings.setPref(Settings.preservedGraph, saveName);
+        Filer.OnPerformed listener = new Filer.OnPerformed() {
+            @Override
+            public void onFinished(Exception reason) {
+                System.out.println("Graph saved as " + saveName + "!");
+            }
+        };
+        if (!isFinal) Filer.saveGraphToFile(graph.getGraph(), saveName, listener);
+        else Filer.saveGraphToFileNoThread(graph.getGraph(), saveName, listener);
     }
 
 

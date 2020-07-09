@@ -15,6 +15,7 @@ public class Settings {
 
     public static final String userPath = "USER_PATH";
     public static final String userLocalization = "USING_USER_LOCALIZATION";
+    public static final String preservedGraph = "PRESERVED_GRAPH";
 
     public static final String userPathDir = "PrimaConfigurationFolder";
     private static final String userPathConstants = File.separator + userPathDir + File.separator + constantsName + ".properties";

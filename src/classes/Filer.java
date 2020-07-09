@@ -38,6 +38,8 @@ public class Filer {
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             public Void doInBackground() throws Exception {
+                Files.deleteIfExists(Paths.get(fileName + ".sv"));
+                Files.createFile(Paths.get(fileName + ".sv"));
                 FileOutputStream outputStream = new FileOutputStream(fileName + ".sv");
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
                 objectOutputStream.writeObject(g.writeToMap());
@@ -57,6 +59,20 @@ public class Filer {
         };
 
         worker.execute();
+    }
+
+    public static void saveGraphToFileNoThread(Graph g, String fileName, OnPerformed listener) {
+        try {
+            Files.deleteIfExists(Paths.get(fileName + ".sv"));
+            Files.createFile(Paths.get(fileName + ".sv"));
+            FileOutputStream outputStream = new FileOutputStream(fileName + ".sv");
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+            objectOutputStream.writeObject(g.writeToMap());
+            objectOutputStream.close();
+            listener.onFinished(null);
+        } catch (IOException e) {
+            listener.onFinished(e);
+        }
     }
 
     public static void loadGraphFromFile(String fileName, boolean graphic, OnGraphLoaded listener) {

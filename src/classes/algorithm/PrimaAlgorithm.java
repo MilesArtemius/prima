@@ -12,27 +12,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class PrimaAlgorithm implements Algorithm {
 
-    /**
-     * SwingWorker<Void, Void> worker = new SwingWorker<>() {
-     *     @Override
-     *     public Void doInBackground() throws Exception {
-     *         // Perform the time-taking task, this method is executed in new thread.
-     *         // NB! Log is thread-safe (afaik).
-     *         return null;
-     *     }
-     *     @Override
-     *         public void done() {
-     *             try {
-     *                 get(); // Get results and errors (if any).
-     *             } catch (Exception e) {
-     *                 e.printStackTrace();
-     *             }
-     *         }
-     *     };
-     *
-     *     worker.execute();
-     */
-
     private Graph graph;
     private ArrayList<Node> nodesForSearch = new ArrayList<Node>();
     private boolean isPrepared = false;
@@ -91,7 +70,8 @@ public class PrimaAlgorithm implements Algorithm {
                 try {
                     get(); // Get results and errors (if any).
                     busy = false;
-                    successListener.listener();
+                    if (successListener!=null)
+                        successListener.listener();
 
                 } catch (Exception e) {
                     busy = false;
