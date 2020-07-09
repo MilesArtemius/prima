@@ -338,9 +338,12 @@ public class PrimaVisual {
         launch.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                algorithm.prepareGraph(graph.getGraph());
-                algorithm.solve(graph.getGraph());
-                graph.repaint();
+                //algorithm.prepareGraph(graph.getGraph());
+                //algorithm.solve(graph.getGraph());
+                //graph.repaint();
+                algorithm.threadSolveAll(graph.getGraph(), () -> {
+                    graph.repaint();
+                }, null);
             }
         });
 
@@ -348,8 +351,11 @@ public class PrimaVisual {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //algorithm.prepareGraph(graph.getGraph());
-                algorithm.solveStep(graph.getGraph());
-                graph.repaint();
+                //algorithm.solveStep(graph.getGraph());
+                //graph.repaint();
+                algorithm.threadSolveStep(graph.getGraph(), () -> {
+                    graph.repaint();
+                }, null);
             }
         });
     }

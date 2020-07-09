@@ -1,10 +1,12 @@
 package classes.algorithm;
 
 import classes.Log;
+import classes.Prima;
 import classes.graph.Graph;
 import classes.graph.Ark;
 import classes.graph.Node;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -34,6 +36,80 @@ public class PrimaAlgorithm implements Algorithm {
     private Graph graph;
     private ArrayList<Node> nodesForSearch = new ArrayList<Node>();
     private boolean isPrepared = false;
+    private boolean busy = false;
+
+    public PrimaAlgorithm(){
+
+    }
+    public PrimaAlgorithm(Prima.LogLevel logLevel){
+
+    }
+
+    public void threadSolveStep(Graph graph, OnSuccess successListener, OnFail failListener) {
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            public Void doInBackground() throws Exception {
+                busy = true;
+                solveStep(graph);
+                return null;
+            }
+            @Override
+            public void done() {
+                try {
+                    get(); // Get results and errors (if any).
+                    busy = false;
+                    successListener.listener();
+
+                } catch (Exception e) {
+                    busy = false;
+                    if (failListener==null)
+                        e.printStackTrace();
+                    else
+                        failListener.listener(e);
+
+
+                }
+            }
+
+        };
+        if (!busy){
+            worker.execute();
+        }
+
+
+    }
+
+    public void threadSolveAll(Graph graph, OnSuccess successListener, OnFail failListener){
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            public Void doInBackground() throws Exception {
+                solve(graph);
+                return null;
+            }
+            @Override
+            public void done() {
+                try {
+                    get(); // Get results and errors (if any).
+                    busy = false;
+                    successListener.listener();
+
+                } catch (Exception e) {
+                    busy = false;
+                    if (failListener==null)
+                        e.printStackTrace();
+                    else
+                        failListener.listener(e);
+                }
+            }
+
+        };
+
+        if (!busy){
+            worker.execute();
+        }
+
+    }
+
     private void logResult(){
         for (Ark ark: graph.getArks()){
 
@@ -54,7 +130,7 @@ public class PrimaAlgorithm implements Algorithm {
         }
         return count;
     }
-
+/*
     public Thread threadSolve(Graph graph){
 
         Thread thread = new Thread(() -> solveStep(graph));
@@ -68,6 +144,8 @@ public class PrimaAlgorithm implements Algorithm {
         return thread;
 
     }
+
+ */
     @Override
     public Graph solve(Graph graph){//сюда изначальный целый граф. Само запустит функции подготовки и решения.
         prepareGraph(graph);
@@ -85,6 +163,7 @@ public class PrimaAlgorithm implements Algorithm {
             prepareGraph(graph);
             return graph;
         }
+        this.graph = graph;
         if (!nodesForSearch.isEmpty()){
             double weight = Double.POSITIVE_INFINITY;
             Ark minArk = null;
@@ -163,5 +242,12 @@ public class PrimaAlgorithm implements Algorithm {
 
     public void setPrepared(boolean prepared) {
         isPrepared = prepared;
+    }
+
+    public interface OnSuccess {
+        void listener();//какие аргументы тебе нужны?
+    }
+    public interface OnFail {
+        void listener(Exception reason);//какие аргументы тебе нужны?
     }
 }
