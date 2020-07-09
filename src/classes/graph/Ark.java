@@ -40,6 +40,11 @@ public class Ark {
         return weight;
     }
 
+    public void setWeight(double weight){
+
+        this.weight = weight;
+    }
+
     public void hideArk(){
 
         this.hidden = true;

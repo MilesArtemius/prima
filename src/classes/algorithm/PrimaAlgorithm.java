@@ -1,6 +1,7 @@
 package classes.algorithm;
 
 import classes.Log;
+
 import classes.Prima;
 import classes.graph.Graph;
 import classes.graph.Ark;
@@ -16,12 +17,12 @@ public class PrimaAlgorithm implements Algorithm {
     private ArrayList<Node> nodesForSearch = new ArrayList<Node>();
     private boolean isPrepared = false;
     private boolean busy = false;
-
+    private Log.Level logLevel = Log.Level.GUI;
     public PrimaAlgorithm(){
 
     }
     public PrimaAlgorithm(Log.Level logLevel){
-
+        this.logLevel = logLevel;
     }
 
     public void threadSolveStep(Graph graph, OnSuccess successListener, OnFail failListener) {
@@ -92,8 +93,8 @@ public class PrimaAlgorithm implements Algorithm {
 
     private void logResult(){
         for (Ark ark: graph.getArks()){
-
-            System.out.println("Ребро с весом " + Double.toString(ark.getWeight()) + (ark.isHidden()? " не добавлено.": " добавлено."));
+            Log.getForLevel(logLevel).say("Ребро с весом ", Double.toString(ark.getWeight()) , (ark.isHidden()? " не добавлено.": " добавлено."));
+            //System.out.println("Ребро с весом " + Double.toString(ark.getWeight()) + (ark.isHidden()? " не добавлено.": " добавлено."));
         }
 
 
@@ -165,12 +166,12 @@ public class PrimaAlgorithm implements Algorithm {
                 minArk.showArk();
                 nodesForSearch.add(isStartInArrMin? graph.getNode(minArk.getEnd()) : graph.getNode(minArk.getStart()));
                 nodesForSearch.get(nodesForSearch.size()-1).showNode();
-                Log.gui().say("Найдено ребро ", minArk);
+                Log.getForLevel(logLevel).say("Найдено ребро ", minArk);
 
             }
             else{
                 //решение завершено
-                Log.gui().say("Решение завершено");
+                Log.getForLevel(logLevel).say("Решение завершено");
                 return null;
             }
 
@@ -183,7 +184,7 @@ public class PrimaAlgorithm implements Algorithm {
     public Graph solveStep(){
         if (graph == null){
 
-            Log.gui().say("Граф не найден");
+            Log.getForLevel(logLevel).say("Граф не найден");
             return null;
         }
         return solveStep(graph);
@@ -209,7 +210,7 @@ public class PrimaAlgorithm implements Algorithm {
             node.hideNode();
         }
         int randomNum = ThreadLocalRandom.current().nextInt(0, graph.getNodes().size());
-        Log.gui().say("Начальный узел: ", graph.getNodes().get(randomNum).getName());
+        Log.getForLevel(logLevel).say("Начальный узел: ", graph.getNodes().get(randomNum).getName());
         nodesForSearch.add(graph.getNodes().get(randomNum));
         nodesForSearch.get(0).showNode();
         solveStep();

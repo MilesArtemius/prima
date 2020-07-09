@@ -1,5 +1,7 @@
 package classes;
 
+import classes.algorithm.Algorithm;
+import classes.algorithm.PrimaAlgorithm;
 import classes.graph.Graph;
 import classes.graph.NodePlus;
 
@@ -67,11 +69,15 @@ public class Prima {
                 String pathToOutputFile = args[2];
                 Log.Level level = Log.Level.valueOf(args[3]);
                 // TODO: launch algorithm.
+                PrimaAlgorithm alg = new PrimaAlgorithm(level);
+
             } else if (args.length == 3) {
                 String pathToInputFile = args[1];
                 String pathToOutputFile = args[2];
                 Log.Level level = Log.Level.CONSOLE;
                 // TODO: launch algorithm.
+                PrimaAlgorithm alg = new PrimaAlgorithm(level);
+
             } else Log.cui().file(null).say("Wrong arguments provided! Aborting execution.");
         } else if (args[0].equals("-GUI")) {
             if (args.length == 2) {
