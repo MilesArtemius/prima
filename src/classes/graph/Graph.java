@@ -1,9 +1,9 @@
 package classes.graph;
 
-import java.io.*;
+import java.awt.geom.Point2D;
 import java.util.*;
 
-public class Graph implements Externalizable {
+public class Graph {
 
     private HashMap<String, Node> nodes = new HashMap<String, Node>();
     private LinkedList<Ark> arks = new LinkedList<Ark>(); // я бы предложил создавать массив в момент вызова getArks(), чтобы избежать хранения лишнего, хотя так быстрее
@@ -123,13 +123,6 @@ public class Graph implements Externalizable {
          */
     }
 
-    private void setPosition(int total, int number) {//для чего? этот метод позволяет расставить начальные позиции для узлов, если они не заданы. если у нас создание узлов только по щелчку, можешь удалять.
-        double ang = 360.0 / total * number;
-        double trueAng = Math.toRadians(90) - Math.toRadians(ang);
-        int x = 401 + (int) (Math.cos(trueAng) * 200);
-        int y = 301 - (int) (Math.sin(trueAng) * 200);
-    }
-
 
     public boolean isRecentlyChanged() {
         return recentlyChanged;
@@ -151,25 +144,58 @@ public class Graph implements Externalizable {
 
 
     @Override
-    public void writeExternal(ObjectOutput out) throws IOException {
-        LinkedList<Map<String, Object>> nodeList = new LinkedList<>();
-        for (Map.Entry<String, Node> entry: nodes.entrySet()) {
-            nodeList.push(entry.getValue().writeToMap());
-        }
-        out.writeObject(nodeList);
-        out.writeObject(arks);
+    public String toString() {
+        StringBuilder graph = new StringBuilder("Graph {\n");
+        for (Map.Entry<String, Node> node: nodes.entrySet()) graph.append('\t').append(node.getValue().toString()).append('\n');
+        graph.append('\n');
+        for (Ark ark: arks) graph.append('\t').append(ark.toString()).append('\n');
+        graph.append('}');
+        return graph.toString();
     }
 
-    @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        LinkedList<Map<String, Object>> nodeList = (LinkedList<Map<String, Object>>) in.readObject();
-        nodes = new HashMap<>();
-        for (Map<String, Object> map: nodeList) {
+
+
+    public Map<String, Object> writeToMap() {
+        LinkedList<Map<String, Object>> nodeList = new LinkedList<>();
+        for (Map.Entry<String, Node> entry: nodes.entrySet()) nodeList.push(entry.getValue().writeToMap());
+        Map<Integer, Map<String, Object>> nodesMap = new HashMap<>();
+        for (int i = 0; i < nodeList.size(); i++) nodesMap.put(i, nodeList.get(i));
+
+        Map<Integer, Map<String, Object>> arksMap = new HashMap<>();
+        for (int i = 0; i < arks.size(); i++) arksMap.put(i, arks.get(i).writeToMap());
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("NODES", nodesMap);
+        map.put("ARKS", arksMap);
+        return map;
+    }
+
+    public static Graph readFromMap(Map<String, Object> map, boolean graphic) {
+        Graph graph = new Graph();
+        graph.nodes = new HashMap<>();
+        graph.arks = new LinkedList<>();
+
+        Map<Integer, Map<String, Object>> nodesMap = (Map<Integer, Map<String, Object>>) map.get("NODES");
+        LinkedList<Map<String, Object>> nodeList = new LinkedList<>();
+        for (int i = 0; i < nodesMap.entrySet().size(); i++) nodeList.addLast(nodesMap.get(i));
+
+        for (int i = 0; i < nodeList.size(); i++) {
             Node node;
-            if (map.containsKey("POSITION")) node = NodePlus.readFromMap(map);
-            else node = Node.readFromMap(map);
-            nodes.put(node.getName(), node);
+            if (nodeList.get(i).containsKey("POSITION") && graphic) node = NodePlus.readFromMap(nodeList.get(i));
+            else if (graphic) node = new NodePlus(Node.readFromMap(nodeList.get(i)), findPos(i, nodeList.size()));
+            else node = Node.readFromMap(nodeList.get(i));
+            graph.nodes.put(node.getName(), node);
         }
-        arks = (LinkedList<Ark>) in.readObject();
+        Map<Integer, Map<String, Object>> arksMap = (Map<Integer, Map<String, Object>>) map.get("ARKS");
+        for (int i = 0; i < arksMap.entrySet().size(); i++) graph.arks.addLast(Ark.readFromMap(arksMap.get(i)));
+        return graph;
+    }
+
+    private static Point2D findPos(int elementNumber, int total) {
+        double ang = 360.0 / total * elementNumber;
+        double trueAng = Math.toRadians(90) - Math.toRadians(ang);
+        int x = 401 + (int) (Math.cos(trueAng) * 200);
+        int y = 301 - (int) (Math.sin(trueAng) * 200);
+        return new Point2D.Double(x, y);
     }
 }

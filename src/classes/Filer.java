@@ -7,6 +7,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Map;
 import java.util.Properties;
 
 public class Filer {
@@ -39,7 +40,7 @@ public class Filer {
             public Void doInBackground() throws Exception {
                 FileOutputStream outputStream = new FileOutputStream(fileName + ".sv");
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-                objectOutputStream.writeObject(g);
+                objectOutputStream.writeObject(g.writeToMap());
                 objectOutputStream.close();
                 return null;
             }
@@ -58,13 +59,13 @@ public class Filer {
         worker.execute();
     }
 
-    public static void loadGraphFromFile(String fileName, OnGraphLoaded listener) {
+    public static void loadGraphFromFile(String fileName, boolean graphic, OnGraphLoaded listener) {
         SwingWorker<Graph, Void> worker = new SwingWorker<>() {
             @Override
             public Graph doInBackground() throws Exception {
                 FileInputStream fileInputStream = new FileInputStream(fileName + ".sv");
                 ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-                return (Graph) objectInputStream.readObject();
+                return Graph.readFromMap((Map<String, Object>) objectInputStream.readObject(), graphic);
             }
             @Override
             public void done() {

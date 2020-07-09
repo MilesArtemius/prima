@@ -47,7 +47,7 @@ public class Prima {
         Filer.saveGraphToFile(g, "graph.sv", new Filer.OnPerformed() {
             @Override
             public void onFinished(Exception reason) {
-                Filer.loadGraphFromFile("graph.sv", new Filer.OnGraphLoaded() {
+                Filer.loadGraphFromFile("graph.sv", true, new Filer.OnGraphLoaded() {
                     @Override
                     public void onFinished(Graph g, Exception reason) {
                         System.out.println(g);

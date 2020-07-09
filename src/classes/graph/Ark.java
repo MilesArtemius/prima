@@ -1,10 +1,9 @@
 package classes.graph;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Ark implements Serializable {
+public class Ark {
 
     private static final long serialVersionUID = 2L;
     private String start, end;
@@ -52,7 +51,7 @@ public class Ark implements Serializable {
     @Override
     public String toString(){
 
-        return "Ребро "+ start + "<->" + end + ", вес: " + Double.toString(weight);
+        return "Ребро "+ start + "<->" + end + ", вес: " + weight;
     }
 
 

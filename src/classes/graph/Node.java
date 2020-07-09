@@ -74,10 +74,11 @@ public class Node {
     }
 
     public Map<String, Object> writeToMap() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("NAME", name);
         Map<Integer, Map<String, Object>> arksMap = new HashMap<>();
         for (int i = 0; i < arks.size(); i++) arksMap.put(i, arks.get(i).writeToMap());
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("NAME", name);
         map.put("ARKS", arksMap);
         map.put("HIDDEN", hidden);
         return map;
@@ -86,10 +87,11 @@ public class Node {
     public static Node readFromMap(Map<String, Object> map) {
         Node node = new Node();
         node.name = (String) map.get("NAME");
-        Map<Integer, Map<String, Object>> arksMap = (Map<Integer, Map<String, Object>>) map.get("ARKS");
         node.arks = new LinkedList<>();
-        for (int i = 0; i < arksMap.entrySet().size(); i++) node.arks.addLast(Ark.readFromMap(arksMap.get(i)));
         node.hidden = (boolean) map.get("HIDDEN");
+
+        Map<Integer, Map<String, Object>> arksMap = (Map<Integer, Map<String, Object>>) map.get("ARKS");
+        for (int i = 0; i < arksMap.entrySet().size(); i++) node.arks.addLast(Ark.readFromMap(arksMap.get(i)));
         return node;
     }
 }

@@ -41,7 +41,7 @@ public class PrimaAlgorithm implements Algorithm {
     public PrimaAlgorithm(){
 
     }
-    public PrimaAlgorithm(Prima.LogLevel logLevel){
+    public PrimaAlgorithm(Log.Level logLevel){
 
     }
 

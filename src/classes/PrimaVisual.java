@@ -68,7 +68,7 @@ public class PrimaVisual {
 
         graph = new GraphShape();
         if (fileName.equals("")) graph.setGraph(Prima.prepareInput());
-        else Filer.loadGraphFromFile(fileName, new Filer.OnGraphLoaded() {
+        else Filer.loadGraphFromFile(fileName, true, new Filer.OnGraphLoaded() {
             @Override
             public void onFinished(Graph loadedGraph, Exception reason) {
                 if (reason != null) {

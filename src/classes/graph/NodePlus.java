@@ -16,7 +16,7 @@ public class NodePlus extends Node {
         super(name);
         this.position = new Point2D.Double(-1, -1);
     }
-    private NodePlus(Node node, Point2D position) {
+    public NodePlus(Node node, Point2D position) {
         super(node);
         this.position = position;
     }
@@ -27,6 +27,12 @@ public class NodePlus extends Node {
 
     public void setPosition(Point2D position) {
         this.position = position;
+    }
+
+    @Override
+    public String toString(){
+
+        return super.toString() + ", позиция: (" + position.getX() + ", " + position.getY() + ")";
     }
 
     @Override
