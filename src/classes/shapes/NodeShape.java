@@ -5,6 +5,7 @@ import classes.Settings;
 import classes.dial.ArkWeightDialog;
 import classes.dial.NodeNameDialog;
 import classes.graph.Node;
+import classes.graph.NodePlus;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,14 +15,13 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.text.ParseException;
-import java.util.Random;
 
 public class NodeShape extends Ellipse2D.Double {
-    private Node node;
+    private NodePlus node;
     private double radius;
 
 
-    public NodeShape(Node node, GraphShape parent, Graphics2D graphics) {
+    public NodeShape(NodePlus node, GraphShape parent, Graphics2D graphics) {
         this.node = node;
 
         Point2D position = node.getPosition();
@@ -43,7 +43,7 @@ public class NodeShape extends Ellipse2D.Double {
         GraphShape.drawCenteredString(graphics, node.getName(), position.getX() - textRadius, position.getY() - textRadius, textRadius * 2, textRadius * 2);
     }
 
-    public Node getNode() {
+    public NodePlus getNode() {
         return node;
     }
 

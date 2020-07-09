@@ -3,6 +3,7 @@ package classes.shapes;
 import classes.Log;
 import classes.Settings;
 import classes.graph.Ark;
+import classes.graph.NodePlus;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +21,7 @@ public class ArkShape extends Polygon {
 
         double size = Settings.getLong("ark_shape_gap") * parent.getSizeModifier();
 
-        Point2D posStart = ark.getStart().getPosition(), posEnd = ark.getEnd().getPosition(), perFirst, perSecond,
+        Point2D posStart = ((NodePlus) ark.getStart()).getPosition(), posEnd = ((NodePlus) ark.getEnd()).getPosition(), perFirst, perSecond,
                 center = new Point2D.Double(posStart.getX() + (posEnd.getX() - posStart.getX()) / 2, posStart.getY() + (posEnd.getY() - posStart.getY()) / 2);
 
         if ((posStart.getX() != posEnd.getX()) && (posStart.getY() != posEnd.getY())) {
@@ -38,12 +39,12 @@ public class ArkShape extends Polygon {
             perSecond = new Point2D.Double(center.getX(), center.getY() - size);
         }
 
-        xpoints[0] = (int) ark.getStart().getPosition().getX();
-        ypoints[0] = (int) ark.getStart().getPosition().getY();
+        xpoints[0] = (int) ((NodePlus) ark.getStart()).getPosition().getX();
+        ypoints[0] = (int) ((NodePlus) ark.getStart()).getPosition().getY();
         xpoints[1] = (int) perFirst.getX();
         ypoints[1] = (int) perFirst.getY();
-        xpoints[2] = (int) ark.getEnd().getPosition().getX();
-        ypoints[2] = (int) ark.getEnd().getPosition().getY();
+        xpoints[2] = (int) ((NodePlus) ark.getEnd()).getPosition().getX();
+        ypoints[2] = (int) ((NodePlus) ark.getEnd()).getPosition().getY();
         xpoints[3] = (int) perSecond.getX();
         ypoints[3] = (int) perSecond.getY();
         invalidate();

@@ -83,7 +83,7 @@ public class Settings {
         }
     }
 
-    private void initializeUserDictionary(OnLongActionFinished listener) { // TODO: thread?
+    private void initializeUserDictionary(OnLongActionFinished listener) {
         initializeDictionary(Locale.forLanguageTag(""));
 
         if (checkPref(userPath) && checkPref(userLocalization)) {
@@ -115,7 +115,7 @@ public class Settings {
         return instance;
     }
 
-    public static void setup(Prima.LogLevel level) { // TODO: add logging.
+    public static void setup(Log.Level level) { // TODO: add logging.
         get();
     }
 
@@ -153,7 +153,7 @@ public class Settings {
 
 
 
-    public static void changeLocalization(Locales locale, OnLongActionFinished listener) { // TODO: thread?
+    public static void changeLocalization(Locales locale, OnLongActionFinished listener) {
         if (locale == Locales.USER) {
             setPref(userLocalization, userLocalization);
             get().initializeUserDictionary(new OnLongActionFinished() {
@@ -171,7 +171,7 @@ public class Settings {
 
 
 
-    public static void alterUserPath(String path, OnLongActionFinished listener) { // TODO: thread?
+    public static void alterUserPath(String path, OnLongActionFinished listener) {
         setPref(userPath, path);
         Filer.addFolder(path + File.separator + userPathDir, new Filer.OnPerformed() {
             @Override
@@ -193,7 +193,7 @@ public class Settings {
         });
     }
 
-    public static void removeUserPath(OnLongActionFinished listener) { // TODO: thread?
+    public static void removeUserPath(OnLongActionFinished listener) {
         if (checkPref(userPath)) Filer.removeFolder(getPref(userPath) + File.separator + userPathDir, new Filer.OnPerformed() {
             @Override
             public void onFinished(Exception reason) {
@@ -278,7 +278,7 @@ public class Settings {
 
 
 
-    public static void alterLocalization(String file, OnLongActionFinished listener) { // TODO: thread?
+    public static void alterLocalization(String file, OnLongActionFinished listener) {
         if (checkPref(userPath)) Filer.copyFile(file, getPref(userPath) + userPathDictionary, new Filer.OnPerformed() {
             @Override
             public void onFinished(Exception reason) {
@@ -294,7 +294,7 @@ public class Settings {
         else if (listener != null) listener.onFinished();
     }
 
-    public static void alterParameter(String name, long value, OnLongActionFinished listener) { // TODO: thread?
+    public static void alterParameter(String name, long value, OnLongActionFinished listener) {
         if (get().constants.containsKey(name)) {
             get().constants.put(name, value);
 

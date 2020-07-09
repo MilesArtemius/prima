@@ -1,13 +1,12 @@
 package classes.graph;
 
-import java.awt.geom.Point2D;
+import java.io.*;
 import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 
-public class Graph {
-
+public class Graph implements Externalizable {
 
     private HashMap<String, Node> nodes = new HashMap<String, Node>();
     private LinkedList<Ark> arks = new LinkedList<Ark>(); // я бы предложил создавать массив в момент вызова getArks(), чтобы избежать хранения лишнего, хотя так быстрее
@@ -20,15 +19,9 @@ public class Graph {
         return nodes.get(name);
     }
 
-    //public void addNode(Point2D position, String name){
-
-    //    nodes.put(name, new Node(position, name));
-    //    setRecentlyChanged(true);
-    //}
-
     public void addNode(Node node){
 
-        nodes.put(node.getName(), new NodePlus(node.getPosition(), node.getName()));
+        nodes.put(node.getName(), node);
         setRecentlyChanged(true);
     }
 
@@ -156,5 +149,17 @@ public class Graph {
             }
         }
         this.recentlyChanged = recentlyChanged;
+    }
+
+
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+
     }
 }

@@ -43,6 +43,10 @@ public class Log {
         }
     }
 
+    public enum Level {
+        NO_LOG, CONSOLE, FILE, GUI
+    }
+
     private Log(boolean isGUISet) {
         Date current = Calendar.getInstance().getTime();
         this.pref = (new SimpleDateFormat("dd-MM-yyyy HH:mm:ss")).format(current) + ": ";
@@ -63,6 +67,16 @@ public class Log {
 
     public static Log gui(Attributes... attributes) {
         return (new Log(true)).attr(attributes);
+    }
+
+    public static Log getForLevel(Level level) {
+        switch (level) {
+            case NO_LOG: return cui().out(null).file(null);
+            case CONSOLE: return cui().file(null);
+            case FILE: return cui();
+            case GUI: return gui();
+            default: return gui(Attributes.ITALIC);
+        }
     }
 
     public static void consumeException(Exception e) {

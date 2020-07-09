@@ -27,7 +27,7 @@ public class GraphShape extends JPanel {
     private Point2D movingMousePos;
     private Point2D transform;
 
-    private Node movingNode;
+    private NodePlus movingNode;
 
     public GraphShape() {
         graph = new Graph();
@@ -100,7 +100,7 @@ public class GraphShape extends JPanel {
 
 
 
-    public void registerMoving(Node node, MouseEvent e) {
+    public void registerMoving(NodePlus node, MouseEvent e) {
         if (movingNode == null) {
             Log.cui().say("Node '", node, "' moving from (", e.getX(), ", ", e.getY(), ")");
             movingNode = node;
@@ -108,7 +108,7 @@ public class GraphShape extends JPanel {
         }
     }
 
-    public void unRegisterMoving(Node node, MouseEvent e) {
+    public void unRegisterMoving(NodePlus node, MouseEvent e) {
         if (movingNode == node) {
             Log.cui().say("Node '", node, "' stopped at (", e.getX(), ", ", e.getY(), ")");
             movingNode = null;
@@ -139,7 +139,7 @@ public class GraphShape extends JPanel {
         setBackground(Settings.getColor("graph_shape_background_color"));
 
         for (Ark ark: graph.getArks()) arks.push(new ArkShape(ark, this, g2d));
-        for (Node node: graph.getNodes()) nodes.push(new NodeShape(node, this, g2d));
+        for (Node node: graph.getNodes()) nodes.push(new NodeShape((NodePlus) node, this, g2d));
 
         if (graph.getNodes().isEmpty()) drawCenteredString(g2d, Settings.getString("no_nodes_prompt"), -transform.getX(), -transform.getY(), getWidth(), getHeight());
     }

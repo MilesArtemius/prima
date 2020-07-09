@@ -1,13 +1,11 @@
 package classes.graph;
 
-import java.awt.geom.Point2D;
-import java.io.Serializable;
+import java.io.*;
 import java.util.LinkedList;
 
-public class Node implements Serializable {
+public class Node implements Externalizable {
 
     private static final long serialVersionUID = 3L;
-    //private Point2D position;
     private String name;
     private LinkedList<Ark> arks = new LinkedList<Ark>();
     private boolean hidden;
@@ -41,7 +39,6 @@ public class Node implements Serializable {
     }
 
     public Node(String name) {
-        //this.position = position;
         this.name = name;
         this.hidden = true;
     }
@@ -61,17 +58,33 @@ public class Node implements Serializable {
         return hidden;
     }
 
-    public Point2D getPosition() {
-        return new Point2D.Double(-1, -1);
-    }
-
-    public void setPosition(Point2D position) {
-        //this.position = position;
-    }
-
     @Override
     public String toString(){
 
         return "Узел "+ name;
+    }
+
+    private void writeObject(ObjectOutputStream oos) throws IOException {
+        // default serialization
+        oos.defaultWriteObject();
+        // write the object
+        System.out.println("New w action node!");
+    }
+
+    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+        // default deserialization
+        ois.defaultReadObject();
+        System.out.println("New r action node!");
+
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+
     }
 }
