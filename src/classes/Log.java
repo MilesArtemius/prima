@@ -17,6 +17,7 @@ public class Log {
     private String file;
     private boolean isGUILog;
     private LinkedList<String> attr;
+    private String color;
 
     public enum Attributes {
         BOLD("b"), ITALIC("i"), MARKED("mark"), CODE("code");
@@ -27,6 +28,18 @@ public class Log {
         }
         public String getAttribute() {
             return attribute;
+        }
+    }
+
+    public enum Colors {
+        NO(""), BLUE("blue"), GREEN("green"), RED("red"), YELLOW("yellow");
+        private String color;
+
+        Colors(String col) {
+            this.color = col;
+        }
+        public String getColor() {
+            return color;
         }
     }
 
@@ -41,6 +54,7 @@ public class Log {
         this.file = (new SimpleDateFormat("dd-MM-yyyy")).format(current) + "_uptime.log";
         this.isGUILog = isGUISet;
         this.attr = new LinkedList<>();
+        this.color = "";
     }
 
     public static Log cui() {
@@ -49,6 +63,10 @@ public class Log {
 
     public static Log gui(Attributes... attributes) {
         return (new Log(true)).attr(attributes);
+    }
+
+    public static void consumeException(Exception e) {
+        cui().beg("WARNING!!!").say(e.getMessage());
     }
 
 
@@ -98,6 +116,11 @@ public class Log {
         return this;
     }
 
+    public Log col(Colors color) {
+        this.color = color.getColor();
+        return this;
+    }
+
 
 
     public void say(Object... words) {
@@ -106,16 +129,21 @@ public class Log {
         argument.append(words[words.length - 1]).append(end).append(suf);
 
         attr.addFirst("p");
-
         String result = argument.toString();
-        if (out != null) out.println(result);
-        if (file != null) Filer.printToFile(result, file, new Filer.OnPerformed() {
+
+        SwingUtilities.invokeLater(new Runnable() {
             @Override
-            public void onFinished(Exception reason) {
-                if (reason != null) reason.printStackTrace();
+            public void run() {
+                if (out != null) out.println(result);
+                if (file != null) Filer.printToFile(result, file, new Filer.OnPerformed() {
+                    @Override
+                    public void onFinished(Exception reason) {
+                        if (reason != null) reason.printStackTrace();
+                    }
+                });
+
+                if (isGUILog && (Prima.getVisual() != null)) Prima.getVisual().appendTextToLog(result, color, attr);
             }
         });
-
-        if (isGUILog && (Prima.getVisual() != null)) Prima.getVisual().appendTextToLog(result, attr);
     }
 }

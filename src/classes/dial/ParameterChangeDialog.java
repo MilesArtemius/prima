@@ -28,7 +28,8 @@ public class ParameterChangeDialog extends JDialog {
 
         setContentPane(contentPane);
         setModal(true);
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        getRootPane().setDefaultButton(apply);
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         content = Settings.getConstantsDescription();
 
@@ -67,7 +68,6 @@ public class ParameterChangeDialog extends JDialog {
                 if (!input.getText().equals("")) Settings.alterParameter(input.getText(), (int) parameterSpinner.getValue(), new Settings.OnLongActionFinished() {
                     @Override
                     public void onFinished() {
-                        if (!Settings.checkPref(Settings.userPath)) System.out.println("Warning! Path for parameter storing not found, parameter changed until session end!");
                         graph.repaint();
                         dispose();
                     }

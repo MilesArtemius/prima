@@ -92,7 +92,7 @@ public class PrimaVisual {
         reEnableAll();
         resetAllNames();
 
-        initializeButtons();
+        initButtons();
     }
 
     private void initFileMenu() {
@@ -215,7 +215,7 @@ public class PrimaVisual {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fileDialog = new JFileChooser();
-                fileDialog.setDialogTitle("Choose user directory");
+                fileDialog.setDialogTitle("Set directory");
                 fileDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 fileDialog.setAcceptAllFileFilterUsed(false);
 
@@ -267,6 +267,7 @@ public class PrimaVisual {
                     public void onFinished() {
                         reEnableAll();
                         resetAllNames();
+                        graph.repaint();
                     }
                 });
             }
@@ -326,7 +327,7 @@ public class PrimaVisual {
         helpMenu.add(aboutUs);
     }
 
-    private void initializeButtons() {
+    private void initButtons() {
         test.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -360,6 +361,7 @@ public class PrimaVisual {
         preserveGraph.setEnabled(enabled);
         addUserLocale.setEnabled(enabled);
         clearFilePath.setEnabled(enabled);
+        setFilePath.setEnabled(!enabled);
     }
 
     private void resetAllNames() {
@@ -405,12 +407,14 @@ public class PrimaVisual {
         return root;
     }
 
-    public void appendTextToLog(String text, List<String> attributes) {
+    public void appendTextToLog(String text, String color, List<String> attributes) {
         StringBuilder log = new StringBuilder(logs.getText());
         for (String attr: attributes) {
             log.append('<').append(attr).append('>');
         }
+        if (!color.equals("")) log.append("<font color=\"").append(color).append("\">");
         log.append(text);
+        if (!color.equals("")) log.append("</font>");
         Collections.reverse(attributes);
         for (String attr: attributes) {
             log.append("</").append(attr).append('>');

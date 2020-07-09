@@ -85,7 +85,7 @@ public class Prima {
         }
 
         visual = new PrimaVisual(saveFile);
-        Log.gui().say("GUI launched...");
+        Log.gui().col(Log.Colors.GREEN).say("GUI launched...");
         Settings.setup(LogLevel.GUI);
 
         JFrame f = new JFrame(Settings.getString("app_name"));

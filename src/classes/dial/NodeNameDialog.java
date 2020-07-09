@@ -20,6 +20,7 @@ public class NodeNameDialog extends JDialog {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         nodeName.setToolTipText(rename ?Settings.getString("rename_node_dialog_prompt") : Settings.getString("create_node_dialog_prompt"));
 

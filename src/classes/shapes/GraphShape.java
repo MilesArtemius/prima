@@ -127,6 +127,12 @@ public class GraphShape extends JPanel {
         arks.clear();
 
         Graphics2D g2d = (Graphics2D) graphics;
+        if (Settings.getBoolean("graph_shape_aliasing")) {
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        }
+
         g2d.translate((int) transform.getX(), (int) transform.getY());
 
         setBackground(Settings.getColor("graph_shape_background_color"));

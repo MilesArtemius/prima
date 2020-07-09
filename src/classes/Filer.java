@@ -2,6 +2,7 @@ package classes;
 
 import classes.graph.Graph;
 
+import javax.swing.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -10,127 +11,222 @@ import java.util.Properties;
 
 public class Filer {
     public static void printToFile(String string, String fileName, OnPerformed listener) {
-        try {
-            Files.write(Paths.get(fileName), (string + "\n").getBytes(), fileExists(fileName) ? StandardOpenOption.APPEND : StandardOpenOption.CREATE);
-            listener.onFinished(null);
-        } catch (IOException e) {
-            listener.onFinished(e);
-        }
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            public Void doInBackground() throws Exception {
+                Files.write(Paths.get(fileName), (string + "\n").getBytes(), Files.exists(Paths.get(fileName)) ? StandardOpenOption.APPEND : StandardOpenOption.CREATE);
+                return null;
+            }
+            @Override
+            public void done() {
+                try {
+                    get();
+                    listener.onFinished(null);
+                } catch (Exception e) {
+                    listener.onFinished(e);
+                }
+            }
+        };
+
+        worker.execute();
     }
 
 
 
     public static void saveGraphToFile(Graph g, String fileName, OnPerformed listener) {
-        try {
-            FileOutputStream outputStream = new FileOutputStream(fileName + ".sv");
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            public Void doInBackground() throws Exception {
+                FileOutputStream outputStream = new FileOutputStream(fileName + ".sv");
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+                objectOutputStream.writeObject(g);
+                objectOutputStream.close();
+                return null;
+            }
+            @Override
+            public void done() {
+                try {
+                    get();
+                    listener.onFinished(null);
+                } catch (Exception e) {
+                    Log.gui().say("Файл не найден или содержимое файла повреждено."); // TODO: move to caller.
+                    listener.onFinished(e);
+                }
+            }
+        };
 
-            objectOutputStream.writeObject(g);
-
-            objectOutputStream.close();
-            listener.onFinished(null);
-        } catch (IOException e){
-            Log.gui().say("Файл не найден или содержимое файла повреждено.");
-            listener.onFinished(e);
-        }
+        worker.execute();
     }
 
     public static void loadGraphFromFile(String fileName, OnGraphLoaded listener) {
+        SwingWorker<Graph, Void> worker = new SwingWorker<>() {
+            @Override
+            public Graph doInBackground() throws Exception {
+                FileInputStream fileInputStream = new FileInputStream(fileName + ".sv");
+                ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+                return (Graph) objectInputStream.readObject();
+            }
+            @Override
+            public void done() {
+                try {
+                    Graph graph = get();
+                    listener.onFinished(graph, null);
+                } catch (Exception e) {
+                    Log.gui().say("Файл не найден или содержимое файла повреждено."); // TODO: move to caller.
+                    listener.onFinished(null, e);
+                }
+            }
+        };
 
-
-        try{
-            FileInputStream fileInputStream = new FileInputStream(fileName + ".sv");
-            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-
-
-            Graph graph = (Graph) objectInputStream.readObject();
-            listener.onFinished(graph, null);
-        }
-        catch (IOException | ClassNotFoundException e){
-            Log.gui().say("Файл не найден или содержимое файла повреждено.");
-            listener.onFinished(null, e);
-        }
-
+        worker.execute();
     }
 
 
 
     public static void savePropertiesToFile(Properties properties, String fileName, OnPerformed listener) {
-        try {
-            FileOutputStream fos = new FileOutputStream(fileName);
-            properties.store(new OutputStreamWriter(fos, StandardCharsets.UTF_16), null);
-            fos.close();
-            listener.onFinished(null);
-        } catch (IOException e) {
-            listener.onFinished(e);
-        }
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            public Void doInBackground() throws Exception {
+                FileOutputStream fos = new FileOutputStream(fileName);
+                properties.store(new OutputStreamWriter(fos, StandardCharsets.UTF_16), null);
+                fos.close();
+                return null;
+            }
+            @Override
+            public void done() {
+                try {
+                    get();
+                    listener.onFinished(null);
+                } catch (Exception e) {
+                    listener.onFinished(e);
+                }
+            }
+        };
+
+        worker.execute();
     }
 
     public static void loadPropertiesFromFile(String fileName, OnPropertiesLoaded listener) {
-        try {
-            Properties prop = new Properties();
-            FileInputStream fist = new FileInputStream(fileName);
-            prop.load(new InputStreamReader(fist, StandardCharsets.UTF_16));
-            fist.close();
-            listener.onFinished(prop, null);
-        } catch (IOException e) {
-            listener.onFinished(null, e);
-        }
+        SwingWorker<Properties, Void> worker = new SwingWorker<>() {
+            @Override
+            public Properties doInBackground() throws Exception {
+                Properties prop = new Properties();
+                FileInputStream fist = new FileInputStream(fileName);
+                prop.load(new InputStreamReader(fist, StandardCharsets.UTF_16));
+                fist.close();
+                return prop;
+            }
+            @Override
+            public void done() {
+                try {
+                    Properties prop = get();
+                    listener.onFinished(prop, null);
+                } catch (Exception e) {
+                    listener.onFinished(null, e);
+                }
+            }
+        };
+
+        worker.execute();
     }
 
 
-
-    public static boolean fileExists(String fileName) {
-        return Files.exists(Paths.get(fileName));
-    }
 
     public static void copyFile(String fileName, String newFileName, OnPerformed listener) {
-        try {
-            Files.copy(Paths.get(fileName), Paths.get(newFileName), StandardCopyOption.REPLACE_EXISTING);
-            listener.onFinished(null);
-        } catch (IOException e) {
-            listener.onFinished(e);
-        }
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            public Void doInBackground() throws Exception {
+                Files.copy(Paths.get(fileName), Paths.get(newFileName), StandardCopyOption.REPLACE_EXISTING);
+                return null;
+            }
+            @Override
+            public void done() {
+                try {
+                    get();
+                    listener.onFinished(null);
+                } catch (Exception e) {
+                    listener.onFinished(e);
+                }
+            }
+        };
+
+        worker.execute();
     }
 
     public static void deleteFile(String fileName, OnPerformed listener) {
-        try {
-            Files.deleteIfExists(Paths.get(fileName));
-            listener.onFinished(null);
-        } catch (IOException e) {
-            listener.onFinished(e);
-        }
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            public Void doInBackground() throws Exception {
+                Files.deleteIfExists(Paths.get(fileName));
+                return null;
+            }
+            @Override
+            public void done() {
+                try {
+                    get();
+                    listener.onFinished(null);
+                } catch (Exception e) {
+                    listener.onFinished(e);
+                }
+            }
+        };
+
+        worker.execute();
     }
 
     public static void removeFolder(String dirName, OnPerformed listener) {
-        try {
-            Files.walkFileTree(Paths.get(dirName), new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.delete(file);
-                    return FileVisitResult.CONTINUE;
-                }
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            public Void doInBackground() throws Exception {
+                Files.walkFileTree(Paths.get(dirName), new SimpleFileVisitor<>() {
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                        Files.delete(file);
+                        return FileVisitResult.CONTINUE;
+                    }
 
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    Files.delete(dir);
-                    return FileVisitResult.CONTINUE;
+                    @Override
+                    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                        Files.delete(dir);
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
+                return null;
+            }
+            @Override
+            public void done() {
+                try {
+                    get();
+                    listener.onFinished(null);
+                } catch (Exception e) {
+                    listener.onFinished(e);
                 }
-            });
-            listener.onFinished(null);
-        } catch (IOException e) {
-            listener.onFinished(e);
-        }
+            }
+        };
+
+        worker.execute();
     }
 
     public static void addFolder(String dirName, OnPerformed listener) {
-        try {
-            Path path = Paths.get(dirName);
-            if (!Files.exists(path) || !Files.isDirectory(path)) Files.createDirectory(Paths.get(dirName));
-            listener.onFinished(null);
-        } catch (IOException e) {
-            listener.onFinished(e);
-        }
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            public Void doInBackground() throws Exception {
+                Path path = Paths.get(dirName);
+                if (!Files.exists(path) || !Files.isDirectory(path)) Files.createDirectory(Paths.get(dirName));
+                return null;
+            }
+            @Override
+            public void done() {
+                try {
+                    get();
+                    listener.onFinished(null);
+                } catch (Exception e) {
+                    listener.onFinished(e);
+                }
+            }
+        };
+
+        worker.execute();
     }
 
 

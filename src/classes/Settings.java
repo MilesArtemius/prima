@@ -141,6 +141,10 @@ public class Settings {
         return new Color(r, g, b);
     }
 
+    public static boolean getBoolean(String key) {
+        return getInt(key) != 0;
+    }
+
     public static HashMap<String, String> getConstantsDescription() {
         HashMap<String, String> constantsDescription = new HashMap<>(get().constants.size());
         for (String key: get().dictionary.keySet()) if (get().constants.containsKey(key)) constantsDescription.put(key, get().dictionary.get(key));
@@ -173,6 +177,17 @@ public class Settings {
             @Override
             public void onFinished(Exception reason) {
                 if (reason != null) reason.printStackTrace();
+                else {
+                    Properties prop = new Properties();
+                    for (Map.Entry<String, Long> entry: get().constants.entrySet()) prop.setProperty(entry.getKey(), entry.getValue().toString());
+                    Filer.savePropertiesToFile(prop, getPref(userPath) + userPathConstants, new Filer.OnPerformed() {
+                        @Override
+                        public void onFinished(Exception reason) {
+                            if (reason != null) reason.printStackTrace();
+                            if (listener != null) listener.onFinished();
+                        }
+                    });
+                }
                 if (listener != null) listener.onFinished();
             }
         });
@@ -299,6 +314,9 @@ public class Settings {
                         });
                     }
                 });
+            } else {
+                Log.cui().say("Warning! Path for parameter storing not found, parameter changed until session end!");
+                if (listener != null) listener.onFinished();
             }
         } else{
             Log.cui().say("Can not alter - no such parameter found!");
