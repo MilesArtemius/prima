@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.Properties;
 
 public class Filer {
+    public static final String PROPERTIES_FILE_EXTENSION = "properties";
+    public static final String GRAPH_FILE_EXTENSION = "sv";
+
     public static void printToFile(String string, String fileName, OnPerformed listener) {
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
@@ -38,12 +41,7 @@ public class Filer {
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             public Void doInBackground() throws Exception {
-                Files.deleteIfExists(Paths.get(fileName + ".sv"));
-                Files.createFile(Paths.get(fileName + ".sv"));
-                FileOutputStream outputStream = new FileOutputStream(fileName + ".sv");
-                ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-                objectOutputStream.writeObject(g.writeToMap());
-                objectOutputStream.close();
+                innerSaveGraph(g, fileName);
                 return null;
             }
             @Override
@@ -52,7 +50,6 @@ public class Filer {
                     get();
                     listener.onFinished(null);
                 } catch (Exception e) {
-                    Log.gui().say("Файл не найден или содержимое файла повреждено."); // TODO: move to caller
                     listener.onFinished(e);
                 }
             }
@@ -63,23 +60,31 @@ public class Filer {
 
     public static void saveGraphToFileNoThread(Graph g, String fileName, OnPerformed listener) {
         try {
-            Files.deleteIfExists(Paths.get(fileName + ".sv"));
-            Files.createFile(Paths.get(fileName + ".sv"));
-            FileOutputStream outputStream = new FileOutputStream(fileName + ".sv");
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-            objectOutputStream.writeObject(g.writeToMap());
-            objectOutputStream.close();
+            innerSaveGraph(g, fileName);
             listener.onFinished(null);
         } catch (IOException e) {
             listener.onFinished(e);
         }
     }
 
+    private static void innerSaveGraph(Graph g, String fileName) throws IOException {
+        if (!fileName.endsWith("." + GRAPH_FILE_EXTENSION)) fileName += "." + GRAPH_FILE_EXTENSION;
+        Files.deleteIfExists(Paths.get(fileName));
+        Files.createFile(Paths.get(fileName));
+        FileOutputStream outputStream = new FileOutputStream(fileName);
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+        objectOutputStream.writeObject(g.writeToMap());
+        objectOutputStream.close();
+    }
+
     public static void loadGraphFromFile(String fileName, boolean graphic, OnGraphLoaded listener) {
         SwingWorker<Graph, Void> worker = new SwingWorker<>() {
             @Override
             public Graph doInBackground() throws Exception {
-                FileInputStream fileInputStream = new FileInputStream(fileName + ".sv");
+                String name;
+                if (!fileName.endsWith("." + GRAPH_FILE_EXTENSION)) name = fileName + "." + GRAPH_FILE_EXTENSION;
+                else name = fileName;
+                FileInputStream fileInputStream = new FileInputStream(name);
                 ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
                 return Graph.readFromMap((Map<String, Object>) objectInputStream.readObject(), graphic);
             }
@@ -89,7 +94,6 @@ public class Filer {
                     Graph graph = get();
                     listener.onFinished(graph, null);
                 } catch (Exception e) {
-                    Log.gui().say("Файл не найден или содержимое файла повреждено."); // TODO: move to caller.
                     listener.onFinished(null, e);
                 }
             }

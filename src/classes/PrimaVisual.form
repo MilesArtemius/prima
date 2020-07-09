@@ -54,14 +54,14 @@
               <grid id="b1900" binding="runtimePanel" layout-manager="GridBagLayout">
                 <constraints>
                   <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-                  <gridbag weightx="1.0" weighty="0.05"/>
+                  <gridbag weightx="0.0" weighty="0.05"/>
                 </constraints>
                 <properties/>
                 <border type="none"/>
                 <children>
                   <grid id="6bcc8" binding="launchPanel" layout-manager="GridBagLayout">
                     <constraints>
-                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                      <grid row="0" column="0" row-span="2" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="0.7" weighty="1.0"/>
                     </constraints>
                     <properties/>
@@ -103,7 +103,14 @@
                   <component id="b9626" class="javax.swing.JButton" binding="test">
                     <constraints>
                       <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                      <gridbag weightx="0.3" weighty="1.0"/>
+                      <gridbag weightx="0.3" weighty="0.5"/>
+                    </constraints>
+                    <properties/>
+                  </component>
+                  <component id="e8898" class="javax.swing.JButton" binding="reset">
+                    <constraints>
+                      <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="0.3" weighty="0.5"/>
                     </constraints>
                     <properties/>
                   </component>
@@ -137,7 +144,7 @@
           </grid>
         </children>
       </grid>
-      <grid id="781cc" class="javax.swing.JMenuBar" binding="menuBar1" default-binding="true" layout-manager="GridBagLayout">
+      <grid id="781cc" class="javax.swing.JMenuBar" binding="menuBar" layout-manager="GridBagLayout">
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
           <gridbag weightx="1.0" weighty="0.0"/>

@@ -33,17 +33,18 @@ public class PrimaVisual {
     private JLabel logsTitle;
     private JLabel visualizationText;
     private JLabel logs;
-    private JMenuBar menuBar1;
+    private JMenuBar menuBar;
     private JMenu fileMenu;
     private JMenu settingsMenu;
     private JMenu helpMenu;
     private JPanel menuSeparator;
     private JLabel menuText;
     private JScrollPane textScroll;
+    private JButton reset;
 
     private PrimaAlgorithm algorithm;
     private GraphShape graph;
-    public String openedFileName;
+    private String openedFileName;
 
     private JMenuItem newGraph; // TODO: add submenu: load, choose from samples.
     private JMenuItem openGraph;
@@ -74,15 +75,12 @@ public class PrimaVisual {
         logs.setText("<html>");
 
         graph = new GraphShape();
-        Filer.OnGraphLoaded loadListner = new Filer.OnGraphLoaded() {
-            @Override
-            public void onFinished(Graph loadedGraph, Exception reason) {
-                if (reason != null) {
-                    reason.printStackTrace();
-                    graph.setGraph(new Graph());
-                } else {
-                    graph.setGraph(loadedGraph);
-                }
+        Filer.OnGraphLoaded loadListner = (loadedGraph, reason) -> {
+            if (reason != null) {
+                Log.consumeException("Файл не найден или содержимое файла повреждено", reason);
+                graph.setGraph(new Graph());
+            } else {
+                graph.setGraph(loadedGraph);
             }
         };
         if (!openedFileName.equals("")) Filer.loadGraphFromFile(openedFileName, true, loadListner);
@@ -108,267 +106,151 @@ public class PrimaVisual {
 
     private void initFileMenu() {
         newGraph = new JMenuItem();
-        newGraph.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                saveGraph.setEnabled(false);
-                graph.setGraph(new Graph());
-                algorithm = new PrimaAlgorithm();
-                graph.repaint();
-            }
+        newGraph.addActionListener(e -> {
+            saveGraph.setEnabled(false);
+            graph.setGraph(new Graph());
+            algorithm = new PrimaAlgorithm();
+            graph.repaint();
         });
         openGraph = new JMenuItem();
-        openGraph.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser fileDialog = new JFileChooser();
-                fileDialog.setDialogTitle("Choose graph file");
-                fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                fileDialog.setDialogType(JFileChooser.OPEN_DIALOG);
-                fileDialog.setFileFilter(new FileNameExtensionFilter("GRAPH FILES", "sv"));
-                fileDialog.setAcceptAllFileFilterUsed(false);
+        openGraph.addActionListener(e -> {
+            JFileChooser fileDialog = new JFileChooser();
+            fileDialog.setDialogTitle("Choose graph file");
+            fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileDialog.setDialogType(JFileChooser.OPEN_DIALOG);
+            fileDialog.setFileFilter(new FileNameExtensionFilter("GRAPH FILES", Filer.GRAPH_FILE_EXTENSION));
+            fileDialog.setAcceptAllFileFilterUsed(false);
 
-                int status = fileDialog.showOpenDialog(root);
-                if (status == JFileChooser.APPROVE_OPTION) {
-                    System.out.println(fileDialog.getSelectedFile().getAbsolutePath());
-                    PrimaVisual.this.openedFileName = fileDialog.getSelectedFile().getName();
-                    PrimaVisual.this.saveGraph.setEnabled(true);
+            int status = fileDialog.showOpenDialog(root);
+            if (status == JFileChooser.APPROVE_OPTION) {
+                System.out.println(fileDialog.getSelectedFile().getAbsolutePath());
+                PrimaVisual.this.openedFileName = fileDialog.getSelectedFile().getName();
+                PrimaVisual.this.saveGraph.setEnabled(true);
 
-                    Filer.loadGraphFromFile(fileDialog.getSelectedFile().getAbsolutePath(), true, new Filer.OnGraphLoaded() {
-                        @Override
-                        public void onFinished(Graph graph, Exception reason) {
-                            if (reason != null) {
-                                Log.consumeException(reason);
-                            } else {
-                                PrimaVisual.this.graph.setGraph(graph);
-                                PrimaVisual.this.graph.repaint();
-                            }
-                        }
-                    });
-                } else if (status == JFileChooser.CANCEL_OPTION) {
-                    System.out.println("Graph file not chosen!");
-                }
+                Filer.loadGraphFromFile(fileDialog.getSelectedFile().getAbsolutePath(), true, (graph, reason) -> {
+                    if (reason != null) {
+                        Log.consumeException("Файл не найден или содержимое файла повреждено", reason);
+                    } else {
+                        PrimaVisual.this.graph.setGraph(graph);
+                        PrimaVisual.this.graph.repaint();
+                    }
+                });
+            } else if (status == JFileChooser.CANCEL_OPTION) {
+                System.out.println("Graph file not chosen!");
             }
         });
         saveGraphAs = new JMenuItem();
-        saveGraphAs.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser fileDialog = new JFileChooser();
-                fileDialog.setDialogTitle("Save graph file as");
-                fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                fileDialog.setDialogType(JFileChooser.SAVE_DIALOG);
-                fileDialog.setFileFilter(new FileNameExtensionFilter("GRAPH FILES", "sv"));
-                fileDialog.setAcceptAllFileFilterUsed(false);
+        saveGraphAs.addActionListener(e -> {
+            JFileChooser fileDialog = new JFileChooser();
+            fileDialog.setDialogTitle("Save graph file as");
+            fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileDialog.setDialogType(JFileChooser.SAVE_DIALOG);
+            fileDialog.setFileFilter(new FileNameExtensionFilter("GRAPH FILES", Filer.GRAPH_FILE_EXTENSION));
+            fileDialog.setAcceptAllFileFilterUsed(false);
 
-                int status = fileDialog.showOpenDialog(root);
-                if (status == JFileChooser.APPROVE_OPTION) {
-                    System.out.println(fileDialog.getSelectedFile().getAbsolutePath());
-                    PrimaVisual.this.openedFileName = fileDialog.getSelectedFile().getName();
-                    PrimaVisual.this.saveGraph.setEnabled(true);
+            int status = fileDialog.showOpenDialog(root);
+            if (status == JFileChooser.APPROVE_OPTION) {
+                System.out.println(fileDialog.getSelectedFile().getAbsolutePath());
+                PrimaVisual.this.openedFileName = fileDialog.getSelectedFile().getName();
+                PrimaVisual.this.saveGraph.setEnabled(true);
 
-                    Filer.saveGraphToFile(PrimaVisual.this.graph.getGraph(), fileDialog.getSelectedFile().getAbsolutePath(), new Filer.OnPerformed() {
-                        @Override
-                        public void onFinished(Exception reason) {
-                            System.out.println("Graph saved!");
-                        }
-                    });
-                } else if (status == JFileChooser.CANCEL_OPTION) {
-                    System.out.println("Graph file not chosen!");
-                }
+                Filer.saveGraphToFile(PrimaVisual.this.graph.getGraph(), fileDialog.getSelectedFile().getAbsolutePath(), reason -> {
+                    if (reason == null) {
+                        Log.gui(Log.Attributes.BOLD).col(Log.Colors.GREEN).say("Graph saved!");
+                    } else {
+                        Log.consumeException("Файл не может быть сохранён", reason);
+                    }
+                });
+            } else if (status == JFileChooser.CANCEL_OPTION) {
+                System.out.println("Graph file not chosen!");
             }
         });
         saveGraph = new JMenuItem();
-        saveGraph.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Filer.saveGraphToFile(graph.getGraph(), openedFileName, new Filer.OnPerformed() {
-                    @Override
-                    public void onFinished(Exception reason) {
-                        System.out.println("Graph saved!");
-                    }
-                });
+        saveGraph.addActionListener(e -> Filer.saveGraphToFile(graph.getGraph(), openedFileName, reason -> {
+            if (reason == null) {
+                Log.gui(Log.Attributes.BOLD).col(Log.Colors.GREEN).say("Graph saved!");
+            } else {
+                Log.consumeException("Файл не может быть сохранён", reason);
             }
-        });
+        }));
         preserveGraph = new JMenuItem();
-        preserveGraph.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                preserve("", false);
-            }
-        });
+        preserveGraph.addActionListener(e -> preserve(false));
 
-        fileMenu.add(newGraph); // Add graph presets.
+        fileMenu.add(newGraph);
+        fileMenu.add(openGraph);
         fileMenu.add(saveGraphAs);
         fileMenu.add(saveGraph);
-        fileMenu.add(preserveGraph); // Save to Settings.getFileRoot if exists.
+        fileMenu.add(preserveGraph);
     }
 
     private void initSettingsMenu() {
         setParameter = new JMenuItem();
-        setParameter.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ParameterChangeDialog pcd = new ParameterChangeDialog(graph, SwingUtilities.getWindowAncestor(root), "Reset setting");
-                pcd.pack();
-                pcd.setLocationRelativeTo(root);
-                pcd.setVisible(true);
-            }
+        setParameter.addActionListener(e -> {
+            ParameterChangeDialog pcd = new ParameterChangeDialog(graph, SwingUtilities.getWindowAncestor(root), "Reset setting");
+            pcd.pack();
+            pcd.setLocationRelativeTo(root);
+            pcd.setVisible(true);
         });
         changeLocalization = new JMenu();
         userLocale = new JMenuItem();
-        userLocale.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Settings.changeLocalization(Settings.Locales.USER, new Settings.OnLongActionFinished() {
-                    @Override
-                    public void onFinished() {
-                        resetAllNames();
-                    }
-                });
-            }
-        });
+        userLocale.addActionListener(e -> Settings.changeLocalization(Settings.Locales.USER, this::resetAllNames));
         englishLocale = new JMenuItem();
-        englishLocale.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Settings.changeLocalization(Settings.Locales.ENGLISH, new Settings.OnLongActionFinished() {
-                    @Override
-                    public void onFinished() {
-                        resetAllNames();
-                    }
-                });
-            }
-        });
+        englishLocale.addActionListener(e -> Settings.changeLocalization(Settings.Locales.ENGLISH, this::resetAllNames));
         russianLocale = new JMenuItem();
-        russianLocale.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Settings.changeLocalization(Settings.Locales.RUSSIAN, new Settings.OnLongActionFinished() {
-                    @Override
-                    public void onFinished() {
-                        resetAllNames();
-                    }
-                });
-            }
-        });
+        russianLocale.addActionListener(e -> Settings.changeLocalization(Settings.Locales.RUSSIAN, this::resetAllNames));
         germanLocale = new JMenuItem();
-        germanLocale.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Settings.changeLocalization(Settings.Locales.GERMAN, new Settings.OnLongActionFinished() {
-                    @Override
-                    public void onFinished() {
-                        resetAllNames();
-                    }
-                });
-            }
-        });
+        germanLocale.addActionListener(e -> Settings.changeLocalization(Settings.Locales.GERMAN, this::resetAllNames));
         latinLocale = new JMenuItem();
-        latinLocale.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Settings.changeLocalization(Settings.Locales.LATIN, new Settings.OnLongActionFinished() {
-                    @Override
-                    public void onFinished() {
-                        resetAllNames();
-                    }
-                });
-            }
-        });
+        latinLocale.addActionListener(e -> Settings.changeLocalization(Settings.Locales.LATIN, this::resetAllNames));
         changeLocalization.add(userLocale);
         changeLocalization.add(englishLocale);
         changeLocalization.add(russianLocale);
         changeLocalization.add(germanLocale);
         changeLocalization.add(latinLocale);
         setFilePath = new JMenuItem();
-        setFilePath.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser fileDialog = new JFileChooser();
-                fileDialog.setDialogTitle("Set directory");
-                fileDialog.setDialogType(JFileChooser.OPEN_DIALOG);
-                fileDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                fileDialog.setAcceptAllFileFilterUsed(false);
+        setFilePath.addActionListener(e -> {
+            JFileChooser fileDialog = new JFileChooser();
+            fileDialog.setDialogTitle("Set directory");
+            fileDialog.setDialogType(JFileChooser.OPEN_DIALOG);
+            fileDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            fileDialog.setAcceptAllFileFilterUsed(false);
 
-                int status = fileDialog.showOpenDialog(root);
-                if (status == JFileChooser.APPROVE_OPTION) {
-                    System.out.println(fileDialog.getSelectedFile().getAbsolutePath());
-                    Settings.alterUserPath(fileDialog.getSelectedFile().getAbsolutePath(), new Settings.OnLongActionFinished() {
-                        @Override
-                        public void onFinished() {
-                            reEnableAll();
-                        }
-                    });
-                } else if (status == JFileChooser.CANCEL_OPTION) {
-                    System.out.println("User directory not chosen!");
-                }
+            int status = fileDialog.showOpenDialog(root);
+            if (status == JFileChooser.APPROVE_OPTION) {
+                System.out.println(fileDialog.getSelectedFile().getAbsolutePath());
+                Settings.alterUserPath(fileDialog.getSelectedFile().getAbsolutePath(), this::reEnableAll);
+            } else if (status == JFileChooser.CANCEL_OPTION) {
+                System.out.println("User directory not chosen!");
             }
         });
         addUserLocale = new JMenuItem();
-        addUserLocale.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser fileDialog = new JFileChooser();
-                fileDialog.setDialogTitle("Choose localization file");
-                fileDialog.setDialogType(JFileChooser.OPEN_DIALOG);
-                fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                fileDialog.setFileFilter(new FileNameExtensionFilter("PROPERTIES FILES", "properties"));
-                fileDialog.setAcceptAllFileFilterUsed(false);
+        addUserLocale.addActionListener(e -> {
+            JFileChooser fileDialog = new JFileChooser();
+            fileDialog.setDialogTitle("Choose localization file");
+            fileDialog.setDialogType(JFileChooser.OPEN_DIALOG);
+            fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileDialog.setFileFilter(new FileNameExtensionFilter("PROPERTIES FILES", Filer.PROPERTIES_FILE_EXTENSION));
+            fileDialog.setAcceptAllFileFilterUsed(false);
 
-                int status = fileDialog.showOpenDialog(root);
-                if (status == JFileChooser.APPROVE_OPTION) {
-                    System.out.println(fileDialog.getSelectedFile().getAbsolutePath());
-                    Settings.alterLocalization(fileDialog.getSelectedFile().getAbsolutePath(), new Settings.OnLongActionFinished() {
-                        @Override
-                        public void onFinished() {
-                            resetAllNames();
-                        }
-                    });
-                } else if (status == JFileChooser.CANCEL_OPTION) {
-                    System.out.println("Localization file not chosen!");
-                }
+            int status = fileDialog.showOpenDialog(root);
+            if (status == JFileChooser.APPROVE_OPTION) {
+                System.out.println(fileDialog.getSelectedFile().getAbsolutePath());
+                Settings.alterLocalization(fileDialog.getSelectedFile().getAbsolutePath(), this::resetAllNames);
+            } else if (status == JFileChooser.CANCEL_OPTION) {
+                System.out.println("Localization file not chosen!");
             }
         });
         clearFilePath = new JMenu();
         clearAll = new JMenuItem();
-        clearAll.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Settings.removeUserPath(new Settings.OnLongActionFinished() {
-                    @Override
-                    public void onFinished() {
-                        reEnableAll();
-                        resetAllNames();
-                        graph.repaint();
-                    }
-                });
-            }
-        });
+        clearAll.addActionListener(e -> Settings.removeUserPath(() -> {
+            reEnableAll();
+            resetAllNames();
+            graph.repaint();
+        }));
         clearConstants = new JMenuItem();
-        clearConstants.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Settings.resetConstants(new Settings.OnLongActionFinished() {
-                    @Override
-                    public void onFinished() {
-                        graph.repaint();
-                    }
-                });
-            }
-        });
+        clearConstants.addActionListener(e -> Settings.resetConstants(() -> graph.repaint()));
         clearDictionary = new JMenuItem();
-        clearDictionary.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Settings.resetDictionary(new Settings.OnLongActionFinished() {
-                    @Override
-                    public void onFinished() {
-                        resetAllNames();
-                    }
-                });
-            }
-        });
+        clearDictionary.addActionListener(e -> Settings.resetDictionary(this::resetAllNames));
         clearFilePath.add(clearAll);
         clearFilePath.add(clearConstants);
         clearFilePath.add(clearDictionary);
@@ -401,57 +283,45 @@ public class PrimaVisual {
     }
 
     private void initButtons() {
-        test.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                PrimaTest.runTests();
-            }
-        });
+        test.addActionListener(e -> PrimaTest.runTests());
 
-        launch.addActionListener(new ActionListener() {
+        reset.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                algorithm.threadSolveAll(graph.getGraph(), () -> {
-                    graph.repaint();
-                }, null);
-            }
-        });
-
-        forward.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                algorithm.threadSolveStep(graph.getGraph(), () -> {
-                    graph.repaint();
-                }, null);
-            }
-        });
-
-        backward.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                algorithm.stepBack();
+                graph.getGraph().reset();
                 graph.repaint();
             }
+        });
+
+        launch.addActionListener(e -> algorithm.threadSolveAll(graph.getGraph(), () -> graph.repaint(), null));
+
+        forward.addActionListener(e -> algorithm.threadSolveStep(graph.getGraph(), () -> graph.repaint(), null));
+
+        backward.addActionListener(e -> {
+            algorithm.stepBack();
+            graph.repaint();
         });
     }
 
 
 
-    public void preserve(String preserveName, boolean isFinal) {
-        String saveName;
-        if (preserveName.equals("")) {
-            String date = (new SimpleDateFormat("dd-MM-yyyy_HH-mm-ss")).format(Calendar.getInstance().getTime());
-            saveName = Settings.getPref(Settings.userPath) + File.separator + Settings.userPathDir + File.separator + date + "_graph";
-        } else saveName = preserveName;
-        Settings.setPref(Settings.preservedGraph, saveName);
-        Filer.OnPerformed listener = new Filer.OnPerformed() {
-            @Override
-            public void onFinished(Exception reason) {
-                System.out.println("Graph saved as " + saveName + "!");
+    public void preserve(boolean isFinal) {
+        String date = (new SimpleDateFormat("dd-MM-yyyy_HH-mm-ss")).format(Calendar.getInstance().getTime());
+        openedFileName = Settings.getPref(Settings.userPath) + File.separator + Settings.userPathDir + File.separator + date + "_graph";
+        Settings.setPref(Settings.preservedGraph, openedFileName);
+        Filer.OnPerformed listener = reason -> {
+            if (reason == null) {
+                Log.gui(Log.Attributes.BOLD).col(Log.Colors.GREEN).say("Graph saved as " + openedFileName + "!");
+            } else {
+                Log.consumeException("Файл не может быть сохранён", reason);
             }
         };
-        if (!isFinal) Filer.saveGraphToFile(graph.getGraph(), saveName, listener);
-        else Filer.saveGraphToFileNoThread(graph.getGraph(), saveName, listener);
+        if (!isFinal) Filer.saveGraphToFile(graph.getGraph(), openedFileName, listener);
+        else Filer.saveGraphToFileNoThread(graph.getGraph(), openedFileName, listener);
+    }
+
+    public Dimension getGraphShapeDimension() {
+        return graph.getSize();
     }
 
 
@@ -502,6 +372,7 @@ public class PrimaVisual {
         forward.setText("Step forward");
         backward.setText("Step backward");
         test.setText("Run tests");
+        reset.setText("Reset graph");
     }
 
     public JPanel getMainPanel() {

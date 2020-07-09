@@ -79,8 +79,9 @@ public class Log {
         }
     }
 
-    public static void consumeException(Exception e) {
-        cui().beg("WARNING!!!").say(e.getMessage());
+    public static void consumeException(String comment, Exception e) {
+        gui(Attributes.BOLD).col(Colors.RED).say(comment);
+        cui().beg("WARNING!!! ").say(e.getMessage());
     }
 
 
@@ -145,19 +146,13 @@ public class Log {
         attr.addFirst("p");
         String result = argument.toString();
 
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (out != null) out.println(result);
-                if (file != null) Filer.printToFile(result, file, new Filer.OnPerformed() {
-                    @Override
-                    public void onFinished(Exception reason) {
-                        if (reason != null) reason.printStackTrace();
-                    }
-                });
+        SwingUtilities.invokeLater(() -> {
+            if (out != null) out.println(result);
+            if (file != null) Filer.printToFile(result, file, reason -> {
+                if (reason != null) reason.printStackTrace();
+            });
 
-                if (isGUILog && (Prima.getVisual() != null)) Prima.getVisual().appendTextToLog(result, color, attr);
-            }
+            if (isGUILog && (Prima.getVisual() != null)) Prima.getVisual().appendTextToLog(result, color, attr);
         });
     }
 }

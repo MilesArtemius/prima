@@ -9,6 +9,9 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +35,8 @@ public class ParameterChangeDialog extends JDialog {
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         content = Settings.getConstantsDescription();
+
+        input.setToolTipText(Settings.getString("reset_setting_dialog_prompt"));
 
         text.setText("<html>");
         for (Map.Entry<String, String> entry: content.entrySet()) addEntry(entry.getKey(), entry.getValue(), "");
@@ -58,6 +63,19 @@ public class ParameterChangeDialog extends JDialog {
                 String up = input.getText();
                 text.setText("<html>");
                 for (Map.Entry<String, String> entry: content.entrySet()) if (entry.getKey().contains(up)) addEntry(entry.getKey(), entry.getValue(), up);
+            }
+        });
+        input.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, Collections.EMPTY_SET);
+        input.addKeyListener(new KeyAdapter() {
+            public void keyPressed (java.awt.event.KeyEvent evt){
+                if (evt.getKeyCode() == KeyEvent.VK_TAB) {
+                    String up = input.getText();
+                    for (Map.Entry<String, String> entry: content.entrySet()) if (entry.getKey().contains(up)) {
+                        input.setText(entry.getKey());
+                        parameterSpinner.grabFocus();
+                        break;
+                    }
+                }
             }
         });
 

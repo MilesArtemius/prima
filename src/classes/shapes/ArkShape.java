@@ -2,6 +2,7 @@ package classes.shapes;
 
 import classes.Log;
 import classes.Settings;
+import classes.dial.ArkWeightDialog;
 import classes.graph.Ark;
 import classes.graph.NodePlus;
 
@@ -11,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.text.ParseException;
 
 public class ArkShape extends Polygon {
     private Ark ark;
@@ -103,15 +105,41 @@ public class ArkShape extends Polygon {
 
     private class MenuPopUp extends JPopupMenu {
         public MenuPopUp(GraphShape parent) {
-            JMenuItem item = new JMenuItem(Settings.getString("remove_ark_action"));
-            item.addActionListener(new ActionListener() {
+            JMenuItem remove = new JMenuItem(Settings.getString("remove_ark_action"));
+            remove.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     parent.getGraph().deleteArk(parent.getGraph().getNode(ArkShape.this.ark.getStart()), parent.getGraph().getNode(ArkShape.this.ark.getEnd()));
                     parent.repaint();
                 }
             });
-            add(item);
+            add(remove);
+            JMenuItem reweight = new JMenuItem(Settings.getString("reweight_ark_action"));
+            reweight.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    ArkWeightDialog dialog = new ArkWeightDialog(SwingUtilities.getWindowAncestor(parent), Settings.getString("reweight_ark_dialog_name"));
+                    dialog.setListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            try {
+                                int arkWeight = dialog.getResult();
+                                dialog.dispose();
+
+                                Log.cui().say("Reweighting ark from node '", ArkShape.this.ark.getStart(), "' to node '", ArkShape.this.ark.getEnd(), "'");
+                                ArkShape.this.ark.setWeight(arkWeight);
+                                parent.repaint();
+                            } catch (ParseException pe) {
+                                pe.printStackTrace();
+                            }
+                        }
+                    });
+                    dialog.pack();
+                    dialog.setLocationRelativeTo(parent);
+                    dialog.setVisible(true);
+                }
+            });
+            add(reweight);
         }
     }
 }

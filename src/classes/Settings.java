@@ -18,8 +18,8 @@ public class Settings {
     public static final String preservedGraph = "PRESERVED_GRAPH";
 
     public static final String userPathDir = "PrimaConfigurationFolder";
-    private static final String userPathConstants = File.separator + userPathDir + File.separator + constantsName + ".properties";
-    private static final String userPathDictionary = File.separator + userPathDir + File.separator + dictionaryName + ".properties";
+    private static final String userPathConstants = File.separator + userPathDir + File.separator + constantsName + "." + Filer.PROPERTIES_FILE_EXTENSION;
+    private static final String userPathDictionary = File.separator + userPathDir + File.separator + dictionaryName + "." + Filer.PROPERTIES_FILE_EXTENSION;
 
     private HashMap<String, Long> constants;
     private HashMap<String, String> dictionary;
@@ -338,7 +338,7 @@ public class Settings {
         public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload) throws IOException {
             // The below is a copy of the default implementation.
             String bundleName = toBundleName(baseName, locale);
-            String resourceName = toResourceName(bundleName, "properties");
+            String resourceName = toResourceName(bundleName, Filer.PROPERTIES_FILE_EXTENSION);
             ResourceBundle bundle = null;
             InputStream stream = null;
             if (reload) {
