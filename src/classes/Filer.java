@@ -49,7 +49,7 @@ public class Filer {
                     get();
                     listener.onFinished(null);
                 } catch (Exception e) {
-                    Log.gui().say("Файл не найден или содержимое файла повреждено."); // TODO: move to caller.
+                    Log.gui().say("Файл не найден или содержимое файла повреждено."); // TODO: move to caller
                     listener.onFinished(e);
                 }
             }

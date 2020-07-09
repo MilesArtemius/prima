@@ -7,7 +7,7 @@ import java.util.LinkedList;
 public class Node implements Serializable {
 
     private static final long serialVersionUID = 3L;
-    private Point2D position;
+    //private Point2D position;
     private String name;
     private LinkedList<Ark> arks = new LinkedList<Ark>();
     private boolean hidden;
@@ -40,8 +40,8 @@ public class Node implements Serializable {
         this.name = name;
     }
 
-    public Node(Point2D position, String name) {
-        this.position = position;
+    public Node(String name) {
+        //this.position = position;
         this.name = name;
         this.hidden = true;
     }
@@ -62,11 +62,11 @@ public class Node implements Serializable {
     }
 
     public Point2D getPosition() {
-        return position;
+        return new Point2D.Double(-1, -1);
     }
 
     public void setPosition(Point2D position) {
-        this.position = position;
+        //this.position = position;
     }
 
     @Override

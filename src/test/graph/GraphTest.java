@@ -2,6 +2,7 @@ package test.graph;
 
 import classes.Log;
 import classes.graph.Graph;
+import classes.graph.NodePlus;
 
 import java.awt.geom.Point2D;
 
@@ -18,13 +19,13 @@ public class GraphTest {
             Log.gui(Log.Attributes.ITALIC, Log.Attributes.BOLD).say("!Граф не пустой!");
 
         Log.gui().say("Создаём узел с именем 'Node':");
-        graph.addNode(new Point2D.Double(0, 0), "Node");
+        graph.addNode(new NodePlus(new Point2D.Double(0, 0), "Node"));
         successful &= (graph.getNodes().size() == 1);
         if (!(graph.getNodes().size() == 1))
             Log.gui(Log.Attributes.ITALIC, Log.Attributes.BOLD).say("!Узел не создан!");
 
         Log.gui().say("Создаём узел с именем 'Node1':");
-        graph.addNode(new Point2D.Double(15, 15), "Node1");
+        graph.addNode(new NodePlus(new Point2D.Double(15, 15), "Node1"));
         successful &= (graph.getNodes().size() == 2);
         if (!(graph.getNodes().size() == 2))
             Log.gui(Log.Attributes.ITALIC, Log.Attributes.BOLD).say("!Узел не создан!");

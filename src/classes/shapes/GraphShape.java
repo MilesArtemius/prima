@@ -6,6 +6,7 @@ import classes.dial.NodeNameDialog;
 import classes.graph.Ark;
 import classes.graph.Graph;
 import classes.graph.Node;
+import classes.graph.NodePlus;
 
 import javax.swing.*;
 import java.awt.*;
@@ -185,7 +186,7 @@ public class GraphShape extends JPanel {
                             dialog.dispose();
 
                             Log.cui().say("Created new node: '", nodeName, "'");
-                            GraphShape.this.getGraph().addNode(position, nodeName);
+                            GraphShape.this.getGraph().addNode(new NodePlus(position, nodeName));
                             GraphShape.this.repaint();
                         }
                     });

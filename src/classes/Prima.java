@@ -1,6 +1,7 @@
 package classes;
 
 import classes.graph.Graph;
+import classes.graph.NodePlus;
 
 
 import javax.swing.*;
@@ -17,12 +18,12 @@ public class Prima {
     public static Graph prepareInput() { // TODO: replace with graph samples
         Graph graph = new Graph();
 
-        graph.addNode(new Point2D.Double(200, 400), "A");
-        graph.addNode(new Point2D.Double(300, 600), "B");
-        graph.addNode(new Point2D.Double(500, 600), "C");
-        graph.addNode(new Point2D.Double(400, 400), "D");
-        graph.addNode(new Point2D.Double(600, 400), "E");
-        graph.addNode(new Point2D.Double(400, 200), "F");
+        graph.addNode(new NodePlus(new Point2D.Double(200, 400), "A"));
+        graph.addNode(new NodePlus(new Point2D.Double(300, 600), "B"));
+        graph.addNode(new NodePlus(new Point2D.Double(500, 600), "C"));
+        graph.addNode(new NodePlus(new Point2D.Double(400, 400), "D"));
+        graph.addNode(new NodePlus(new Point2D.Double(600, 400), "E"));
+        graph.addNode(new NodePlus(new Point2D.Double(400, 200), "F"));
 
         graph.addArk("A", "B", 8);
         graph.addArk("A", "D", 3);

@@ -20,9 +20,15 @@ public class Graph {
         return nodes.get(name);
     }
 
-    public void addNode(Point2D position, String name){
+    //public void addNode(Point2D position, String name){
 
-        nodes.put(name, new Node(position, name));
+    //    nodes.put(name, new Node(position, name));
+    //    setRecentlyChanged(true);
+    //}
+
+    public void addNode(Node node){
+
+        nodes.put(node.getName(), new NodePlus(node.getPosition(), node.getName()));
         setRecentlyChanged(true);
     }
 
