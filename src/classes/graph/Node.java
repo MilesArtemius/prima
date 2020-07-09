@@ -1,14 +1,23 @@
 package classes.graph;
 
-import java.io.*;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
-public class Node implements Externalizable {
+public class Node {
 
     private static final long serialVersionUID = 3L;
     private String name;
     private LinkedList<Ark> arks = new LinkedList<Ark>();
     private boolean hidden;
+
+    private Node() {}
+
+    public Node(Node node) {
+        this.name = node.getName();
+        this.arks = node.arks;
+        this.hidden = node.hidden;
+    }
 
     public String getName() {
         return name;
@@ -23,7 +32,7 @@ public class Node implements Externalizable {
         if (!arks.isEmpty()){
 
             for (Ark ark:arks) {
-                if (ark.getStart() == node || ark.getEnd() == node){//неважно на каком конце нода которую ищем
+                if (ark.getStart().equals(node.getName()) || ark.getEnd().equals(node.getName())){//неважно на каком конце нода которую ищем
 
                     return ark;
                 }
@@ -64,27 +73,23 @@ public class Node implements Externalizable {
         return "Узел "+ name;
     }
 
-    private void writeObject(ObjectOutputStream oos) throws IOException {
-        // default serialization
-        oos.defaultWriteObject();
-        // write the object
-        System.out.println("New w action node!");
+    public Map<String, Object> writeToMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("NAME", name);
+        Map<Integer, Map<String, Object>> arksMap = new HashMap<>();
+        for (int i = 0; i < arks.size(); i++) arksMap.put(i, arks.get(i).writeToMap());
+        map.put("ARKS", arksMap);
+        map.put("HIDDEN", hidden);
+        return map;
     }
 
-    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
-        // default deserialization
-        ois.defaultReadObject();
-        System.out.println("New r action node!");
-
-    }
-
-    @Override
-    public void writeExternal(ObjectOutput out) throws IOException {
-
-    }
-
-    @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-
+    public static Node readFromMap(Map<String, Object> map) {
+        Node node = new Node();
+        node.name = (String) map.get("NAME");
+        Map<Integer, Map<String, Object>> arksMap = (Map<Integer, Map<String, Object>>) map.get("ARKS");
+        node.arks = new LinkedList<>();
+        for (int i = 0; i < arksMap.entrySet().size(); i++) node.arks.addLast(Ark.readFromMap(arksMap.get(i)));
+        node.hidden = (boolean) map.get("HIDDEN");
+        return node;
     }
 }

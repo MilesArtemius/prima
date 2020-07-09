@@ -19,9 +19,12 @@ public class ArkShape extends Polygon {
         this.npoints = 4;
         this.ark = ark;
 
+        NodePlus start = (NodePlus) parent.getGraph().getNode(ark.getStart());
+        NodePlus end = (NodePlus) parent.getGraph().getNode(ark.getEnd());
+
         double size = Settings.getLong("ark_shape_gap") * parent.getSizeModifier();
 
-        Point2D posStart = ((NodePlus) ark.getStart()).getPosition(), posEnd = ((NodePlus) ark.getEnd()).getPosition(), perFirst, perSecond,
+        Point2D posStart = start.getPosition(), posEnd = end.getPosition(), perFirst, perSecond,
                 center = new Point2D.Double(posStart.getX() + (posEnd.getX() - posStart.getX()) / 2, posStart.getY() + (posEnd.getY() - posStart.getY()) / 2);
 
         if ((posStart.getX() != posEnd.getX()) && (posStart.getY() != posEnd.getY())) {
@@ -39,12 +42,12 @@ public class ArkShape extends Polygon {
             perSecond = new Point2D.Double(center.getX(), center.getY() - size);
         }
 
-        xpoints[0] = (int) ((NodePlus) ark.getStart()).getPosition().getX();
-        ypoints[0] = (int) ((NodePlus) ark.getStart()).getPosition().getY();
+        xpoints[0] = (int) start.getPosition().getX();
+        ypoints[0] = (int) start.getPosition().getY();
         xpoints[1] = (int) perFirst.getX();
         ypoints[1] = (int) perFirst.getY();
-        xpoints[2] = (int) ((NodePlus) ark.getEnd()).getPosition().getX();
-        ypoints[2] = (int) ((NodePlus) ark.getEnd()).getPosition().getY();
+        xpoints[2] = (int) end.getPosition().getX();
+        ypoints[2] = (int) end.getPosition().getY();
         xpoints[3] = (int) perSecond.getX();
         ypoints[3] = (int) perSecond.getY();
         invalidate();
@@ -104,7 +107,7 @@ public class ArkShape extends Polygon {
             item.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    parent.getGraph().deleteArk(ArkShape.this.ark.getStart(), ArkShape.this.ark.getEnd());
+                    parent.getGraph().deleteArk(parent.getGraph().getNode(ArkShape.this.ark.getStart()), parent.getGraph().getNode(ArkShape.this.ark.getEnd()));
                     parent.repaint();
                 }
             });

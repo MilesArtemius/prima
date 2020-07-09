@@ -90,8 +90,8 @@ public class PrimaAlgorithm implements Algorithm {
             Ark minArk = null;
             boolean isStartInArrMin = false;
             for (Ark ark: graph.getArks()){
-                boolean isStartInArr = nodesForSearch.contains(ark.getStart());
-                boolean isEndInArr = nodesForSearch.contains(ark.getEnd());
+                boolean isStartInArr = nodesForSearch.contains(graph.getNode(ark.getStart()));
+                boolean isEndInArr = nodesForSearch.contains(graph.getNode(ark.getEnd()));
                 if (ark.isHidden() && (isStartInArr ^ isEndInArr)){
                     if (weight > ark.getWeight()){
                         minArk = ark;
@@ -104,7 +104,7 @@ public class PrimaAlgorithm implements Algorithm {
             if (minArk != null){
 
                 minArk.showArk();
-                nodesForSearch.add(isStartInArrMin? minArk.getEnd() : minArk.getStart());
+                nodesForSearch.add(isStartInArrMin? graph.getNode(minArk.getEnd()) : graph.getNode(minArk.getStart()));
                 nodesForSearch.get(nodesForSearch.size()-1).showNode();
                 Log.gui().say("Найдено ребро ", minArk);
 

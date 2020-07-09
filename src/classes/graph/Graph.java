@@ -1,10 +1,7 @@
 package classes.graph;
 
 import java.io.*;
-import java.util.LinkedList;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
+import java.util.*;
 
 public class Graph implements Externalizable {
 
@@ -31,7 +28,7 @@ public class Graph implements Externalizable {
         if (node != null){
 
             for (int i = node.getArks().size()-1; i>=0; i--) {
-                deleteArk(node, node.getArks().get(i).getStart() == node ? node.getArks().get(i).getEnd() : node.getArks().get(i).getStart());
+                deleteArk(node, getNode(node.getArks().get(i).getStart()) == node ? getNode(node.getArks().get(i).getEnd()) : getNode(node.getArks().get(i).getStart()));
             }
             nodes.remove(name);
             setRecentlyChanged(true);
@@ -51,7 +48,7 @@ public class Graph implements Externalizable {
 
     public void addArk(Node start, Node end, int weight){
         if (start.getArkTo(end) == null){//обратной тоже не будет, у нас тут неориентированный граф
-            Ark ark = new Ark(start, end, weight);
+            Ark ark = new Ark(start.getName(), end.getName(), weight);
             arks.add(ark);
             start.getArks().add(ark);
             end.getArks().add(ark);
@@ -155,11 +152,24 @@ public class Graph implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-
+        LinkedList<Map<String, Object>> nodeList = new LinkedList<>();
+        for (Map.Entry<String, Node> entry: nodes.entrySet()) {
+            nodeList.push(entry.getValue().writeToMap());
+        }
+        out.writeObject(nodeList);
+        out.writeObject(arks);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-
+        LinkedList<Map<String, Object>> nodeList = (LinkedList<Map<String, Object>>) in.readObject();
+        nodes = new HashMap<>();
+        for (Map<String, Object> map: nodeList) {
+            Node node;
+            if (map.containsKey("POSITION")) node = NodePlus.readFromMap(map);
+            else node = Node.readFromMap(map);
+            nodes.put(node.getName(), node);
+        }
+        arks = (LinkedList<Ark>) in.readObject();
     }
 }

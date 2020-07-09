@@ -1,7 +1,7 @@
 package classes.graph;
 
 import java.awt.geom.Point2D;
-import java.io.*;
+import java.util.Map;
 
 public class NodePlus extends Node {
 
@@ -16,8 +16,10 @@ public class NodePlus extends Node {
         super(name);
         this.position = new Point2D.Double(-1, -1);
     }
-
-    public NodePlus() {}
+    private NodePlus(Node node, Point2D position) {
+        super(node);
+        this.position = position;
+    }
 
     public Point2D getPosition() {
         return position;
@@ -27,30 +29,19 @@ public class NodePlus extends Node {
         this.position = position;
     }
 
-
-    /*protected void writeObject(ObjectOutputStream oos) throws IOException {
-        // default serialization
-        oos.defaultWriteObject();
-        // write the object
-        System.out.println("New w action!");
+    @Override
+    public Map<String, Object> writeToMap() {
+        Map<String, Object> map = super.writeToMap();
+        map.put("POSITION", true);
+        map.put("POSITION_X", position.getX());
+        map.put("POSITION_Y", position.getY());
+        return map;
     }
 
-    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
-        // default deserialization
-        ois.defaultReadObject();
-        System.out.println("New r action!");
-
-    }*/
-
-    @Override
-    public void writeExternal(ObjectOutput out) throws IOException {
-        super.writeExternal(out);
-        out.writeObject(position);
-    }
-
-    @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        super.readExternal(in);
-        position = (Point2D) in.readObject();
+    public static NodePlus readFromMap(Map<String, Object> map) {
+        double posX = (double) map.get("POSITION_X");
+        double posY = (double) map.get("POSITION_Y");
+        Point2D point = new Point2D.Double(posX, posY);
+        return new NodePlus(Node.readFromMap(map), point);
     }
 }

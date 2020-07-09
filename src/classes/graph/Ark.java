@@ -1,15 +1,19 @@
 package classes.graph;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Ark implements Serializable {
 
     private static final long serialVersionUID = 2L;
-    private final Node start, end;
-    private final double weight;
+    private String start, end;
+    private double weight;
     private boolean hidden;
 
-    public Ark(Node start, Node end, double weight){
+    private Ark() {}
+
+    public Ark(String start, String end, double weight){
         this.start = start;
         this.end = end;
         this.weight = weight;
@@ -17,11 +21,11 @@ public class Ark implements Serializable {
 
     }
 
-    public Node getStart() {
+    public String getStart() {
         return start;
     }
 
-    public Node getEnd() {
+    public String getEnd() {
         return end;
     }
 
@@ -48,8 +52,26 @@ public class Ark implements Serializable {
     @Override
     public String toString(){
 
-        return "Ребро "+ start.getName() + "<->" + end.getName() + ", вес: " + Double.toString(weight);
+        return "Ребро "+ start + "<->" + end + ", вес: " + Double.toString(weight);
     }
 
 
+
+    public Map<String, Object> writeToMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("START", start);
+        map.put("END", end);
+        map.put("WEIGHT", weight);
+        map.put("HIDDEN", hidden);
+        return map;
+    }
+
+    public static Ark readFromMap(Map<String, Object> map) {
+        Ark ark = new Ark();
+        ark.start = (String) map.get("START");
+        ark.end = (String) map.get("END");
+        ark.weight = (double) map.get("WEIGHT");
+        ark.hidden = (boolean) map.get("HIDDEN");
+        return ark;
+    }
 }
