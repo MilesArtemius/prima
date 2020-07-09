@@ -347,8 +347,8 @@ public class PrimaVisual {
         forward.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                algorithm.prepareGraph(graph.getGraph());
-                algorithm.solveStep();
+                //algorithm.prepareGraph(graph.getGraph());
+                algorithm.solveStep(graph.getGraph());
                 graph.repaint();
             }
         });

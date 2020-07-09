@@ -12,6 +12,9 @@ public class Graph {
     private HashMap<String, Node> nodes = new HashMap<String, Node>();
     private LinkedList<Ark> arks = new LinkedList<Ark>(); // я бы предложил создавать массив в момент вызова getArks(), чтобы избежать хранения лишнего, хотя так быстрее
 
+
+    private boolean recentlyChanged = true;
+
     public Node getNode(String name){
 
         return nodes.get(name);
@@ -20,6 +23,7 @@ public class Graph {
     public void addNode(Point2D position, String name){
 
         nodes.put(name, new Node(position, name));
+        setRecentlyChanged(true);
     }
 
     public void deleteNode(String name){
@@ -31,6 +35,7 @@ public class Graph {
                 deleteArk(node, node.getArks().get(i).getStart() == node ? node.getArks().get(i).getEnd() : node.getArks().get(i).getStart());
             }
             nodes.remove(name);
+            setRecentlyChanged(true);
         }
     }
 
@@ -41,6 +46,7 @@ public class Graph {
             nodes.remove(originName);
             nodes.put(newName, node);
             node.setName(newName);
+            setRecentlyChanged(true);
         }
     }
 
@@ -50,6 +56,7 @@ public class Graph {
             arks.add(ark);
             start.getArks().add(ark);
             end.getArks().add(ark);
+            setRecentlyChanged(true);
         }
         else {
 
@@ -74,6 +81,7 @@ public class Graph {
             arks.remove(arkToDelete);
             start.getArks().remove(arkToDelete);
             end.getArks().remove(arkToDelete);
+            setRecentlyChanged(true);
         }
 
     }
@@ -127,4 +135,20 @@ public class Graph {
     }
 
 
+    public boolean isRecentlyChanged() {
+        return recentlyChanged;
+    }
+
+    public void setRecentlyChanged(boolean recentlyChanged) {
+        if (recentlyChanged){
+
+            for (Ark ark: getArks()) {
+                ark.hideArk();
+            }
+            for (Node node: getNodes()){
+                node.hideNode();
+            }
+        }
+        this.recentlyChanged = recentlyChanged;
+    }
 }

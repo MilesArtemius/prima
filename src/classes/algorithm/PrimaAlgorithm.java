@@ -81,7 +81,10 @@ public class PrimaAlgorithm implements Algorithm {
     @Override
     public Graph solveStep(Graph graph){//сюда только получающееся остовное дерево (граф с hidden ark). Каждый шаг добавляется одно ребро.
     //возвращает null если решение завершено
-
+        if (graph.isRecentlyChanged() || !isPrepared){
+            prepareGraph(graph);
+            return graph;
+        }
         if (!nodesForSearch.isEmpty()){
             double weight = Double.POSITIVE_INFINITY;
             Ark minArk = null;
@@ -119,17 +122,27 @@ public class PrimaAlgorithm implements Algorithm {
     }
 
     public Graph solveStep(){
+        if (graph == null){
 
+            Log.gui().say("Граф не найден");
+            return null;
+        }
         return solveStep(graph);
     }
 
     @Override
     public Graph prepareGraph(Graph graph) {//сюда изначальный целый граф. Превращает граф в граф без ребер и добавляет стартовое ребро.
         this.graph = graph;
+        if (graph.isRecentlyChanged()){
+            isPrepared = false;
+            graph.setRecentlyChanged(false);
+        }
         if (isPrepared){
             return null;
         }
+
         isPrepared = true;
+        nodesForSearch = new ArrayList<Node>();
         for (Ark ark: graph.getArks()) {
             ark.hideArk();
         }
