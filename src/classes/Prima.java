@@ -64,21 +64,9 @@ public class Prima {
             launchGUI("");
         } else if (args[0].equals("-noGUI")) {
             Settings.setup(Log.Level.NO_LOG);
-            if (args.length == 4) {
-                String pathToInputFile = args[1];
-                String pathToOutputFile = args[2];
-                Log.Level level = Log.Level.valueOf(args[3]);
-                // TODO: launch algorithm.
-                PrimaAlgorithm alg = new PrimaAlgorithm(level);
-
-            } else if (args.length == 3) {
-                String pathToInputFile = args[1];
-                String pathToOutputFile = args[2];
-                Log.Level level = Log.Level.CONSOLE;
-                // TODO: launch algorithm.
-                PrimaAlgorithm alg = new PrimaAlgorithm(level);
-
-            } else Log.cui().file(null).say("Wrong arguments provided! Aborting execution.");
+            if (args.length == 4) launchNoGUI(args[1], args[2], Log.Level.valueOf(args[3]));
+            else if (args.length == 3) launchNoGUI(args[1], args[2], Log.Level.CONSOLE);
+            else Log.cui().file(null).say("Wrong arguments provided! Aborting execution.");
         } else if (args[0].equals("-GUI")) {
             if (args.length == 2) {
                 Settings.setup(Log.Level.GUI);
@@ -91,6 +79,26 @@ public class Prima {
             Settings.setup(Log.Level.NO_LOG);
             Log.cui().file(null).say("Wrong arguments provided! Aborting execution.");
         }
+    }
+
+    private static void launchNoGUI(String loadFile, String saveFile, Log.Level logLevel) {
+        Filer.loadGraphFromFile(loadFile, false, new Filer.OnGraphLoaded() {
+            @Override
+            public void onFinished(Graph graph, Exception reason) {
+                if (reason == null) {
+                    PrimaAlgorithm alg = new PrimaAlgorithm(logLevel);
+                    alg.solve(graph);
+                    Filer.saveGraphToFile(graph, saveFile, new Filer.OnPerformed() {
+                        @Override
+                        public void onFinished(Exception reason) {
+                            if (reason != null) Log.consumeException(reason);
+                        }
+                    });
+                } else {
+                    Log.consumeException(reason);
+                }
+            }
+        });
     }
 
     private static void launchGUI(String saveFile) {
