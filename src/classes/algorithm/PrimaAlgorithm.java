@@ -93,8 +93,8 @@ public class PrimaAlgorithm implements Algorithm {
 
     private void logResult(){
         for (Ark ark: graph.getArks()){
-            Log.getForLevel(logLevel).say("Ребро с весом ", Double.toString(ark.getWeight()) , (ark.isHidden()? " не добавлено.": " добавлено."));
-            //System.out.println("Ребро с весом " + Double.toString(ark.getWeight()) + (ark.isHidden()? " не добавлено.": " добавлено."));
+            //Log.getForLevel(logLevel).say("Ребро с весом ", Double.toString(ark.getWeight()) , (ark.isHidden()? " не добавлено.": " добавлено."));
+
         }
 
 
@@ -111,30 +111,19 @@ public class PrimaAlgorithm implements Algorithm {
         }
         return count;
     }
-/*
-    public Thread threadSolve(Graph graph){
 
-        Thread thread = new Thread(() -> solveStep(graph));
-        thread.start();
-        return thread;
-    }
-
-    public Thread threadSolveAll(Graph graph){
-        Thread thread = new Thread(() -> solve(graph));
-        thread.start();
-        return thread;
-
-    }
-
- */
     @Override
     public Graph solve(Graph graph){//сюда изначальный целый граф. Само запустит функции подготовки и решения.
-        prepareGraph(graph);
-        while (solveStep() != null) {
-            //решаем
+        if (prepareGraph(graph)!=null){
+            while (solveStep() != null) {
+                //решаем
+            }
+            logResult();
+            return graph;
+
         }
-        logResult();
-        return graph;
+        return null;
+
     }
 
     @Override
@@ -172,7 +161,7 @@ public class PrimaAlgorithm implements Algorithm {
             }
             else{
                 //решение завершено
-                Log.getForLevel(logLevel).say("Решение завершено");
+                Log.getForLevel(logLevel).good().say("Решение завершено");
                 return null;
             }
 
@@ -211,8 +200,12 @@ public class PrimaAlgorithm implements Algorithm {
         if (isPrepared){
             return null;
         }
-
+        if (graph.isEmpty()){
+            Log.getForLevel(logLevel).bad().say("Граф пустой, запуск алгоритма невозможен.");
+            return null;
+        }
         isPrepared = true;
+        Log.getForLevel(logLevel).good().say("Начато решение");
         nodesForSearch = new ArrayList<Node>();
         for (Ark ark: graph.getArks()) {
             ark.hideArk();
@@ -239,9 +232,9 @@ public class PrimaAlgorithm implements Algorithm {
     }
 
     public interface OnSuccess {
-        void listener();//какие аргументы тебе нужны?
+        void listener();
     }
     public interface OnFail {
-        void listener(Exception reason);//какие аргументы тебе нужны?
+        void listener(Exception reason);
     }
 }
