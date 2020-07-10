@@ -363,46 +363,48 @@ public class PrimaVisual {
     private void resetAllNames() {
         setOpenFileName(openedFileName);
 
-        fileMenu.setText("Файл");
-        newGraph.setText("Создать");
-        emptyGraph.setText("Пустой граф");
-        sampleGraph.setText("Тестовый графа");
-        bipartiteGraph.setText("Тестовый двудольный граф");
-        petersonGraph.setText("Граф Петерсона");
-        openGraph.setText("Открыть...");
-        saveGraphAs.setText("Сохранить как...");
-        saveGraph.setText("Сохранить");
-        preserveGraph.setText("Записать");
+        fileMenu.setText(Settings.getString("fileMenu"));
+        newGraph.setText(Settings.getString("newGraph"));
+        emptyGraph.setText(Settings.getString("emptyGraph"));
+        sampleGraph.setText(Settings.getString("sampleGraph"));
+        bipartiteGraph.setText(Settings.getString("bipartiteGraph"));
+        petersonGraph.setText(Settings.getString("petersonGraph"));
+        openGraph.setText(Settings.getString("openGraph"));
+        saveGraphAs.setText(Settings.getString("saveGraphAs"));
+        saveGraph.setText(Settings.getString("saveGraph"));
+        preserveGraph.setText(Settings.getString("preserveGraph"));
 
-        settingsMenu.setText("Настройки");
-        setParameter.setText("Установить параметр");
-        changeLocalization.setText("Изменить локализацию");
+        settingsMenu.setText(Settings.getString("settingsMenu"));
+        setParameter.setText(Settings.getString("setParameter"));
+        changeLocalization.setText(Settings.getString("changeLocalization"));
         userLocale.setText(Settings.getString("user_defined_localization_name"));
         englishLocale.setText(Settings.Locales.ENGLISH.getLocale());
         russianLocale.setText(Settings.Locales.RUSSIAN.getLocale());
         germanLocale.setText(Settings.Locales.GERMAN.getLocale());
         latinLocale.setText(Settings.Locales.LATIN.getLocale());
-        setFilePath.setText("Установить путь к файлам конфигурации");
-        addUserLocale.setText("Добавить пользовательскую локализацию");
-        clearFilePath.setText("Очистить файлы конфигурации...");
-        clearAll.setText("Полностью");
-        clearConstants.setText("Только параметры");
-        clearDictionary.setText("Только локализацию");
+        setFilePath.setText(Settings.getString("setFilePath"));
+        addUserLocale.setText(Settings.getString("addUserLocale"));
+        clearFilePath.setText(Settings.getString("clearFilePath"));
+        clearAll.setText(Settings.getString("clearAll"));
+        clearConstants.setText(Settings.getString("clearConstants"));
+        clearDictionary.setText(Settings.getString("clearDictionary"));
 
-        helpMenu.setText("Помощь");
-        aboutApp.setText("О программе");
-        aboutUs.setText("О нас");
+        helpMenu.setText(Settings.getString("helpMenu"));
+        aboutApp.setText(Settings.getString("aboutApp"));
+        aboutUs.setText(Settings.getString("aboutUs"));
 
-        menuText.setText("<html><b><font size=\"3\">Спасибо за использование нашей программы!</font></b></html>");
-        visualizationText.setText("<html><b><font size=\"5\">Граф:</font></b></html>");
-        logsTitle.setText("<html><font size=\"5\">Логи:</font></html>");
+        menuText.setText(Settings.getString("menuText"));
+        visualizationText.setText(Settings.getString("visualizationText"));
+        logsTitle.setText(Settings.getString("logsTitle"));
 
-        clearLogs.setText("Очистить логи");
-        launch.setText("Запустить алгоритм!");
-        forward.setText("Шаг вперёд");
-        backward.setText("Шаг назад");
-        test.setText("Провести тестирование");
-        reset.setText("Очистить граф");
+        clearLogs.setText(Settings.getString("clearLogs"));
+        launch.setText(Settings.getString("launch"));
+        forward.setText(Settings.getString("forward"));
+        backward.setText(Settings.getString("backward"));
+        test.setText(Settings.getString("test"));
+        reset.setText(Settings.getString("reset"));
+
+        graph.repaint();
     }
 
     public JPanel getMainPanel() {
