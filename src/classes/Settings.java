@@ -121,7 +121,7 @@ public class Settings {
                 logLevel = Log.Level.FILE;
 
                 if (reason == null) for (Object key : properties.keySet()) {
-                    Log.cui().beg("\t").say(key, " -> ", properties.get(key).toString());
+                    Log.getForLevel(logLevel).beg("\t").say(key, " -> ", properties.get(key).toString());
                     if (dictionary.containsKey(key.toString())) dictionary.put(key.toString(), properties.get(key).toString());
                 } else Log.getForLevel(logLevel).warn().say("Файл не найден или пользовательская локализация не задана!");
 
@@ -138,9 +138,10 @@ public class Settings {
 
     private Settings() {
         logLevel = Log.Level.GUI;
-        Log.getForLevel(logLevel).say("Initializing settings...");
+        Log.getForLevel(logLevel).info().say("Загрузка настроек...");
         initializeUserDictionary(null);
         initializeDefaultConstants();
+        Log.getForLevel(logLevel).good().say("Загрузка настроек успешно завершена!");
     }
 
     private static Settings get() {
@@ -208,7 +209,7 @@ public class Settings {
 
 
     public static void alterUserPath(String path, OnLongActionFinished listener) {
-        Log.gui().info().say("Установка пути к файлам конфигурации...");
+        Log.gui().info().say("Установка пути к файлам конфигурации в " + path + "...");
         setPref(userPath, path);
         Filer.addFolder(path + File.separator + userPathDir, reason -> {
             if (reason != null) Log.consumeException("Ошибка при создании файлов конфигурации!", reason);
@@ -232,30 +233,46 @@ public class Settings {
         if (checkPref(userPath)) Filer.removeFolder(getPref(userPath) + File.separator + userPathDir, reason -> {
             if (reason != null) reason.printStackTrace();
             else {
+                Log.gui().good().say("Удаление файлов конфигурации успешно завершено!");
+                Log.gui().info().say("Удаление системных записей...");
                 clearPrefs();
+                Log.gui().good().say("Удаление системных записей успешно завершено!");
                 get().initializeDefaultConstants();
                 get().initializeUserDictionary(null);
             }
             if (listener != null) listener.onFinished();
         });
-        else if (listener != null) listener.onFinished();
+        else {
+            Log.gui().warn().say("Файлы конфигурации отсутствуют!");
+            if (listener != null) listener.onFinished();
+        }
     }
 
     public static void resetConstants(OnLongActionFinished listener) {
+        Log.gui().info().say("Удаление пользовательских параметров...");
         if (checkPref(userPath)) Filer.deleteFile(getPref(userPath) + userPathConstants, reason -> {
+            Log.gui().good().say("Удаление пользовательских параметров успешно завершено!");
             get().initializeDefaultConstants();
             if (listener != null) listener.onFinished();
         });
-        else if (listener != null) listener.onFinished();
+        else{
+            Log.gui().warn().say("Пользовательские параметры не заданы!");
+            if (listener != null) listener.onFinished();
+        }
     }
 
     public static void resetDictionary(OnLongActionFinished listener) {
+        Log.gui().info().say("Удаление пользовательской локализации...");
         if (checkPref(userPath)) Filer.deleteFile(getPref(userPath) + userPathDictionary, reason -> {
             resetPref(userLocalization);
+            Log.gui().good().say("Удаление пользовательской локализации успешно завершено!");
             get().initializeUserDictionary(null);
             if (listener != null) listener.onFinished();
         });
-        else if (listener != null) listener.onFinished();
+        else {
+            Log.gui().warn().say("Пользовательская локализация не задана!");
+            if (listener != null) listener.onFinished();
+        }
     }
 
 
@@ -305,35 +322,47 @@ public class Settings {
 
 
     public static void alterLocalization(String file, OnLongActionFinished listener) {
+        Log.gui().info().say("Установка пользовательской локализации из файла " + file + "...");
         if (checkPref(userPath)) Filer.copyFile(file, getPref(userPath) + userPathDictionary, reason -> {
-            if (reason != null) reason.printStackTrace();
+            if (reason != null) Log.consumeException("Ошибка при установке пользовательской локализации!", reason);
             else changeLocalization(Locales.USER, () -> {
+                Log.gui().good().say("Установка пользовательской локализации успешно завершена!");
                 if (listener != null) listener.onFinished();
             });
         });
-        else if (listener != null) listener.onFinished();
+        else {
+            Log.gui().warn().say("Путь к файлам конфигурации не задан!");
+            if (listener != null) listener.onFinished();
+        }
     }
 
     public static void alterParameter(String name, long value, OnLongActionFinished listener) {
         if (get().constants.containsKey(name)) {
+            Log.gui().info().say("Изменение параметра с ключом " + name + " на " + value +  "...");
             get().constants.put(name, value);
 
             if (checkPref(userPath)) {
+                Log.gui().info().say("Загрузка пользовательских параметров...");
                 Filer.loadPropertiesFromFile(getPref(userPath) + userPathConstants, (properties, reason) -> {
                     Properties prop = new Properties();
-                    if (reason == null) prop = properties;
+                    if (reason == null) {
+                        prop = properties;
+                        Log.gui().good().say("Загрузка пользовательских параметров успешно завершена!");
+                    } else Log.gui().warn().say("Файл с пользовательскими параметрами не найден - параметр будет записан в новый!");
                     prop.setProperty(name, String.valueOf(value));
+                    Log.gui().info().say("Сохранение пользовательских параметров в файл " + getPref(userPath) + userPathConstants + "...");
                     Filer.savePropertiesToFile(prop, getPref(userPath) + userPathConstants, reason1 -> {
-                        if (reason1 != null) reason1.printStackTrace();
+                        if (reason1 != null) Log.consumeException("Ошибка при сохранении пользовательских настроек!", reason1);
+                        else Log.gui().good().say("Сохранение пользовательских параметров успешно завершено!");
                         if (listener != null) listener.onFinished();
                     });
                 });
             } else {
-                Log.cui().say("Warning! Path for parameter storing not found, parameter changed until session end!");
+                Log.gui().warn().say("Поскольку путь для сохранения файлов конфигурации не задан, параметр сохранён только для текущей сессии!");
                 if (listener != null) listener.onFinished();
             }
         } else{
-            Log.cui().say("Can not alter - no such parameter found!");
+            Log.gui().warn().say("Изменить параметр невозможно - заданный ключ не существует!");
             if (listener != null) listener.onFinished();
         }
     }

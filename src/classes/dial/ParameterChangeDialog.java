@@ -83,12 +83,9 @@ public class ParameterChangeDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 parameterSpinner.validate();
-                if (!input.getText().equals("")) Settings.alterParameter(input.getText(), (int) parameterSpinner.getValue(), new Settings.OnLongActionFinished() {
-                    @Override
-                    public void onFinished() {
-                        graph.repaint();
-                        dispose();
-                    }
+                if (!input.getText().equals("")) Settings.alterParameter(input.getText(), (int) parameterSpinner.getValue(), () -> {
+                    graph.repaint();
+                    dispose();
                 });
             }
         });
