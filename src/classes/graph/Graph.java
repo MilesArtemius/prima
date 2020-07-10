@@ -33,7 +33,7 @@ public class Graph {
         if (node != null){
 
             for (int i = node.getArks().size()-1; i>=0; i--) {
-                deleteArk(node, getNode(node.getArks().get(i).getStart()) == node ? getNode(node.getArks().get(i).getStart()) : getNode(node.getArks().get(i).getEnd()));
+                deleteArk(node, getNode(node.getArks().get(i).getStart()) == node ? getNode(node.getArks().get(i).getEnd()) : getNode(node.getArks().get(i).getStart()));//????!?!?!??!?!
             }
             nodes.remove(name);
             setRecentlyChanged(true);
