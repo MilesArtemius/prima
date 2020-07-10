@@ -10,8 +10,6 @@ import classes.graph.NodePlus;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
@@ -172,28 +170,22 @@ public class GraphShape extends JPanel {
     private class MenuPopUp extends JPopupMenu {
         public MenuPopUp(Point2D position) {
             JMenuItem item = new JMenuItem(Settings.getString("create_node_action"));
-            item.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    NodeNameDialog dialog = new NodeNameDialog(SwingUtilities.getWindowAncestor(GraphShape.this),
-                            Settings.getString("create_node_dialog_name"), false);
-                    dialog.setListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            String nodeName = Settings.getString("create_node_dialog_default_node_name",
-                                    (new Random()).nextInt() % Settings.getLong("graph_shape_random_node_name_length"));
-                            if (!dialog.getResult().equals("")) nodeName = dialog.getResult();
-                            dialog.dispose();
+            item.addActionListener(e -> {
+                NodeNameDialog dialog = new NodeNameDialog(SwingUtilities.getWindowAncestor(GraphShape.this),
+                        Settings.getString("create_node_dialog_name"), false);
+                dialog.setListener(e1 -> {
+                    String nodeName = Settings.getString("create_node_dialog_default_node_name",
+                            (new Random()).nextInt() % Settings.getLong("graph_shape_random_node_name_length"));
+                    if (!dialog.getResult().equals("")) nodeName = dialog.getResult();
+                    dialog.dispose();
 
-                            Log.cui().say("Created new node: '", nodeName, "'");
-                            GraphShape.this.getGraph().addNode(new NodePlus(position, nodeName));
-                            GraphShape.this.repaint();
-                        }
-                    });
-                    dialog.pack();
-                    dialog.setLocationRelativeTo(GraphShape.this);
-                    dialog.setVisible(true);
-                }
+                    Log.cui().say("Created new node: '", nodeName, "'");
+                    GraphShape.this.getGraph().addNode(new NodePlus(position, nodeName));
+                    GraphShape.this.repaint();
+                });
+                dialog.pack();
+                dialog.setLocationRelativeTo(GraphShape.this);
+                dialog.setVisible(true);
             });
             add(item);
         }

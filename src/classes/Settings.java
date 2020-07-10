@@ -23,6 +23,7 @@ public class Settings {
 
     private HashMap<String, Long> constants;
     private HashMap<String, String> dictionary;
+    private static Log.Level logLevel;
     private static Settings instance;
 
     public enum Locales {
@@ -43,70 +44,101 @@ public class Settings {
     }
 
     private void initializeDefaultConstants() {
+        Log.getForLevel(logLevel).info().say("Загрузка параметров по умолчанию...");
+        boolean restoreLevel = logLevel == Log.Level.GUI;
+        logLevel = Log.Level.FILE;
+
         try {
-            Log.cui().say("Loading constants from file ", constantsName, ":");
+            Log.getForLevel(logLevel).say("Загрузка параметров из файла '", constantsName, "':");
             ResourceBundle constantsBundle = ResourceBundle.getBundle(constantsName, new UTF16Control());
             constants = new HashMap<>();
             for (String key: constantsBundle.keySet()) {
-                Log.cui().beg("\t").say(key, " -> ", constantsBundle.getString(key));
+                Log.getForLevel(logLevel).beg("\t").say(key, " -> ", constantsBundle.getString(key));
                 constants.put(key, Long.decode(constantsBundle.getString(key)));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.consumeException("Ошибка при загрузке параметров по умолчанию!", e);
         }
 
-        if (checkPref(userPath)) {
-            Log.cui().say("Loading user defined constants:");
+        if (restoreLevel) logLevel = Log.Level.GUI;
+        Log.getForLevel(logLevel).info().say("Загрузка параметров по умолчанию успешно завершена!");
 
-            Filer.loadPropertiesFromFile(getPref(userPath) + userPathConstants, new Filer.OnPropertiesLoaded() {
-                @Override
-                public void onFinished(Properties properties, Exception reason) {
-                    if (reason == null) for (Object key : properties.keySet()) {
-                        Log.cui().beg("\t").say(key, " -> ", properties.get(key.toString()).toString());
+        if (checkPref(userPath)) {
+            Log.getForLevel(logLevel).info().say("Загрузка пользовательских параметров...");
+            restoreLevel = logLevel == Log.Level.GUI;
+
+            Log.getForLevel(logLevel).say("Загрузка параметров из файла '", getPref(userPath) + userPathConstants, "':");
+            Filer.loadPropertiesFromFile(getPref(userPath) + userPathConstants, (properties, reason) -> {
+                boolean restoreLogLevel = logLevel == Log.Level.GUI;
+                logLevel = Log.Level.FILE;
+
+                if (reason == null) {
+                    for (Object key : properties.keySet()) {
+                        Log.getForLevel(logLevel).beg("\t").say(key, " -> ", properties.get(key.toString()).toString());
                         if (constants.containsKey(key.toString())) constants.put(key.toString(), Long.decode(properties.get(key.toString()).toString()));
-                    } else Log.cui().say("Directory exists, but not file!");
-                }
+                    }
+                } else Log.getForLevel(logLevel).warn().say("Файл не найден или пользовательские настройки не заданы!");
+
+                if (restoreLogLevel) logLevel = Log.Level.GUI;
+                Log.getForLevel(logLevel).good().say("Загрузка пользовательских параметров успешно завершена!");
             });
+
+            if (restoreLevel) logLevel = Log.Level.GUI;
         }
     }
 
     private void initializeDictionary(Locale locale) {
+        Log.getForLevel(logLevel).info().say("Загрузка локализации по умолчанию...");
+        boolean restoreLevel = logLevel == Log.Level.GUI;
+        logLevel = Log.Level.FILE;
+
         try {
-            Log.cui().say("Loading localization from file ", dictionaryName, ":");
+            Log.getForLevel(logLevel).say("Загрузка локализации из файла '", dictionaryName, "':");
             ResourceBundle dictionaryBundle = ResourceBundle.getBundle(dictionaryName, locale, new UTF16Control());
             dictionary = new HashMap<>();
             for (String key: dictionaryBundle.keySet()) {
-                Log.cui().beg("\t").say(key, " -> ", dictionaryBundle.getString(key));
+                Log.getForLevel(logLevel).beg("\t").say(key, " -> ", dictionaryBundle.getString(key));
                 dictionary.put(key, dictionaryBundle.getString(key));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.consumeException("Ошибка при загрузке локализации по умолчанию!", e);
         }
+
+        if (restoreLevel) logLevel = Log.Level.GUI;
+        Log.getForLevel(logLevel).good().say("Загрузка локализации по умолчанию успешно завершена!");
     }
 
     private void initializeUserDictionary(OnLongActionFinished listener) {
         initializeDictionary(Locale.forLanguageTag(""));
-
         if (checkPref(userPath) && checkPref(userLocalization)) {
-            Log.cui().say("Loading user defined localization:");
+            Log.getForLevel(logLevel).info().say("Загрузка пользовательской локализации по умолчанию...");
+            boolean restoreLevel = logLevel == Log.Level.GUI;
+            logLevel = Log.Level.FILE;
 
-            Filer.loadPropertiesFromFile(getPref(userPath) + userPathDictionary, new Filer.OnPropertiesLoaded() {
-                @Override
-                public void onFinished(Properties properties, Exception reason) {
-                    if (reason == null) for (Object key : properties.keySet()) {
-                        Log.cui().beg("\t").say(key, " -> ", properties.get(key).toString());
-                        if (dictionary.containsKey(key.toString())) dictionary.put(key.toString(), properties.get(key).toString());
-                    } else Log.cui().say("Directory exists, but not file!");
-                    if (listener != null) listener.onFinished();
-                }
+            Log.getForLevel(logLevel).say("Загрузка локализации из файла '", getPref(userPath) + userPathDictionary, "':");
+            Filer.loadPropertiesFromFile(getPref(userPath) + userPathDictionary, (properties, reason) -> {
+                boolean restoreLogLevel = logLevel == Log.Level.GUI;
+                logLevel = Log.Level.FILE;
+
+                if (reason == null) for (Object key : properties.keySet()) {
+                    Log.cui().beg("\t").say(key, " -> ", properties.get(key).toString());
+                    if (dictionary.containsKey(key.toString())) dictionary.put(key.toString(), properties.get(key).toString());
+                } else Log.getForLevel(logLevel).warn().say("Файл не найден или пользовательская локализация не задана!");
+
+                if (restoreLogLevel) logLevel = Log.Level.GUI;
+                Log.getForLevel(logLevel).good().say("Загрузка пользовательской локализации успешно завершена!");
+                if (listener != null) listener.onFinished();
             });
+
+            if (restoreLevel) logLevel = Log.Level.GUI;
         } else if (listener != null) listener.onFinished();
     }
 
 
 
     private Settings() {
-        Log.cui().say("Initializing settings...");
+        logLevel = Log.Level.GUI;
+        Log.getForLevel(logLevel).say("Initializing settings...");
         initializeUserDictionary(null);
         initializeDefaultConstants();
     }
@@ -116,7 +148,8 @@ public class Settings {
         return instance;
     }
 
-    public static void setup(Log.Level level) { // TODO: add logging.
+    public static void setup(Log.Level level) {
+        logLevel = level;
         get();
     }
 
@@ -155,17 +188,19 @@ public class Settings {
 
 
     public static void changeLocalization(Locales locale, OnLongActionFinished listener) {
+        Log.gui().info().say("Замена локализации...");
         if (locale == Locales.USER) {
+            Log.gui().info().say("Установка пользовательской локализации...");
             setPref(userLocalization, userLocalization);
-            get().initializeUserDictionary(new OnLongActionFinished() {
-                @Override
-                public void onFinished() {
-                    if (listener != null) listener.onFinished();
-                }
+            get().initializeUserDictionary(() -> {
+                Log.gui().good().say("Установка пользовательской локализации успешно завершена!");
+                if (listener != null) listener.onFinished();
             });
         } else {
+            Log.gui().info().say("Установка локализации для языка " + locale.name() + "...");
             resetPref(userLocalization);
             get().initializeDictionary(Locale.forLanguageTag(locale.getSymbol()));
+            Log.gui().good().say("Установка локализации для языка " + locale.name() + " успешно завершена!");
             if (listener != null) listener.onFinished();
         }
     }
@@ -173,62 +208,52 @@ public class Settings {
 
 
     public static void alterUserPath(String path, OnLongActionFinished listener) {
+        Log.gui().info().say("Установка пути к файлам конфигурации...");
         setPref(userPath, path);
-        Filer.addFolder(path + File.separator + userPathDir, new Filer.OnPerformed() {
-            @Override
-            public void onFinished(Exception reason) {
-                if (reason != null) reason.printStackTrace();
-                else {
-                    Properties prop = new Properties();
-                    for (Map.Entry<String, Long> entry: get().constants.entrySet()) prop.setProperty(entry.getKey(), entry.getValue().toString());
-                    Filer.savePropertiesToFile(prop, getPref(userPath) + userPathConstants, new Filer.OnPerformed() {
-                        @Override
-                        public void onFinished(Exception reason) {
-                            if (reason != null) reason.printStackTrace();
-                            if (listener != null) listener.onFinished();
-                        }
-                    });
-                }
-                if (listener != null) listener.onFinished();
+        Filer.addFolder(path + File.separator + userPathDir, reason -> {
+            if (reason != null) Log.consumeException("Ошибка при создании файлов конфигурации!", reason);
+            else {
+                Log.gui().good().say("Установка пути к файлам конфигурации успешно завершена!");
+                Log.gui().info().say("Сохранение текущих настроек в файл конфигурации...");
+                Properties prop = new Properties();
+                for (Map.Entry<String, Long> entry: get().constants.entrySet()) prop.setProperty(entry.getKey(), entry.getValue().toString());
+                Filer.savePropertiesToFile(prop, getPref(userPath) + userPathConstants, reason1 -> {
+                    if (reason1 != null) Log.consumeException("Ошибка при сохранении текущих настроек в файл конфигурации!", reason1);
+                    else Log.gui().good().say("Сохранение текущих настроек в файл конфигурации успешно завершено!");
+                    if (listener != null) listener.onFinished();
+                });
             }
+            if (listener != null) listener.onFinished();
         });
     }
 
     public static void removeUserPath(OnLongActionFinished listener) {
-        if (checkPref(userPath)) Filer.removeFolder(getPref(userPath) + File.separator + userPathDir, new Filer.OnPerformed() {
-            @Override
-            public void onFinished(Exception reason) {
-                if (reason != null) reason.printStackTrace();
-                else {
-                    clearPrefs();
-                    get().initializeDefaultConstants();
-                    get().initializeUserDictionary(null);
-                }
-                if (listener != null) listener.onFinished();
+        Log.gui().info().say("Удаление файлов конфигурации...");
+        if (checkPref(userPath)) Filer.removeFolder(getPref(userPath) + File.separator + userPathDir, reason -> {
+            if (reason != null) reason.printStackTrace();
+            else {
+                clearPrefs();
+                get().initializeDefaultConstants();
+                get().initializeUserDictionary(null);
             }
+            if (listener != null) listener.onFinished();
         });
         else if (listener != null) listener.onFinished();
     }
 
     public static void resetConstants(OnLongActionFinished listener) {
-        if (checkPref(userPath)) Filer.deleteFile(getPref(userPath) + userPathConstants, new Filer.OnPerformed() {
-            @Override
-            public void onFinished(Exception reason) {
-                get().initializeDefaultConstants();
-                if (listener != null) listener.onFinished();
-            }
+        if (checkPref(userPath)) Filer.deleteFile(getPref(userPath) + userPathConstants, reason -> {
+            get().initializeDefaultConstants();
+            if (listener != null) listener.onFinished();
         });
         else if (listener != null) listener.onFinished();
     }
 
     public static void resetDictionary(OnLongActionFinished listener) {
-        if (checkPref(userPath)) Filer.deleteFile(getPref(userPath) + userPathDictionary, new Filer.OnPerformed() {
-            @Override
-            public void onFinished(Exception reason) {
-                resetPref(userLocalization);
-                get().initializeUserDictionary(null);
-                if (listener != null) listener.onFinished();
-            }
+        if (checkPref(userPath)) Filer.deleteFile(getPref(userPath) + userPathDictionary, reason -> {
+            resetPref(userLocalization);
+            get().initializeUserDictionary(null);
+            if (listener != null) listener.onFinished();
         });
         else if (listener != null) listener.onFinished();
     }
@@ -280,17 +305,11 @@ public class Settings {
 
 
     public static void alterLocalization(String file, OnLongActionFinished listener) {
-        if (checkPref(userPath)) Filer.copyFile(file, getPref(userPath) + userPathDictionary, new Filer.OnPerformed() {
-            @Override
-            public void onFinished(Exception reason) {
-                if (reason != null) reason.printStackTrace();
-                else changeLocalization(Locales.USER, new OnLongActionFinished() {
-                    @Override
-                    public void onFinished() {
-                        if (listener != null) listener.onFinished();
-                    }
-                });
-            }
+        if (checkPref(userPath)) Filer.copyFile(file, getPref(userPath) + userPathDictionary, reason -> {
+            if (reason != null) reason.printStackTrace();
+            else changeLocalization(Locales.USER, () -> {
+                if (listener != null) listener.onFinished();
+            });
         });
         else if (listener != null) listener.onFinished();
     }
@@ -300,20 +319,14 @@ public class Settings {
             get().constants.put(name, value);
 
             if (checkPref(userPath)) {
-                Filer.loadPropertiesFromFile(getPref(userPath) + userPathConstants, new Filer.OnPropertiesLoaded() {
-                    @Override
-                    public void onFinished(Properties properties, Exception reason) {
-                        Properties prop = new Properties();
-                        if (reason == null) prop = properties;
-                        prop.setProperty(name, String.valueOf(value));
-                        Filer.savePropertiesToFile(prop, getPref(userPath) + userPathConstants, new Filer.OnPerformed() {
-                            @Override
-                            public void onFinished(Exception reason) {
-                                if (reason != null) reason.printStackTrace();
-                                if (listener != null) listener.onFinished();
-                            }
-                        });
-                    }
+                Filer.loadPropertiesFromFile(getPref(userPath) + userPathConstants, (properties, reason) -> {
+                    Properties prop = new Properties();
+                    if (reason == null) prop = properties;
+                    prop.setProperty(name, String.valueOf(value));
+                    Filer.savePropertiesToFile(prop, getPref(userPath) + userPathConstants, reason1 -> {
+                        if (reason1 != null) reason1.printStackTrace();
+                        if (listener != null) listener.onFinished();
+                    });
                 });
             } else {
                 Log.cui().say("Warning! Path for parameter storing not found, parameter changed until session end!");

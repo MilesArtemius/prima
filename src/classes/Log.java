@@ -86,6 +86,24 @@ public class Log {
 
 
 
+    public Log good() {
+        return attr(Log.Attributes.BOLD).col(Log.Colors.GREEN);
+    }
+
+    public Log info() {
+        return attr(Log.Attributes.BOLD).col(Log.Colors.BLUE);
+    }
+
+    public Log warn() {
+        return attr(Log.Attributes.BOLD).col(Log.Colors.YELLOW);
+    }
+
+    public Log bad() {
+        return attr(Log.Attributes.BOLD).col(Log.Colors.RED);
+    }
+
+
+
     public Log pref(String prefix) {
         pref = prefix;
         return this;

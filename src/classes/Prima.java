@@ -4,7 +4,6 @@ import classes.algorithm.PrimaAlgorithm;
 import classes.graph.Graph;
 import classes.graph.NodePlus;
 
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -96,7 +95,7 @@ public class Prima {
         }
 
         visual = new PrimaVisual(saveFile);
-        Log.gui().col(Log.Colors.GREEN).say("GUI launched!");
+        Log.gui().good().say("GUI launched!");
         Settings.setup(Log.Level.GUI);
 
         JFrame f = new JFrame(Settings.getString("app_name") + " - " + saveFile);
@@ -111,6 +110,7 @@ public class Prima {
                 if (Settings.checkPref(Settings.userPath)) visual.preserve(true);
             }
         });
+        f.getRootPane().setDefaultButton(visual.focus());
     }
 
     public static PrimaVisual getVisual() {

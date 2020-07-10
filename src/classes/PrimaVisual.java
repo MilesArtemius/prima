@@ -1,6 +1,7 @@
 package classes;
 
 import classes.algorithm.PrimaAlgorithm;
+import classes.dial.AboutDialog;
 import classes.dial.ParameterChangeDialog;
 import classes.graph.Graph;
 import classes.shapes.GraphShape;
@@ -9,8 +10,6 @@ import test.PrimaTest;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -41,6 +40,8 @@ public class PrimaVisual {
     private JLabel menuText;
     private JScrollPane textScroll;
     private JButton reset;
+    private JPanel logsNamePanel;
+    private JButton clearLogs;
 
     private PrimaAlgorithm algorithm;
     private GraphShape graph;
@@ -108,6 +109,11 @@ public class PrimaVisual {
         initButtons();
     }
 
+    public JButton focus() {
+        launch.requestFocus();
+        return launch;
+    }
+
     private void initFileMenu() {
         newGraph = new JMenu();
         emptyGraph = new JMenuItem();
@@ -117,16 +123,13 @@ public class PrimaVisual {
             algorithm = new PrimaAlgorithm();
             graph.repaint();
         });
-        Filer.OnGraphLoaded listener = new Filer.OnGraphLoaded() {
-            @Override
-            public void onFinished(Graph graph, Exception reason) {
-                if (reason == null) {
-                    PrimaVisual.this.graph.setGraph(graph);
-                    PrimaVisual.this.algorithm = new PrimaAlgorithm();
-                    PrimaVisual.this.graph.repaint();
-                } else{
-                    Log.consumeException("Ошибка при загрузке графа из ресурсов программы", reason);
-                }
+        Filer.OnGraphLoaded listener = (graph, reason) -> {
+            if (reason == null) {
+                PrimaVisual.this.graph.setGraph(graph);
+                PrimaVisual.this.algorithm = new PrimaAlgorithm();
+                PrimaVisual.this.graph.repaint();
+            } else{
+                Log.consumeException("Ошибка при загрузке графа из ресурсов программы", reason);
             }
         };
         sampleGraph = new JMenuItem();
@@ -298,25 +301,17 @@ public class PrimaVisual {
 
     private void initAboutMenu() {
         aboutApp = new JMenuItem();
-        aboutApp.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO: implement;
-            }
-        });
+        aboutApp.addActionListener(e -> displayAboutDialog(aboutApp()));
         aboutUs = new JMenuItem();
-        aboutUs.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO: implement;
-            }
-        });
+        aboutUs.addActionListener(e -> displayAboutDialog(aboutUs()));
 
         helpMenu.add(aboutApp);
         helpMenu.add(aboutUs);
     }
 
     private void initButtons() {
+        clearLogs.addActionListener(e -> logs.setText("<html>"));
+
         test.addActionListener(e -> PrimaTest.runTests());
 
         reset.addActionListener(e -> {
@@ -409,6 +404,7 @@ public class PrimaVisual {
         visualizationText.setText("Graph:");
         logsTitle.setText("Logs:");
 
+        clearLogs.setText("Clear logs");
         launch.setText("Launch!");
         forward.setText("Step forward");
         backward.setText("Step backward");
@@ -434,5 +430,34 @@ public class PrimaVisual {
         }
 
         logs.setText(log.toString());
+    }
+
+    private String aboutUs() {
+        return "<html>"
+                + "<img src=\""
+                + PrimaVisual.class.getResource("/resource/path/to/image1")
+                + "\">"
+                + "<img src=\""
+                + PrimaVisual.class.getResource("/resource/path/to/image2")
+                + "\">"
+                + "The text</html>";
+    }
+
+    private String aboutApp() {
+        return "<html>"
+                + "<img src=\""
+                + PrimaVisual.class.getResource("/resource/path/to/image1")
+                + "\">"
+                + "<img src=\""
+                + PrimaVisual.class.getResource("/resource/path/to/image2")
+                + "\">"
+                + "The text</html>";
+    }
+
+    private void displayAboutDialog(String HTML) {
+        AboutDialog dialog = new AboutDialog(SwingUtilities.getWindowAncestor(root), HTML);
+        dialog.pack();
+        dialog.setLocationRelativeTo(root);
+        dialog.setVisible(true);
     }
 }
