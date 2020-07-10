@@ -77,9 +77,9 @@ public class ParameterChangeDialog extends JDialog {
                     Log.cui().say("По нажатию клавиши 'TAB' производится подстановка первого ключа, содержащего строку '" + up + "'...");
                     for (Map.Entry<String, String> entry: content.entrySet()) if (entry.getKey().contains(up)) {
                         input.setText(entry.getKey());
-                        Log.cui().say("Произведена подстановка ключа'" + entry.getValue() + "'.");
+                        Log.cui().say("Произведена подстановка ключа'" + entry.getKey() + "'.");
                         parameterSpinner.grabFocus();
-                        break;
+                        return;
                     }
                     Log.cui().say("Подходящий ключ не найден.");
                 }

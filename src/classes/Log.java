@@ -32,7 +32,7 @@ public class Log {
     }
 
     public enum Colors {
-        NO(""), BLUE("blue"), GREEN("green"), RED("red"), YELLOW("yellow");
+        NO(""), BLUE("blue"), GREEN("green"), RED("red"), YELLOW("cc7000");
         private String color;
 
         Colors(String col) {

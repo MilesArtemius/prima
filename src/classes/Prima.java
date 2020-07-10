@@ -67,6 +67,7 @@ public class Prima {
         JFrame f = new JFrame(Settings.getString("app_name") + " - " + saveFile);
         f.setMinimumSize(new Dimension(Settings.getInt("default_screen_width"), Settings.getInt("default_screen_height")));
         f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        f.setIconImage(new ImageIcon(PrimaVisual.class.getResource("/stone.jpg")).getImage());
         f.setContentPane(visual.getMainPanel());
         f.pack();
         f.setLocationByPlatform(true);

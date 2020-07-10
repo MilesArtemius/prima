@@ -393,9 +393,9 @@ public class PrimaVisual {
         aboutApp.setText("О программе");
         aboutUs.setText("О нас");
 
-        menuText.setText("Спасибо за использование нашей программы!");
-        visualizationText.setText("Граф:");
-        logsTitle.setText("Логи:");
+        menuText.setText("<html><b><font size=\"3\">Спасибо за использование нашей программы!</font></b></html>");
+        visualizationText.setText("<html><b><font size=\"5\">Граф:</font></b></html>");
+        logsTitle.setText("<html><font size=\"5\">Логи:</font></html>");
 
         clearLogs.setText("Очистить логи");
         launch.setText("Запустить алгоритм!");
@@ -479,7 +479,7 @@ public class PrimaVisual {
                 + PrimaVisual.class.getResource("/stone.jpg")
                 + "\">"
                 + "<br>Рисунок 2 - Граф после завершения алгоритма Прима<br>" +
-                "<br><font size=\"4\"><b><font size=\"5\">&#9Создание графа.</font></b><br><br>" +
+                "<br><font size=\"4\"><b><font size=\"5\">&#9Создание графа</font></b><br><br>" +
                 "Создание вершин и ребер:<br>" +
                 "1)Для создания вершины необходимо в любом свободном<br>" +
                 "месте полотна совершить клик ПКМ.<br>" +
