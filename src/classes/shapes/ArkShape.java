@@ -105,14 +105,14 @@ public class ArkShape extends Polygon {
             Log.cui().say("Вызвано меню ArkShape.");
             JMenuItem remove = new JMenuItem(Settings.getString("remove_ark_action"));
             remove.addActionListener(e -> {
-                Log.cui().say("Вызбран элемент '" + remove.getName()  + "'.");
+                Log.cui().say("Вызбран элемент '" + remove.getText()  + "'.");
                 parent.getGraph().deleteArk(parent.getGraph().getNode(ArkShape.this.ark.getStart()), parent.getGraph().getNode(ArkShape.this.ark.getEnd()));
                 parent.repaint();
             });
             add(remove);
             JMenuItem reweight = new JMenuItem(Settings.getString("reweight_ark_action"));
             reweight.addActionListener(e -> {
-                Log.cui().say("Вызбран элемент '" + reweight.getName()  + "'.");
+                Log.cui().say("Вызбран элемент '" + reweight.getText()  + "'.");
                 ArkWeightDialog dialog = new ArkWeightDialog(SwingUtilities.getWindowAncestor(parent), Settings.getString("reweight_ark_dialog_name"));
                 dialog.setListener(value -> {
                     dialog.dispose();

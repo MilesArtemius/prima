@@ -1,6 +1,7 @@
 package classes.graph;
 
 import java.awt.geom.Point2D;
+import java.util.List;
 import java.util.Map;
 
 public class NodePlus extends Node {
@@ -44,10 +45,10 @@ public class NodePlus extends Node {
         return map;
     }
 
-    public static NodePlus readFromMap(Map<String, Object> map) {
+    public static NodePlus readFromMap(Map<String, Object> map, List<Ark> arks) {
         double posX = (double) map.get("POSITION_X");
         double posY = (double) map.get("POSITION_Y");
         Point2D point = new Point2D.Double(posX, posY);
-        return new NodePlus(Node.readFromMap(map), point);
+        return new NodePlus(Node.readFromMap(map, arks), point);
     }
 }

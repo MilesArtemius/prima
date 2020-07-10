@@ -16,30 +16,6 @@ public class Prima {
 
     private static PrimaVisual visual;
 
-    public static Graph prepareInput() { // TODO: replace with graph samples
-        Graph graph = new Graph();
-
-        graph.addNode(new NodePlus(new Point2D.Double(200, 400), "A"));
-        graph.addNode(new NodePlus(new Point2D.Double(300, 600), "B"));
-        graph.addNode(new NodePlus(new Point2D.Double(500, 600), "C"));
-        graph.addNode(new NodePlus(new Point2D.Double(400, 400), "D"));
-        graph.addNode(new NodePlus(new Point2D.Double(600, 400), "E"));
-        graph.addNode(new NodePlus(new Point2D.Double(400, 200), "F"));
-
-        graph.addArk("A", "B", 8);
-        graph.addArk("A", "D", 3);
-        graph.addArk("A", "F", 10);
-        graph.addArk("B", "C", 9);
-        graph.addArk("B", "D", 7);
-        graph.addArk("C", "E", 4);
-        graph.addArk("C", "D", 3);
-        graph.addArk("E", "D", 13);
-        graph.addArk("E", "F", 5);
-        graph.addArk("F", "D", 1);
-
-        return graph;
-    }
-
     /**
      * There are four available command line argument configurations:
      * 1. "" - Empty configuration launches default GUI app with empty graph.
@@ -53,11 +29,11 @@ public class Prima {
         else if (args[0].equals(CONSOLE_ARG_NO_GUI)) {
             if (args.length == 4) launchNoGUI(args[1], args[2], Log.Level.valueOf(args[3]));
             else if (args.length == 3) launchNoGUI(args[1], args[2], Log.Level.CONSOLE);
-            else Log.cui().file(null).say("Wrong arguments provided, aborting execution");
+            else Log.cui().file(null).say("Неверный набор аргументов, выполнение отменено!");
         } else if (args[0].equals(CONSOLE_ARG_GUI)) {
             if (args.length == 2) launchGUI(args[1]);
-            else Log.cui().file(null).say("Wrong arguments provided, aborting execution");
-        } else Log.cui().file(null).say("Wrong arguments provided, aborting execution");
+            else Log.cui().file(null).say("Неверный набор аргументов, выполнение отменено!");
+        } else Log.cui().file(null).say("Неверный набор аргументов, выполнение отменено!");
     }
 
     private static void launchNoGUI(String loadFile, String saveFile, Log.Level logLevel) {
@@ -67,17 +43,17 @@ public class Prima {
                 alg.solve(graph);
                 Filer.saveGraphToFile(graph, saveFile, reason1 -> {
                     if (reason1 != null){
-                        Log.consumeException("Сохранение невозможно", reason1);
+                        Log.consumeException("Сохранение невозможно!", reason1);
                     }
                 });
             } else {
-                Log.consumeException("Файл не найден или содержимое файла повреждено", reason);
+                Log.consumeException("Файл не найден или содержимое файла повреждено!", reason);
             }
         });
     }
 
     private static void launchGUI(String saveFile) {
-        Log.cui().say("Uptime started!");
+        Log.cui().say("Выполнение началось!");
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -86,7 +62,7 @@ public class Prima {
         }
 
         visual = new PrimaVisual(saveFile);
-        Log.gui().good().say("GUI launched!");
+        Log.gui().good().say("Запущен GUI!");
 
         JFrame f = new JFrame(Settings.getString("app_name") + " - " + saveFile);
         f.setMinimumSize(new Dimension(Settings.getInt("default_screen_width"), Settings.getInt("default_screen_height")));

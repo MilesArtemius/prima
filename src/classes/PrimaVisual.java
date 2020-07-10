@@ -90,7 +90,7 @@ public class PrimaVisual {
         };
         if (!openedFileName.equals("")) Filer.loadGraphFromFile(openedFileName, true, loadListner);
         else if (!Settings.getPref(Settings.preservedGraph).equals("")) Filer.loadGraphFromFile(Settings.getPref(Settings.preservedGraph), true, loadListner);
-        else graph.setGraph(Prima.prepareInput());
+        else graph.setGraph(new Graph());
 
         graphShapePanel.add(graph, new GridBagConstraints(GridBagConstraints.RELATIVE, GridBagConstraints.RELATIVE,
                 GridBagConstraints.REMAINDER, GridBagConstraints.REMAINDER, 1.0, 1.0, GridBagConstraints.CENTER,

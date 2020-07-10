@@ -106,6 +106,7 @@ public class Filer {
                 try {
                     Graph graph = get();
                     Log.getForLevel(Settings.logLevel).good().say("Загрузка графа успешно завершена!");
+                    Log.cui().say("Граф: " + graph);
                     listener.onFinished(graph, null);
                 } catch (Exception e) {
                     Log.getForLevel(Settings.logLevel).bad().say("При загрузке графа произошла ошибка!");
@@ -135,6 +136,7 @@ public class Filer {
                 try {
                     Graph graph = get();
                     Log.getForLevel(Settings.logLevel).good().say("Загрузка примера графа успешно завершена!");
+                    Log.cui().say("Граф: " + graph);
                     listener.onFinished(graph, null);
                 } catch (Exception e) {
                     Log.getForLevel(Settings.logLevel).bad().say("При загрузке примера графа произошла ошибка!");

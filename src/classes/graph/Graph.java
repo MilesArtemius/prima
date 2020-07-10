@@ -33,7 +33,7 @@ public class Graph {
         if (node != null){
 
             for (int i = node.getArks().size()-1; i>=0; i--) {
-                deleteArk(node, getNode(node.getArks().get(i).getStart()) == node ? getNode(node.getArks().get(i).getEnd()) : getNode(node.getArks().get(i).getStart()));
+                deleteArk(node, getNode(node.getArks().get(i).getStart()) == node ? getNode(node.getArks().get(i).getStart()) : getNode(node.getArks().get(i).getEnd()));
             }
             nodes.remove(name);
             setRecentlyChanged(true);
@@ -198,19 +198,20 @@ public class Graph {
         graph.nodes = new HashMap<>();
         graph.arks = new LinkedList<>();
 
+        Map<Integer, Map<String, Object>> arksMap = (Map<Integer, Map<String, Object>>) map.get("ARKS");
+        for (int i = 0; i < arksMap.entrySet().size(); i++) graph.arks.addLast(Ark.readFromMap(arksMap.get(i)));
+
         Map<Integer, Map<String, Object>> nodesMap = (Map<Integer, Map<String, Object>>) map.get("NODES");
         LinkedList<Map<String, Object>> nodeList = new LinkedList<>();
         for (int i = 0; i < nodesMap.entrySet().size(); i++) nodeList.addLast(nodesMap.get(i));
 
         for (int i = 0; i < nodeList.size(); i++) {
             Node node;
-            if (nodeList.get(i).containsKey("POSITION") && graphic) node = NodePlus.readFromMap(nodeList.get(i));
-            else if (graphic) node = new NodePlus(Node.readFromMap(nodeList.get(i)), findPos(i, nodeList.size()));
-            else node = Node.readFromMap(nodeList.get(i));
+            if (nodeList.get(i).containsKey("POSITION") && graphic) node = NodePlus.readFromMap(nodeList.get(i), graph.arks);
+            else if (graphic) node = new NodePlus(Node.readFromMap(nodeList.get(i), graph.arks), findPos(i, nodeList.size()));
+            else node = Node.readFromMap(nodeList.get(i), graph.arks);
             graph.nodes.put(node.getName(), node);
         }
-        Map<Integer, Map<String, Object>> arksMap = (Map<Integer, Map<String, Object>>) map.get("ARKS");
-        for (int i = 0; i < arksMap.entrySet().size(); i++) graph.arks.addLast(Ark.readFromMap(arksMap.get(i)));
         return graph;
     }
 

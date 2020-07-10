@@ -10,8 +10,6 @@ import classes.shapes.GraphShape;
 import javax.swing.*;
 import java.awt.*;
 
-import static classes.Prima.prepareInput;
-
 public class PrimaAlgorithmTestForGUI {
     public static void runTest(Graph graph) {
         boolean success = true;

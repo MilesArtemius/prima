@@ -141,7 +141,8 @@ public class GraphShape extends JPanel {
         for (Ark ark: graph.getArks()) arks.push(new ArkShape(ark, this, g2d));
         for (Node node: graph.getNodes()) nodes.push(new NodeShape((NodePlus) node, this, g2d));
 
-        if (graph.getNodes().isEmpty()) drawCenteredString(g2d, Settings.getString("no_nodes_prompt"), -transform.getX(), -transform.getY(), getWidth(), getHeight());
+        if (graph.getNodes().isEmpty()) drawCenteredString(g2d, Settings.getString("no_nodes_prompt"),
+                -transform.getX() + getWidth() * 1.0/10.0, -transform.getY() + getHeight() * 1.0/10.0, getWidth() * 4.0/5.0, getHeight() * 4.0/5.0);
     }
 
     public int getSizeModifier() {
@@ -174,7 +175,7 @@ public class GraphShape extends JPanel {
             Log.cui().say("Вызвано меню GraphShape.");
             JMenuItem item = new JMenuItem(Settings.getString("create_node_action"));
             item.addActionListener(e -> {
-                Log.cui().say("Вызбран элемент '" + item.getName()  + "'.");
+                Log.cui().say("Вызбран элемент '" + item.getText()  + "'.");
                 NodeNameDialog dialog = new NodeNameDialog(SwingUtilities.getWindowAncestor(GraphShape.this),
                         Settings.getString("create_node_dialog_name"), false);
                 dialog.setListener(value -> {
