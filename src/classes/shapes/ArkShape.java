@@ -10,7 +10,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import java.text.ParseException;
 
 public class ArkShape extends Polygon {
     private Ark ark;
@@ -86,7 +85,7 @@ public class ArkShape extends Polygon {
 
 
     public boolean pressMouse(GraphShape parent, MouseEvent e, Point2D absolute) {
-        Log.cui().say("Mouse pressed on ark '", ark.getStart(), "' - > '", ark.getEnd(), "'");
+        Log.cui().say("Нажатие кнопки мыши по ребру '", ark, "'.");
         if (SwingUtilities.isRightMouseButton(e)) {
             MenuPopUp popUp = new MenuPopUp(parent);
             popUp.show(e.getComponent(), (int) absolute.getX(), (int) absolute.getY());
@@ -95,7 +94,7 @@ public class ArkShape extends Polygon {
     }
 
     public boolean releaseMouse(GraphShape parent, MouseEvent e, Point2D absolute) {
-        Log.cui().say("Mouse released from '", ark.getStart(), "' - > '", ark.getEnd(), "'");
+        Log.cui().say("Освобождение кнопки мыши в ребре '", ark, "'.");
         return true;
     }
 
@@ -103,26 +102,22 @@ public class ArkShape extends Polygon {
 
     private class MenuPopUp extends JPopupMenu {
         public MenuPopUp(GraphShape parent) {
+            Log.cui().say("Вызвано меню ArkShape.");
             JMenuItem remove = new JMenuItem(Settings.getString("remove_ark_action"));
             remove.addActionListener(e -> {
+                Log.cui().say("Вызбран элемент '" + remove.getName()  + "'.");
                 parent.getGraph().deleteArk(parent.getGraph().getNode(ArkShape.this.ark.getStart()), parent.getGraph().getNode(ArkShape.this.ark.getEnd()));
                 parent.repaint();
             });
             add(remove);
             JMenuItem reweight = new JMenuItem(Settings.getString("reweight_ark_action"));
             reweight.addActionListener(e -> {
+                Log.cui().say("Вызбран элемент '" + reweight.getName()  + "'.");
                 ArkWeightDialog dialog = new ArkWeightDialog(SwingUtilities.getWindowAncestor(parent), Settings.getString("reweight_ark_dialog_name"));
-                dialog.setListener(e1 -> {
-                    try {
-                        int arkWeight = dialog.getResult();
-                        dialog.dispose();
-
-                        Log.cui().say("Reweighting ark from node '", ArkShape.this.ark.getStart(), "' to node '", ArkShape.this.ark.getEnd(), "'");
-                        ArkShape.this.ark.setWeight(arkWeight);
-                        parent.repaint();
-                    } catch (ParseException pe) {
-                        pe.printStackTrace();
-                    }
+                dialog.setListener(value -> {
+                    dialog.dispose();
+                    ArkShape.this.ark.setWeight(value);
+                    parent.repaint();
                 });
                 dialog.pack();
                 dialog.setLocationRelativeTo(parent);

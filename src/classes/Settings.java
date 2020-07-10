@@ -23,7 +23,7 @@ public class Settings {
 
     private HashMap<String, Long> constants;
     private HashMap<String, String> dictionary;
-    private static Log.Level logLevel;
+    public static Log.Level logLevel = Log.Level.GUI;
     private static Settings instance;
 
     public enum Locales {
@@ -67,7 +67,6 @@ public class Settings {
             Log.getForLevel(logLevel).info().say("Загрузка пользовательских параметров...");
             restoreLevel = logLevel == Log.Level.GUI;
 
-            Log.getForLevel(logLevel).say("Загрузка параметров из файла '", getPref(userPath) + userPathConstants, "':");
             Filer.loadPropertiesFromFile(getPref(userPath) + userPathConstants, (properties, reason) -> {
                 boolean restoreLogLevel = logLevel == Log.Level.GUI;
                 logLevel = Log.Level.FILE;
@@ -115,7 +114,6 @@ public class Settings {
             boolean restoreLevel = logLevel == Log.Level.GUI;
             logLevel = Log.Level.FILE;
 
-            Log.getForLevel(logLevel).say("Загрузка локализации из файла '", getPref(userPath) + userPathDictionary, "':");
             Filer.loadPropertiesFromFile(getPref(userPath) + userPathDictionary, (properties, reason) -> {
                 boolean restoreLogLevel = logLevel == Log.Level.GUI;
                 logLevel = Log.Level.FILE;
@@ -198,10 +196,10 @@ public class Settings {
                 if (listener != null) listener.onFinished();
             });
         } else {
-            Log.gui().info().say("Установка локализации для языка " + locale.name() + "...");
+            Log.gui().info().say("Установка локализации для языка '", locale.name(), "'...");
             resetPref(userLocalization);
             get().initializeDictionary(Locale.forLanguageTag(locale.getSymbol()));
-            Log.gui().good().say("Установка локализации для языка " + locale.name() + " успешно завершена!");
+            Log.gui().good().say("Установка локализации для языка успешно завершена!");
             if (listener != null) listener.onFinished();
         }
     }
@@ -209,7 +207,7 @@ public class Settings {
 
 
     public static void alterUserPath(String path, OnLongActionFinished listener) {
-        Log.gui().info().say("Установка пути к файлам конфигурации в " + path + "...");
+        Log.gui().info().say("Установка пути к файлам конфигурации в '", path, "'...");
         setPref(userPath, path);
         Filer.addFolder(path + File.separator + userPathDir, reason -> {
             if (reason != null) Log.consumeException("Ошибка при создании файлов конфигурации!", reason);
@@ -322,7 +320,7 @@ public class Settings {
 
 
     public static void alterLocalization(String file, OnLongActionFinished listener) {
-        Log.gui().info().say("Установка пользовательской локализации из файла " + file + "...");
+        Log.gui().info().say("Установка пользовательской локализации...");
         if (checkPref(userPath)) Filer.copyFile(file, getPref(userPath) + userPathDictionary, reason -> {
             if (reason != null) Log.consumeException("Ошибка при установке пользовательской локализации!", reason);
             else changeLocalization(Locales.USER, () -> {
@@ -338,7 +336,7 @@ public class Settings {
 
     public static void alterParameter(String name, long value, OnLongActionFinished listener) {
         if (get().constants.containsKey(name)) {
-            Log.gui().info().say("Изменение параметра с ключом " + name + " на " + value +  "...");
+            Log.gui().info().say("Изменение параметра с ключом '", name, "' на '", value, "'...");
             get().constants.put(name, value);
 
             if (checkPref(userPath)) {
@@ -350,7 +348,7 @@ public class Settings {
                         Log.gui().good().say("Загрузка пользовательских параметров успешно завершена!");
                     } else Log.gui().warn().say("Файл с пользовательскими параметрами не найден - параметр будет записан в новый!");
                     prop.setProperty(name, String.valueOf(value));
-                    Log.gui().info().say("Сохранение пользовательских параметров в файл " + getPref(userPath) + userPathConstants + "...");
+                    Log.gui().info().say("Сохранение пользовательских параметров...");
                     Filer.savePropertiesToFile(prop, getPref(userPath) + userPathConstants, reason1 -> {
                         if (reason1 != null) Log.consumeException("Ошибка при сохранении пользовательских настроек!", reason1);
                         else Log.gui().good().say("Сохранение пользовательских параметров успешно завершено!");

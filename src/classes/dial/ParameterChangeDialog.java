@@ -1,16 +1,13 @@
 package classes.dial;
 
+import classes.Log;
 import classes.Settings;
-import classes.shapes.GraphShape;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,9 +21,10 @@ public class ParameterChangeDialog extends JDialog {
     private JLabel text;
     private JSpinner parameterSpinner;
 
-    HashMap<String, String> content;
+    private OnParameterChangeListener listener;
+    private HashMap<String, String> content;
 
-    public ParameterChangeDialog(GraphShape graph, Window owner, String title) {
+    public ParameterChangeDialog(Window owner, String title) {
         super(owner, title);
 
         setContentPane(contentPane);
@@ -61,41 +59,59 @@ public class ParameterChangeDialog extends JDialog {
 
             private void update() {
                 String up = input.getText();
+                Log.cui().say("Редоктирование списка ключей, содержащих '" + up + "'...");
                 text.setText("<html>");
-                for (Map.Entry<String, String> entry: content.entrySet()) if (entry.getKey().contains(up)) addEntry(entry.getKey(), entry.getValue(), up);
+                for (Map.Entry<String, String> entry: content.entrySet()) if (entry.getKey().contains(up)) {
+                    Log.cui().beg("\t").say("Добавлен ключ '" + entry.getKey() + "'.");
+                    addEntry(entry.getKey(), entry.getValue(), up);
+                }
+                Log.cui().say("Редоктирование списка ключей успешно завершено.");
             }
         });
         input.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, Collections.EMPTY_SET);
         input.addKeyListener(new KeyAdapter() {
-            public void keyPressed (java.awt.event.KeyEvent evt){
+            @Override
+            public void keyPressed (KeyEvent evt){
                 if (evt.getKeyCode() == KeyEvent.VK_TAB) {
                     String up = input.getText();
+                    Log.cui().say("По нажатию клавиши 'TAB' производится подстановка первого ключа, содержащего строку '" + up + "'...");
                     for (Map.Entry<String, String> entry: content.entrySet()) if (entry.getKey().contains(up)) {
                         input.setText(entry.getKey());
+                        Log.cui().say("Произведена подстановка ключа'" + entry.getValue() + "'.");
                         parameterSpinner.grabFocus();
                         break;
                     }
+                    Log.cui().say("Подходящий ключ не найден.");
                 }
             }
         });
 
-        apply.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                parameterSpinner.validate();
-                if (!input.getText().equals("")) Settings.alterParameter(input.getText(), (int) parameterSpinner.getValue(), () -> {
-                    graph.repaint();
-                    dispose();
-                });
+        apply.addActionListener(e -> {
+            parameterSpinner.validate();
+            Log.cui().say("Данные диалогового окна выбора имени узла получены.");
+            if (listener != null) listener.onParameterChanged(input.getText(), (int) parameterSpinner.getValue());
+        });
+
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent winEvt) {
+                Log.cui().say("Диалоговое окно выбора имени узла закрыто.");
             }
         });
     }
 
-    public void addEntry(String key, String value, String containment) {
+    public void setListener(OnParameterChangeListener listener) {
+        this.listener = listener;
+    }
+
+    private void addEntry(String key, String value, String containment) {
         String txt = text.getText();
         int position = key.indexOf(containment);
         String keyStart = key.substring(0, position), keyEnd = key.substring(position + containment.length());
         txt += "<p><code>" + keyStart + "<b>" + containment + "</b>" + keyEnd + "</code> - " + value + "</p><br>";
         text.setText(txt);
+    }
+
+    public interface OnParameterChangeListener {
+        void onParameterChanged(String key, int value);
     }
 }

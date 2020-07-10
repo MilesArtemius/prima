@@ -48,25 +48,16 @@ public class Prima {
      * 4. "-noGUI path_to_input_file.sv path_to_output_file log_level" - the same as above, setting algorithm log level to one of four: NO_LOG, CONSOLE, FILE, GUI.
      */
     public static void main(String[] args) {
-        if (args.length == 0) {
-            launchGUI("");
-        } else if (args[0].equals(CONSOLE_ARG_NO_GUI)) {
-            Settings.setup(Log.Level.NO_LOG);
+        Settings.setup(Log.Level.NO_LOG);
+        if (args.length == 0) launchGUI("");
+        else if (args[0].equals(CONSOLE_ARG_NO_GUI)) {
             if (args.length == 4) launchNoGUI(args[1], args[2], Log.Level.valueOf(args[3]));
             else if (args.length == 3) launchNoGUI(args[1], args[2], Log.Level.CONSOLE);
             else Log.cui().file(null).say("Wrong arguments provided, aborting execution");
         } else if (args[0].equals(CONSOLE_ARG_GUI)) {
-            if (args.length == 2) {
-                Settings.setup(Log.Level.GUI);
-                launchGUI(args[1]);
-            } else {
-                Settings.setup(Log.Level.NO_LOG);
-                Log.cui().file(null).say("Wrong arguments provided, aborting execution");
-            }
-        } else {
-            Settings.setup(Log.Level.NO_LOG);
-            Log.cui().file(null).say("Wrong arguments provided, aborting execution");
-        }
+            if (args.length == 2) launchGUI(args[1]);
+            else Log.cui().file(null).say("Wrong arguments provided, aborting execution");
+        } else Log.cui().file(null).say("Wrong arguments provided, aborting execution");
     }
 
     private static void launchNoGUI(String loadFile, String saveFile, Log.Level logLevel) {
@@ -96,7 +87,6 @@ public class Prima {
 
         visual = new PrimaVisual(saveFile);
         Log.gui().good().say("GUI launched!");
-        Settings.setup(Log.Level.GUI);
 
         JFrame f = new JFrame(Settings.getString("app_name") + " - " + saveFile);
         f.setMinimumSize(new Dimension(Settings.getInt("default_screen_width"), Settings.getInt("default_screen_height")));

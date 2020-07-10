@@ -42,6 +42,7 @@ public class Filer {
 
 
     public static void saveGraphToFile(Graph g, String fileName, OnPerformed listener) {
+        Log.getForLevel(Settings.logLevel).info().say("Сохранение графа в файл '" + fileName + "'...");
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             public Void doInBackground() throws Exception {
@@ -52,8 +53,10 @@ public class Filer {
             public void done() {
                 try {
                     get();
+                    Log.getForLevel(Settings.logLevel).good().say("Сохранение графа успешно завершено!");
                     listener.onFinished(null);
                 } catch (Exception e) {
+                    Log.getForLevel(Settings.logLevel).bad().say("При сохранении графа произошла ошибка!");
                     listener.onFinished(e);
                 }
             }
@@ -64,9 +67,12 @@ public class Filer {
 
     public static void saveGraphToFileNoThread(Graph g, String fileName, OnPerformed listener) {
         try {
+            Log.getForLevel(Settings.logLevel).info().say("Синхронное сохранение графа в файл '" + fileName + "'...");
             innerSaveGraph(g, fileName);
+            Log.getForLevel(Settings.logLevel).good().say("Синхронное сохранение графа успешно завершено!");
             listener.onFinished(null);
         } catch (IOException e) {
+            Log.getForLevel(Settings.logLevel).bad().say("При синхронном сохранении графа произошла ошибка!");
             listener.onFinished(e);
         }
     }
@@ -82,6 +88,7 @@ public class Filer {
     }
 
     public static void loadGraphFromFile(String fileName, boolean graphic, OnGraphLoaded listener) {
+        Log.getForLevel(Settings.logLevel).info().say("Загрузка графа из файла '" + fileName + "'...");
         SwingWorker<Graph, Void> worker = new SwingWorker<>() {
             @Override
             public Graph doInBackground() throws Exception {
@@ -98,8 +105,10 @@ public class Filer {
             public void done() {
                 try {
                     Graph graph = get();
+                    Log.getForLevel(Settings.logLevel).good().say("Загрузка графа успешно завершена!");
                     listener.onFinished(graph, null);
                 } catch (Exception e) {
+                    Log.getForLevel(Settings.logLevel).bad().say("При загрузке графа произошла ошибка!");
                     listener.onFinished(null, e);
                 }
             }
@@ -109,6 +118,7 @@ public class Filer {
     }
 
     public static void loadGraphFromResources(String fileName, OnGraphLoaded listener) {
+        Log.getForLevel(Settings.logLevel).info().say("Загрузка примера графа из файла '" + fileName + "'...");
         SwingWorker<Graph, Void> worker = new SwingWorker<>() {
             @Override
             public Graph doInBackground() throws Exception {
@@ -118,14 +128,16 @@ public class Filer {
                     Map<String, Object> map = (Map<String, Object>) objectInputStream.readObject();
                     inputStream.close();
                     return Graph.readFromMap(map, true);
-                } else throw new IOException("No resource file exists!");
+                } else throw new IOException("Такого файла нет в ресурсах проекта!");
             }
             @Override
             public void done() {
                 try {
                     Graph graph = get();
+                    Log.getForLevel(Settings.logLevel).good().say("Загрузка примера графа успешно завершена!");
                     listener.onFinished(graph, null);
                 } catch (Exception e) {
+                    Log.getForLevel(Settings.logLevel).bad().say("При загрузке примера графа произошла ошибка!");
                     listener.onFinished(null, e);
                 }
             }
@@ -137,6 +149,7 @@ public class Filer {
 
 
     public static void savePropertiesToFile(Properties properties, String fileName, OnPerformed listener) {
+        Log.getForLevel(Settings.logLevel).info().say("Сохранение параметров в файл '" + fileName + "'...");
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             public Void doInBackground() throws Exception {
@@ -149,8 +162,10 @@ public class Filer {
             public void done() {
                 try {
                     get();
+                    Log.getForLevel(Settings.logLevel).good().say("Сохранение параметров успешно завершено!");
                     listener.onFinished(null);
                 } catch (Exception e) {
+                    Log.getForLevel(Settings.logLevel).bad().say("При сохранении параметров произошла ошибка!");
                     listener.onFinished(e);
                 }
             }
@@ -160,6 +175,7 @@ public class Filer {
     }
 
     public static void loadPropertiesFromFile(String fileName, OnPropertiesLoaded listener) {
+        Log.getForLevel(Settings.logLevel).info().say("Загрузка параметров из файла '" + fileName + "'...");
         SwingWorker<Properties, Void> worker = new SwingWorker<>() {
             @Override
             public Properties doInBackground() throws Exception {
@@ -173,8 +189,10 @@ public class Filer {
             public void done() {
                 try {
                     Properties prop = get();
+                    Log.getForLevel(Settings.logLevel).good().say("Загрузка параметров успешно завершено!");
                     listener.onFinished(prop, null);
                 } catch (Exception e) {
+                    Log.getForLevel(Settings.logLevel).bad().say("При загрузке параметров произошла ошибка!");
                     listener.onFinished(null, e);
                 }
             }
@@ -186,6 +204,7 @@ public class Filer {
 
 
     public static void copyFile(String fileName, String newFileName, OnPerformed listener) {
+        Log.getForLevel(Settings.logLevel).info().say("Копирование файла '" + fileName + "' в файл '" + newFileName + "'...");
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             public Void doInBackground() throws Exception {
@@ -196,8 +215,10 @@ public class Filer {
             public void done() {
                 try {
                     get();
+                    Log.getForLevel(Settings.logLevel).good().say("Копирование файла успешно завершено!");
                     listener.onFinished(null);
                 } catch (Exception e) {
+                    Log.getForLevel(Settings.logLevel).bad().say("При копировании файла произошла ошибка!");
                     listener.onFinished(e);
                 }
             }
@@ -207,6 +228,7 @@ public class Filer {
     }
 
     public static void deleteFile(String fileName, OnPerformed listener) {
+        Log.getForLevel(Settings.logLevel).info().say("Удаление файла '" + fileName + "'...");
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             public Void doInBackground() throws Exception {
@@ -217,8 +239,10 @@ public class Filer {
             public void done() {
                 try {
                     get();
+                    Log.getForLevel(Settings.logLevel).good().say("Удаление файла успешно завершено!");
                     listener.onFinished(null);
                 } catch (Exception e) {
+                    Log.getForLevel(Settings.logLevel).bad().say("При удалении файла произошла ошибка!");
                     listener.onFinished(e);
                 }
             }
@@ -228,6 +252,7 @@ public class Filer {
     }
 
     public static void removeFolder(String dirName, OnPerformed listener) {
+        Log.getForLevel(Settings.logLevel).info().say("Удаление каталога '" + dirName + "'...");
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             public Void doInBackground() throws Exception {
@@ -235,12 +260,14 @@ public class Filer {
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                         Files.delete(file);
+                        Log.getForLevel(Settings.logLevel).info().say("Файл '" + file.toAbsolutePath().toString() + "' удалён.");
                         return FileVisitResult.CONTINUE;
                     }
 
                     @Override
                     public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
                         Files.delete(dir);
+                        Log.getForLevel(Settings.logLevel).info().say("Каталог '" + dir.toAbsolutePath().toString() + "' удалён.");
                         return FileVisitResult.CONTINUE;
                     }
                 });
@@ -250,8 +277,10 @@ public class Filer {
             public void done() {
                 try {
                     get();
+                    Log.getForLevel(Settings.logLevel).good().say("Удаление каталога успешно завершено!");
                     listener.onFinished(null);
                 } catch (Exception e) {
+                    Log.getForLevel(Settings.logLevel).bad().say("При удалении каталога произошла ошибка!");
                     listener.onFinished(e);
                 }
             }
@@ -261,6 +290,7 @@ public class Filer {
     }
 
     public static void addFolder(String dirName, OnPerformed listener) {
+        Log.getForLevel(Settings.logLevel).info().say("Создание каталога '" + dirName + "'...");
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             public Void doInBackground() throws Exception {
@@ -272,8 +302,10 @@ public class Filer {
             public void done() {
                 try {
                     get();
+                    Log.getForLevel(Settings.logLevel).good().say("Создание каталога успешно завершено!");
                     listener.onFinished(null);
                 } catch (Exception e) {
+                    Log.getForLevel(Settings.logLevel).bad().say("При создании каталога произошла ошибка!");
                     listener.onFinished(e);
                 }
             }

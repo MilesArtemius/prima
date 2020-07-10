@@ -81,7 +81,7 @@ public class Log {
 
     public static void consumeException(String comment, Exception e) {
         gui(Attributes.BOLD).col(Colors.RED).say(comment);
-        cui().beg("WARNING!!! ").say(e.getMessage());
+        cui().beg("WARNING!!! \n").say(e.getMessage());
     }
 
 

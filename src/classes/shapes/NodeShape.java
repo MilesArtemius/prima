@@ -12,7 +12,6 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
-import java.text.ParseException;
 
 public class NodeShape extends Ellipse2D.Double {
     private NodePlus node;
@@ -47,7 +46,7 @@ public class NodeShape extends Ellipse2D.Double {
 
 
     public boolean pressMouse(GraphShape parent, MouseEvent e, Point2D absolute) {
-        Log.cui().say("Mouse pressed on node '", node, "'");
+        Log.cui().say("Нажатие кнопки мыши по узлу '", node, "'.");
         if (SwingUtilities.isRightMouseButton(e)) {
             MenuPopUp popUp = new MenuPopUp(parent);
             popUp.show(e.getComponent(), (int) absolute.getX(), (int) absolute.getY());
@@ -56,7 +55,7 @@ public class NodeShape extends Ellipse2D.Double {
     }
 
     public boolean releaseMouse(GraphShape parent, MouseEvent e, Point2D absolute) {
-        Log.cui().say("Mouse released from node '", node, "'");
+        Log.cui().say("Освобождение кнопки мыши в узле '", node, "'.");
         if (SwingUtilities.isLeftMouseButton(e)) parent.unRegisterMoving(this.node, e);
         return true;
     }
@@ -70,8 +69,10 @@ public class NodeShape extends Ellipse2D.Double {
 
     private class MenuPopUp extends JPopupMenu {
         public MenuPopUp(GraphShape parent) {
+            Log.cui().say("Вызвано меню NodeShape.");
             JMenuItem remove = new JMenuItem(Settings.getString("remove_node_action"));
             remove.addActionListener(e -> {
+                Log.cui().say("Вызбран элемент '" + remove.getName()  + "'.");
                 parent.getGraph().deleteNode(NodeShape.this.node.getName());
                 parent.repaint();
             });
@@ -79,15 +80,14 @@ public class NodeShape extends Ellipse2D.Double {
 
             JMenuItem rename = new JMenuItem(Settings.getString("rename_node_action"));
             rename.addActionListener(e -> {
+                Log.cui().say("Вызбран элемент '" + rename.getName()  + "'.");
                 NodeNameDialog dialog = new NodeNameDialog(SwingUtilities.getWindowAncestor(parent),
                         Settings.getString("rename_node_dialog_name"), true);
-                dialog.setListener(e12 -> {
-                    if (!dialog.getResult().equals("")) {
-                        String nodeName = dialog.getResult();
+                dialog.setListener(value -> {
+                    if (!value.equals("")) {
                         dialog.dispose();
-
-                        Log.cui().say("Renamed node: '", NodeShape.this.node.getName(), "' to '" + nodeName + "'");
-                        parent.getGraph().changeNode(NodeShape.this.node.getName(), nodeName);
+                        Log.cui().say("Renamed node: '", NodeShape.this.node.getName(), "' to '" + value + "'");
+                        parent.getGraph().changeNode(NodeShape.this.node.getName(), value);
                         parent.repaint();
                     }
                 });
@@ -102,18 +102,13 @@ public class NodeShape extends Ellipse2D.Double {
                 if ((node == NodeShape.this.node) || (NodeShape.this.node.getArkTo(node) != null)) continue;
                 JMenuItem item = new JMenuItem(node.getName());
                 item.addActionListener(e -> {
+                    Log.cui().say("Вызбран элемент '" + connect.getName() + " -> " + item.getName()  + "'.");
                     ArkWeightDialog dialog = new ArkWeightDialog(SwingUtilities.getWindowAncestor(parent), Settings.getString("create_ark_dialog_name"));
-                    dialog.setListener(e1 -> {
-                        try {
-                            int arkWeight = dialog.getResult();
-                            dialog.dispose();
-
-                            Log.cui().say("Connecting node '", NodeShape.this.node, "' with node '", node, "'");
-                            parent.getGraph().addArk(NodeShape.this.node.getName(), node.getName(), arkWeight);
-                            parent.repaint();
-                        } catch (ParseException pe) {
-                            pe.printStackTrace();
-                        }
+                    dialog.setListener(value -> {
+                        dialog.dispose();
+                        Log.cui().say("Connecting node '", NodeShape.this.node, "' with node '", node, "'");
+                        parent.getGraph().addArk(NodeShape.this.node.getName(), node.getName(), value);
+                        parent.repaint();
                     });
                     dialog.pack();
                     dialog.setLocationRelativeTo(parent);

@@ -82,7 +82,7 @@ public class PrimaVisual {
         graph = new GraphShape();
         Filer.OnGraphLoaded loadListner = (loadedGraph, reason) -> {
             if (reason != null) {
-                Log.consumeException("Файл не найден или содержимое файла повреждено", reason);
+                Log.consumeException("Файл графа не найден или его содержимое повреждено!", reason);
                 graph.setGraph(new Graph());
             } else {
                 graph.setGraph(loadedGraph);
@@ -118,32 +118,38 @@ public class PrimaVisual {
         newGraph = new JMenu();
         emptyGraph = new JMenuItem();
         emptyGraph.addActionListener(e -> {
+            Log.gui().info().say("Создание пустого графа...");
             setOpenFileName("");
             graph.setGraph(new Graph());
             algorithm = new PrimaAlgorithm();
             graph.repaint();
+            Log.gui().good().say("Пустой граф успешно создан!");
         });
         Filer.OnGraphLoaded listener = (graph, reason) -> {
             if (reason == null) {
                 PrimaVisual.this.graph.setGraph(graph);
                 PrimaVisual.this.algorithm = new PrimaAlgorithm();
                 PrimaVisual.this.graph.repaint();
+                Log.gui().good().say("Граф успешно загружен!");
             } else{
-                Log.consumeException("Ошибка при загрузке графа из ресурсов программы", reason);
+                Log.consumeException("Ошибка при загрузке графа из ресурсов программы!", reason);
             }
         };
         sampleGraph = new JMenuItem();
         sampleGraph.addActionListener(e -> {
+            Log.gui().info().say("Загрузка тестового графа...");
             setOpenFileName("");
             Filer.loadGraphFromResources(Filer.SAMPLE_GRAPH, listener);
         });
         bipartiteGraph = new JMenuItem();
         bipartiteGraph.addActionListener(e -> {
+            Log.gui().info().say("Загрузка тестового двудольного графа...");
             setOpenFileName("");
             Filer.loadGraphFromResources(Filer.BIPARTITE_GRAPH, listener);
         });
         petersonGraph = new JMenuItem();
         petersonGraph.addActionListener(e -> {
+            Log.gui().info().say("Загрузка графа Петерсона...");
             setOpenFileName("");
             Filer.loadGraphFromResources(Filer.PETERSON_GRAPH, listener);
         });
@@ -153,8 +159,9 @@ public class PrimaVisual {
         newGraph.add(petersonGraph);
         openGraph = new JMenuItem();
         openGraph.addActionListener(e -> {
+            Log.gui().info().say("Загрузка графа из файла...");
             JFileChooser fileDialog = new JFileChooser();
-            fileDialog.setDialogTitle("Choose graph file");
+            fileDialog.setDialogTitle("Открыть граф...");
             fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
             fileDialog.setDialogType(JFileChooser.OPEN_DIALOG);
             fileDialog.setFileFilter(new FileNameExtensionFilter("GRAPH FILES", Filer.GRAPH_FILE_EXTENSION));
@@ -162,53 +169,41 @@ public class PrimaVisual {
 
             int status = fileDialog.showOpenDialog(root);
             if (status == JFileChooser.APPROVE_OPTION) {
-                System.out.println(fileDialog.getSelectedFile().getAbsolutePath());
                 PrimaVisual.this.setOpenFileName(fileDialog.getSelectedFile().getAbsolutePath());
 
                 Filer.loadGraphFromFile(fileDialog.getSelectedFile().getAbsolutePath(), true, (graph, reason) -> {
-                    if (reason != null) {
-                        Log.consumeException("Файл не найден или содержимое файла повреждено", reason);
-                    } else {
+                    if (reason != null) Log.consumeException("Файл графа не найден или содержимое файла повреждено!", reason);
+                    else {
                         PrimaVisual.this.graph.setGraph(graph);
                         PrimaVisual.this.graph.repaint();
+                        Log.gui().good().say("Граф успешно загружен!");
                     }
                 });
-            } else if (status == JFileChooser.CANCEL_OPTION) {
-                System.out.println("Graph file not chosen!");
-            }
+            } else if (status == JFileChooser.CANCEL_OPTION) Log.gui().warn().say("Файл графа не выбран!");
         });
         saveGraphAs = new JMenuItem();
         saveGraphAs.addActionListener(e -> {
             JFileChooser fileDialog = new JFileChooser();
-            fileDialog.setDialogTitle("Save graph file as");
+            fileDialog.setDialogTitle("Сохранить граф как...");
             fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
             fileDialog.setDialogType(JFileChooser.SAVE_DIALOG);
-            fileDialog.setFileFilter(new FileNameExtensionFilter("GRAPH FILES", Filer.GRAPH_FILE_EXTENSION));
+            fileDialog.setFileFilter(new FileNameExtensionFilter("ФАЙЛЫ ГРАФОВ", Filer.GRAPH_FILE_EXTENSION));
             fileDialog.setAcceptAllFileFilterUsed(false);
 
             int status = fileDialog.showOpenDialog(root);
             if (status == JFileChooser.APPROVE_OPTION) {
-                System.out.println(fileDialog.getSelectedFile().getAbsolutePath());
                 PrimaVisual.this.setOpenFileName(fileDialog.getSelectedFile().getAbsolutePath());
 
                 Filer.saveGraphToFile(PrimaVisual.this.graph.getGraph(), fileDialog.getSelectedFile().getAbsolutePath(), reason -> {
-                    if (reason == null) {
-                        Log.gui(Log.Attributes.BOLD).col(Log.Colors.GREEN).say("Graph saved!");
-                    } else {
-                        Log.consumeException("Файл не может быть сохранён", reason);
-                    }
+                    if (reason == null) Log.gui().good().say("Граф сохранён!");
+                    else Log.consumeException("Файл графа не может быть сохранён!", reason);
                 });
-            } else if (status == JFileChooser.CANCEL_OPTION) {
-                System.out.println("Graph file not chosen!");
-            }
+            } else if (status == JFileChooser.CANCEL_OPTION) Log.gui().warn().say("Файл графа не выбран!");
         });
         saveGraph = new JMenuItem();
         saveGraph.addActionListener(e -> Filer.saveGraphToFile(graph.getGraph(), openedFileName, reason -> {
-            if (reason == null) {
-                Log.gui(Log.Attributes.BOLD).col(Log.Colors.GREEN).say("Graph saved!");
-            } else {
-                Log.consumeException("Файл не может быть сохранён", reason);
-            }
+            if (reason == null) Log.gui(Log.Attributes.BOLD).col(Log.Colors.GREEN).say("Граф сохранён!");
+            else Log.consumeException("Файл графа не может быть сохранён!", reason);
         }));
         preserveGraph = new JMenuItem();
         preserveGraph.addActionListener(e -> preserve(false));
@@ -223,7 +218,13 @@ public class PrimaVisual {
     private void initSettingsMenu() {
         setParameter = new JMenuItem();
         setParameter.addActionListener(e -> {
-            ParameterChangeDialog pcd = new ParameterChangeDialog(graph, SwingUtilities.getWindowAncestor(root), "Reset setting");
+            ParameterChangeDialog pcd = new ParameterChangeDialog(SwingUtilities.getWindowAncestor(root), "Изменить параметр...");
+            pcd.setListener((key, value) -> {
+                if (!key.equals("")) Settings.alterParameter(key, value, () -> {
+                    pcd.dispose();
+                    graph.repaint();
+                });
+            });
             pcd.pack();
             pcd.setLocationRelativeTo(root);
             pcd.setVisible(true);
@@ -247,35 +248,27 @@ public class PrimaVisual {
         setFilePath = new JMenuItem();
         setFilePath.addActionListener(e -> {
             JFileChooser fileDialog = new JFileChooser();
-            fileDialog.setDialogTitle("Set directory");
+            fileDialog.setDialogTitle("Выбор каталога...");
             fileDialog.setDialogType(JFileChooser.OPEN_DIALOG);
             fileDialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             fileDialog.setAcceptAllFileFilterUsed(false);
 
             int status = fileDialog.showOpenDialog(root);
-            if (status == JFileChooser.APPROVE_OPTION) {
-                System.out.println(fileDialog.getSelectedFile().getAbsolutePath());
-                Settings.alterUserPath(fileDialog.getSelectedFile().getAbsolutePath(), this::reEnableAll);
-            } else if (status == JFileChooser.CANCEL_OPTION) {
-                System.out.println("User directory not chosen!");
-            }
+            if (status == JFileChooser.APPROVE_OPTION) Settings.alterUserPath(fileDialog.getSelectedFile().getAbsolutePath(), this::reEnableAll);
+            else if (status == JFileChooser.CANCEL_OPTION) Log.gui().warn().say("Каталог для файлов конфигурации не выбран!");
         });
         addUserLocale = new JMenuItem();
         addUserLocale.addActionListener(e -> {
             JFileChooser fileDialog = new JFileChooser();
-            fileDialog.setDialogTitle("Choose localization file");
+            fileDialog.setDialogTitle("Выбор файла локализации...");
             fileDialog.setDialogType(JFileChooser.OPEN_DIALOG);
             fileDialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
-            fileDialog.setFileFilter(new FileNameExtensionFilter("PROPERTIES FILES", Filer.PROPERTIES_FILE_EXTENSION));
+            fileDialog.setFileFilter(new FileNameExtensionFilter("ФАЙЛЫ КОНФИГУРАЦИИ", Filer.PROPERTIES_FILE_EXTENSION));
             fileDialog.setAcceptAllFileFilterUsed(false);
 
             int status = fileDialog.showOpenDialog(root);
-            if (status == JFileChooser.APPROVE_OPTION) {
-                System.out.println(fileDialog.getSelectedFile().getAbsolutePath());
-                Settings.alterLocalization(fileDialog.getSelectedFile().getAbsolutePath(), this::resetAllNames);
-            } else if (status == JFileChooser.CANCEL_OPTION) {
-                System.out.println("Localization file not chosen!");
-            }
+            if (status == JFileChooser.APPROVE_OPTION) Settings.alterLocalization(fileDialog.getSelectedFile().getAbsolutePath(), this::resetAllNames);
+            else if (status == JFileChooser.CANCEL_OPTION) Log.gui().warn().say("Файл локализации не выбран!");
         });
         clearFilePath = new JMenu();
         clearAll = new JMenuItem();
@@ -337,9 +330,9 @@ public class PrimaVisual {
         Settings.setPref(Settings.preservedGraph, fileName);
         Filer.OnPerformed listener = reason -> {
             if (reason == null) {
-                Log.gui(Log.Attributes.BOLD).col(Log.Colors.GREEN).say("Graph saved as " + fileName + "!");
+                Log.gui().good().say("Граф сохранён в файл '" + fileName + "'!");
             } else {
-                Log.consumeException("Файл не может быть сохранён", reason);
+                Log.consumeException("Файл графа не может быть сохранён!", reason);
             }
         };
         if (!isFinal) Filer.saveGraphToFile(graph.getGraph(), fileName, listener);
@@ -370,46 +363,46 @@ public class PrimaVisual {
     private void resetAllNames() {
         setOpenFileName(openedFileName);
 
-        fileMenu.setText("File");
-        newGraph.setText("New...");
-        emptyGraph.setText("Empty graph");
-        sampleGraph.setText("Sample graph");
-        bipartiteGraph.setText("Sample bipartite graph");
-        petersonGraph.setText("Peterson graph");
-        openGraph.setText("Open...");
-        saveGraphAs.setText("Save as...");
-        saveGraph.setText("Save");
-        preserveGraph.setText("Preserve");
+        fileMenu.setText("Файл");
+        newGraph.setText("Создать");
+        emptyGraph.setText("Пустой граф");
+        sampleGraph.setText("Тестовый графа");
+        bipartiteGraph.setText("Тестовый двудольный граф");
+        petersonGraph.setText("Граф Петерсона");
+        openGraph.setText("Открыть...");
+        saveGraphAs.setText("Сохранить как...");
+        saveGraph.setText("Сохранить");
+        preserveGraph.setText("Записать");
 
-        settingsMenu.setText("Settings");
-        setParameter.setText("Set parameter");
-        changeLocalization.setText("Change localization");
+        settingsMenu.setText("Настройки");
+        setParameter.setText("Установить параметр");
+        changeLocalization.setText("Изменить локализацию");
         userLocale.setText(Settings.getString("user_defined_localization_name"));
         englishLocale.setText(Settings.Locales.ENGLISH.getLocale());
         russianLocale.setText(Settings.Locales.RUSSIAN.getLocale());
         germanLocale.setText(Settings.Locales.GERMAN.getLocale());
         latinLocale.setText(Settings.Locales.LATIN.getLocale());
-        setFilePath.setText("Set default file path");
-        addUserLocale.setText("Add user-defined localization");
-        clearFilePath.setText("Clear default file path");
-        clearAll.setText("Clear everything");
-        clearConstants.setText("Clear user-defined constants");
-        clearDictionary.setText("Clear user-defined localization");
+        setFilePath.setText("Установить путь к файлам конфигурации");
+        addUserLocale.setText("Добавить пользовательскую локализацию");
+        clearFilePath.setText("Очистить файлы конфигурации...");
+        clearAll.setText("Полностью");
+        clearConstants.setText("Только параметры");
+        clearDictionary.setText("Только локализацию");
 
-        helpMenu.setText("Help");
-        aboutApp.setText("About app");
-        aboutUs.setText("About us");
+        helpMenu.setText("Помощь");
+        aboutApp.setText("О программе");
+        aboutUs.setText("О нас");
 
-        menuText.setText("Thanks for using our wonderful app!");
-        visualizationText.setText("Graph:");
-        logsTitle.setText("Logs:");
+        menuText.setText("Спасибо за использование нашей программы!");
+        visualizationText.setText("Граф:");
+        logsTitle.setText("Логи:");
 
-        clearLogs.setText("Clear logs");
-        launch.setText("Launch!");
-        forward.setText("Step forward");
-        backward.setText("Step backward");
-        test.setText("Run tests");
-        reset.setText("Reset graph");
+        clearLogs.setText("Очистить логи");
+        launch.setText("Запустить алгоритм!");
+        forward.setText("Шаг вперёд");
+        backward.setText("Шаг назад");
+        test.setText("Провести тестирование");
+        reset.setText("Очистить граф");
     }
 
     public JPanel getMainPanel() {
@@ -433,29 +426,78 @@ public class PrimaVisual {
     }
 
     private String aboutUs() {
-        return "<html>"
+        return "<html>" +
+                "<font size=\"4\"><b><font size=\"5\">Студенты ЛЭТИ, <br>" +
+                "разрабатывающие данную программу:</font></b><br>"
                 + "<img src=\""
-                + PrimaVisual.class.getResource("/resource/path/to/image1")
-                + "\">"
+                + PrimaVisual.class.getResource("/stone.jpg")
+                + "\"><br>" +
+                "Сергеев Александр, группа 8304<br>" +
+                "*почта*<br>"
                 + "<img src=\""
-                + PrimaVisual.class.getResource("/resource/path/to/image2")
-                + "\">"
-                + "The text</html>";
+                + PrimaVisual.class.getResource("/stone.jpg")
+                + "\"><br>" +
+                "Алтухов Александр, группа 8304<br>" +
+                "*почта*<br>"
+                + "<img src=\""
+                + PrimaVisual.class.getResource("/stone.jpg")
+                + "\"><br>" +
+                "Звегинцева Елизавета, группа 8381<br>" +
+                "elli.zveg@gmail.com<br>"
+                + "</html>";
     }
 
     private String aboutApp() {
-        return "<html>"
+        return "<html>"+
+                "<font size=\"4\"><b><font size=\"5\">&#9Алгоритм Прима</font></b><br> " +
+                "&#9Алгоритм Прима - алгоритм построения <br>" +
+                "минимального остовного дерева взвешенного связного <br>" +
+                "неориентированного графа. <br>" +
+                "&#9Алгоритм впервые был открыт в 1930 году чешским <br>" +
+                "математиком Войцехом Ярником, позже переоткрыт Робертом <br>" +
+                "Примом в 1957 году, и, независимо от них, Э. Дейкстрой <br>" +
+                "в 1959 году.<br>" +
+                "&#9На вход алгоритма подаётся связный неориентированный <br>" +
+                "граф. Для каждого ребра задаётся его стоимость.<br>" +
+                "Сначала берётся произвольная вершина и находится ребро, <br>" +
+                "инцидентное данной вершине и обладающее <br>" +
+                "наименьшей стоимостью. Найденное ребро и соединяемые им <br>" +
+                "две вершины образуют дерево. Затем, <br>" +
+                "рассматриваются рёбра графа, один конец которых — <br>" +
+                "уже принадлежащая дереву вершина,<br>" +
+                " а другой — нет; из этих рёбер выбирается ребро <br>" +
+                "наименьшей стоимости. Выбираемое на каждом шаге ребро<br>" +
+                " присоединяется к дереву. Рост дерева происходит <br>" +
+                "до тех пор, пока не будут исчерпаны все вершины исходного графа.<br>" +
+                "&#9Результатом работы алгоритма <br>" +
+                "является остовное дерево минимальной стоимости.<br>"
                 + "<img src=\""
-                + PrimaVisual.class.getResource("/resource/path/to/image1")
+                + PrimaVisual.class.getResource("/stone.jpg")
                 + "\">"
+                +"<br>Рисунок 1 - Начальный граф<br>"
                 + "<img src=\""
-                + PrimaVisual.class.getResource("/resource/path/to/image2")
+                + PrimaVisual.class.getResource("/stone.jpg")
                 + "\">"
-                + "The text</html>";
+                + "<br>Рисунок 2 - Граф после завершения алгоритма Прима<br>" +
+                "<br><font size=\"4\"><b><font size=\"5\">&#9Создание графа.</font></b><br><br>" +
+                "Создание вершин и ребер:<br>" +
+                "1)Для создания вершины необходимо в любом свободном<br>" +
+                "месте полотна совершить клик ПКМ.<br>" +
+                "2)Для создания ребра между двумя вершинами необходимо:<br>" +
+                "-совершить клик ПМК по вершине, с которой хотите соединить <br>" +
+                " ребро;<br>" +
+                "-выбрать пункт меню Соединить с... и выбрать вершину<br>" +
+                "<br>" +
+                "Редактирование вершин и ребер:<br>" +
+                "1)Вершины можно перетаскивать, зажав на них ЛКМ.<br>" +
+                "2)Для изменения имени вершины можно нажать ПКМ на нее<br>" +
+                "и выбрать пункт из меню.<br>" +
+                "3)Для удаления вершины или ребра необходимо выбрать<br>" +
+                "пункт Удалить из меню ПКМ.</html>";
     }
 
     private void displayAboutDialog(String HTML) {
-        AboutDialog dialog = new AboutDialog(SwingUtilities.getWindowAncestor(root), HTML);
+        AboutDialog dialog = new AboutDialog(SwingUtilities.getWindowAncestor(root), Settings.getString("about_dialog_name"), HTML);
         dialog.pack();
         dialog.setLocationRelativeTo(root);
         dialog.setVisible(true);
