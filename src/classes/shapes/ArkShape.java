@@ -117,6 +117,7 @@ public class ArkShape extends Polygon {
                 dialog.setListener(value -> {
                     dialog.dispose();
                     ArkShape.this.ark.setWeight(value);
+                    parent.getGraph().setRecentlyChanged(true);
                     parent.repaint();
                 });
                 dialog.pack();

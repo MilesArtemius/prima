@@ -33,7 +33,7 @@ public class Graph {
         if (node != null){
 
             for (int i = node.getArks().size()-1; i>=0; i--) {
-                deleteArk(node, getNode(node.getArks().get(i).getStart()) == node ? getNode(node.getArks().get(i).getStart()) : getNode(node.getArks().get(i).getEnd()));
+                deleteArk(node, getNode(node.getArks().get(i).getStart()) == node ? getNode(node.getArks().get(i).getEnd()) : getNode(node.getArks().get(i).getStart()));//????!?!?!??!?!
             }
             nodes.remove(name);
             setRecentlyChanged(true);
@@ -145,13 +145,17 @@ public class Graph {
     public void restoreHistory(){
         History.NodePlusArk val = history.restore();
         if (val != null){
-            if (val.ark!=null)
+            if (val.ark!=null){
                 val.ark.hideArk();
+                Log.gui().say("Из решения удалено ", val.ark);
+            }
+
             val.node.hideNode();
+            Log.gui().say("Из решения удален ", val.node.toSimpleString());
 
         }
         else {
-            Log.gui().say("Начало уже достигнуто");
+            Log.gui().warn().say("Начало уже достигнуто");
         }
     }
 
@@ -160,8 +164,10 @@ public class Graph {
     }
 
     public void reset(){
-        for (Map.Entry<String, Node> node: nodes.entrySet()) node.getValue().hideNode();
-        for (Ark ark: arks) ark.hideArk();
+        //for (Map.Entry<String, Node> node: nodes.entrySet()) node.getValue().hideNode();
+        //for (Ark ark: arks) ark.hideArk();
+        setRecentlyChanged(true);
+
     }
 
 

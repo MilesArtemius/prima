@@ -35,6 +35,9 @@ public class NodePlus extends Node {
 
         return super.toString() + ", позиция: (" + position.getX() + ", " + position.getY() + ")";
     }
+    public String toSimpleString(){
+        return super.toString();
+    }
 
     @Override
     public Map<String, Object> writeToMap() {

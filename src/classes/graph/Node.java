@@ -73,6 +73,9 @@ public class Node {
 
         return "Узел "+ name;
     }
+    public String toSimpleString(){
+        return "Узел "+ name;
+    }
 
     public Map<String, Object> writeToMap() {
         Map<String, Object> map = new HashMap<>();

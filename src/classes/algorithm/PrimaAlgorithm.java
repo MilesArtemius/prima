@@ -9,6 +9,8 @@ import classes.graph.Node;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class PrimaAlgorithm implements Algorithm {
@@ -93,8 +95,8 @@ public class PrimaAlgorithm implements Algorithm {
 
     private void logResult(){
         for (Ark ark: graph.getArks()){
-            Log.getForLevel(logLevel).say("Ребро с весом ", Double.toString(ark.getWeight()) , (ark.isHidden()? " не добавлено.": " добавлено."));
-            //System.out.println("Ребро с весом " + Double.toString(ark.getWeight()) + (ark.isHidden()? " не добавлено.": " добавлено."));
+            //Log.getForLevel(logLevel).say("Ребро с весом ", Double.toString(ark.getWeight()) , (ark.isHidden()? " не добавлено.": " добавлено."));
+
         }
 
 
@@ -111,30 +113,19 @@ public class PrimaAlgorithm implements Algorithm {
         }
         return count;
     }
-/*
-    public Thread threadSolve(Graph graph){
 
-        Thread thread = new Thread(() -> solveStep(graph));
-        thread.start();
-        return thread;
-    }
-
-    public Thread threadSolveAll(Graph graph){
-        Thread thread = new Thread(() -> solve(graph));
-        thread.start();
-        return thread;
-
-    }
-
- */
     @Override
     public Graph solve(Graph graph){//сюда изначальный целый граф. Само запустит функции подготовки и решения.
-        prepareGraph(graph);
-        while (solveStep() != null) {
-            //решаем
+        if (prepareGraph(graph)!=null){
+            while (solveStep() != null) {
+                //решаем
+            }
+            logResult();
+            return graph;
+
         }
-        logResult();
-        return graph;
+        return null;
+
     }
 
     @Override
@@ -172,7 +163,7 @@ public class PrimaAlgorithm implements Algorithm {
             }
             else{
                 //решение завершено
-                Log.getForLevel(logLevel).say("Решение завершено");
+                Log.getForLevel(logLevel).good().say("Решение завершено");
                 return null;
             }
 
@@ -209,10 +200,17 @@ public class PrimaAlgorithm implements Algorithm {
             graph.setRecentlyChanged(false);
         }
         if (isPrepared){
+            return graph;
+        }
+        if (graph.isEmpty()){
+            Log.getForLevel(logLevel).bad().say("Граф пустой, запуск алгоритма невозможен.");
             return null;
         }
-
+        if (!checkConnectivity(graph)){
+            return null;
+        }
         isPrepared = true;
+        Log.getForLevel(logLevel).good().say("Начато решение");
         nodesForSearch = new ArrayList<Node>();
         for (Ark ark: graph.getArks()) {
             ark.hideArk();
@@ -239,9 +237,47 @@ public class PrimaAlgorithm implements Algorithm {
     }
 
     public interface OnSuccess {
-        void listener();//какие аргументы тебе нужны?
+        void listener();
     }
     public interface OnFail {
-        void listener(Exception reason);//какие аргументы тебе нужны?
+        void listener(Exception reason);
+    }
+
+    public boolean checkConnectivity(Graph graph){
+
+        HashMap<String, Boolean> map = new HashMap<>();
+        LinkedList<String> queue = new LinkedList<>();
+        if (!graph.isEmpty()){
+            int randomNum = ThreadLocalRandom.current().nextInt(0, graph.getNodes().size());
+            map.put(graph.getNodes().get(randomNum).getName(), true);
+            queue.addLast(graph.getNodes().get(randomNum).getName());
+
+            while (!queue.isEmpty()){
+                String name = queue.getFirst();
+                queue.removeFirst();
+                for (Ark ark: graph.getNode(name).getArks()){
+                    boolean isStartInMap = map.containsKey(ark.getStart());
+                    boolean isEndInMap = map.containsKey(ark.getEnd());
+                    if (isStartInMap^isEndInMap){
+                        queue.addLast(isStartInMap? ark.getEnd() : ark.getStart());
+                        map.put(isStartInMap? ark.getEnd() : ark.getStart(), true);
+                    }
+
+
+                }
+            }
+
+            if (map.size() == graph.getNodes().size()){
+
+                Log.getForLevel(logLevel).good().say("Граф прошел проверку на связность и пригоден для алгоритма.");
+                return true;
+            }
+            else{
+                Log.getForLevel(logLevel).bad().say("Граф не прошел проверку на связность и непригоден для алгоритма.");
+                return false;
+            }
+        }
+        return false;
+
     }
 }
